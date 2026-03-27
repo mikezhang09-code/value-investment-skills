@@ -42,14 +42,24 @@ value-investment-skills/
 
 ## Installation
 
-### Option 1 — Clone directly into your Claude skills folder
+### Option 1 — Ask Claude to install it (easiest)
+
+Open Claude Code and say:
+
+```
+Install the value-investing skill from https://github.com/mikezhang09-code/value-investment-skills
+```
+
+Claude will run the clone command for you automatically. No terminal needed.
+
+### Option 2 — Clone directly into your Claude skills folder
 
 ```bash
 git clone https://github.com/mikezhang09-code/value-investment-skills.git \
   ~/.claude/skills/value-investing
 ```
 
-### Option 2 — Manual copy
+### Option 3 — Manual copy
 
 1. Clone this repo anywhere:
    ```bash
