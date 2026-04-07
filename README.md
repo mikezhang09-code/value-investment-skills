@@ -31,13 +31,20 @@ value-investment-skills/
 ├── SKILL.md                          # Main skill definition (8-step workflow)
 ├── assets/
 │   └── report-template.md            # Professional investment report template
-└── references/
-    ├── data-sources.md               # Where to find filings for each market
-    ├── financial-analysis.md         # Ratio definitions and scoring framework
-    ├── frameworks.md                 # Graham / Buffett / Munger / Fisher checklists
-    ├── intrinsic-value.md            # Valuation methods (DCF, EPV, Graham Formula)
-    ├── moat-analysis.md              # Competitive moat identification framework
-    └── portfolio-construction.md     # Building a concentrated 10–20 stock portfolio
+├── references/
+│   ├── data-sources.md               # Where to find filings for each market
+│   ├── financial-analysis.md         # Ratio definitions and scoring framework
+│   ├── frameworks.md                 # Graham / Buffett / Munger / Fisher checklists
+│   ├── intrinsic-value.md            # Valuation methods (DCF, EPV, Graham Formula)
+│   ├── moat-analysis.md              # Competitive moat identification framework
+│   └── portfolio-construction.md     # Building a concentrated 10–20 stock portfolio
+└── web-report/                       # Interactive HTML web report generation skill
+    ├── SKILL.md                      # Skill definition — triggers, workflow, checklist
+    └── references/
+        ├── design-system.md          # CSS variables, typography, Chart.js, components
+        ├── single-stock-report.md    # Full template for single-stock deep dives
+        ├── multi-stock-report.md     # Sortable tables, filters, comparison charts
+        └── portfolio-report.md       # Portfolio overview with holdings & scenarios
 ```
 
 ## Installation
@@ -95,6 +102,26 @@ Claude will follow an 8-step research process:
 6. **Margin of Safety** — compare current price to intrinsic value
 7. **Investment Decision** — BUY / ACCUMULATE / MONITOR / PASS / AVOID
 8. **Report Generation** — professional report + optional Excel model
+
+## Web Report Skill (New)
+
+The `web-report/` subdirectory contains an interactive HTML web report generation skill — the visual counterpart to traditional Word/PDF reports. It produces single-file, self-contained HTML pages with:
+
+- **Chart.js visualizations** — revenue/profit combos, margin trends, moat radar, intrinsic value bars, sensitivity tables, scenario analysis, peer comparisons (7+ charts per report)
+- **Three design themes** — Dark Terminal (default), Light Editorial, Dark Luxe — with editorial-grade typography (Playfair Display + Source Sans 3 + IBM Plex Mono)
+- **Bilingual English/Chinese** labeling throughout, with full financial glossary
+- **Three report types** — single-stock deep dive, multi-stock comparison/screening, portfolio overview
+- **Interactive features** — tabbed navigation, sortable tables, filter controls, expandable rows, smooth animations
+- **Responsive & print-friendly** — works from 320px mobile to 1440px desktop, with print stylesheet
+
+### Trigger phrases
+
+```
+"Create a web report for [stock]"
+"Convert this analysis to an HTML page"
+"Build an interactive dashboard for [stock]"
+"Generate an HTML report"
+```
 
 ## Investment Philosophy
 
