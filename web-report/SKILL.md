@@ -40,8 +40,10 @@ defaults, component patterns, and aesthetic guidelines that ensure visual consis
 
 ### 1. Single Stock Analysis Report (most common)
 The flagship output — a comprehensive, tabbed or scrollable analysis page for one company.
-Sections: Executive Summary → Business Overview → Financial Scorecard → Valuation Analysis →
-Moat Analysis → Risk Assessment → Investment Verdict.
+Sections: Quick-Kill Screener → Executive Summary → Business Overview → Financial Scorecard →
+Valuation Analysis → Moat Analysis (with trend) → Industry Analysis → Risk Assessment
+(value traps, inflation scorecard, derivatives) → Sell Criteria Check → Monitoring Indicators →
+Investment Verdict.
 **Read**: `references/single-stock-report.md` + `references/design-system.md`
 
 ### 2. Multi-Stock Comparison Report
@@ -127,6 +129,22 @@ Pattern:
 | Investment Verdict | 投资判定 |
 | Position Sizing | 仓位管理 |
 | Bear / Base / Bull | 悲观 / 基准 / 乐观 |
+| Sell Discipline | 卖出纪律 |
+| Value Trap | 价值陷阱 |
+| Quick-Kill Screener | 快速筛查 |
+| Franchise Business | 特许经营型企业 |
+| Commodity Business | 大宗商品型企业 |
+| Institutional Imperative | 机构驱动力 |
+| Look-Through Earnings | 透视盈余 |
+| Economic Goodwill | 经济商誉 |
+| Inflation Scorecard | 通胀评分卡 |
+| Derivatives Exposure | 衍生品敞口 |
+| Moat Trend | 护城河趋势 |
+| Combined Ratio | 综合成本率 |
+| Insurance Float | 保险浮存金 |
+| Sell Criteria Check | 卖出标准检查 |
+| Monitoring Indicators | 监测指标 |
+| Sell Triggers | 卖出触发信号 |
 
 ---
 
@@ -149,7 +167,14 @@ Before delivering, verify:
 - [ ] All fonts load from Google Fonts
 - [ ] Responsive: looks good on 320px mobile through 1440px desktop
 - [ ] Bilingual labels on all section headers and key metrics
-- [ ] Verdict badge prominently displayed (BUY green / HOLD amber / AVOID red)
+- [ ] Verdict badge prominently displayed (BUY green / HOLD amber / AVOID red / SELL red)
+- [ ] Quick-Kill Screener panel present with 8-question pass/fail grid
+- [ ] Moat trend indicator present (Widening ▲ / Stable ● / Narrowing ▼)
+- [ ] Sell Criteria Check table present (mandatory for HOLD/SELL verdicts)
+- [ ] Value Trap Diagnostic table present with 5-type check
+- [ ] Industry-specific KPI card present (if relevant sector)
+- [ ] Inflation Scorecard present (if macro overlay is relevant)
+- [ ] Monitoring Indicators section with quarterly checks + sell triggers
 - [ ] Disclaimer footer present
 - [ ] Data vintage noted (TTM, FY year, date of analysis)
 - [ ] At least 5 Chart.js visualizations for single-stock reports

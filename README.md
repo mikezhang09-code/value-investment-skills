@@ -7,11 +7,17 @@ A Claude Code skill for deep fundamental research and value investing analysis, 
 When installed, this skill gives Claude the ability to:
 
 - Research any publicly listed company as a seasoned fundamental analyst
+- **Quick-Kill screen** stocks with an 8-question pass/fail gate before deep analysis
 - Perform 10-year financial deep dives (revenue, margins, ROE, ROIC, FCF, etc.)
-- Assess competitive moats using Morningstar-style classification
+- Assess competitive moats using Morningstar-style classification **with trend analysis** (widening/stable/narrowing)
+- **Apply industry-specific playbooks** for insurance, banking, consumer, media, energy, railroads, and technology
 - Calculate intrinsic value using multiple methods (DCF, EPV, Graham Formula, DDM)
-- Apply margin of safety analysis and deliver a clear BUY / PASS recommendation
-- Generate professional investor-grade research reports
+- Apply margin of safety analysis and deliver a clear BUY / PASS / SELL recommendation
+- **Run sell discipline checks** — 4 explicit criteria for hold/sell decisions
+- **Identify value traps** using a 5-type diagnostic framework
+- **Assess inflation, goodwill, and derivatives risk** with structured scorecards
+- **Detect behavioral biases** in your own analysis with a 5-point self-check
+- Generate professional investor-grade research reports (Word, PDF, and interactive HTML)
 - Screen for undervalued businesses across **5 markets**: US, Hong Kong, China A-shares, Singapore, and India
 
 ## Markets Covered
@@ -28,16 +34,19 @@ When installed, this skill gives Claude the ability to:
 
 ```
 value-investment-skills/
-├── SKILL.md                          # Main skill definition (8-step workflow)
+├── SKILL.md                          # Main skill definition (10-step workflow with quick-kill screener)
 ├── assets/
 │   └── report-template.md            # Professional investment report template
 ├── references/
 │   ├── data-sources.md               # Where to find filings for each market
 │   ├── financial-analysis.md         # Ratio definitions and scoring framework
 │   ├── frameworks.md                 # Graham / Buffett / Munger / Fisher checklists
+│   ├── industry-playbooks.md         # Sector-specific analysis (insurance, banking, consumer, tech, etc.) [NEW]
+│   ├── inflation-goodwill-derivatives.md  # Inflation scorecard, economic goodwill, derivatives risk [NEW]
 │   ├── intrinsic-value.md            # Valuation methods (DCF, EPV, Graham Formula)
 │   ├── moat-analysis.md              # Competitive moat identification framework
-│   └── portfolio-construction.md     # Building a concentrated 10–20 stock portfolio
+│   ├── portfolio-construction.md     # Building a concentrated 10–20 stock portfolio
+│   └── sell-discipline-and-traps.md  # Sell criteria, value traps, behavioral biases [NEW]
 └── web-report/                       # Interactive HTML web report generation skill
     ├── SKILL.md                      # Skill definition — triggers, workflow, checklist
     └── references/
@@ -92,16 +101,19 @@ Once installed, the skill activates automatically when you ask Claude anything i
 "Analyze Berkshire Hathaway — full deep dive"
 ```
 
-Claude will follow an 8-step research process:
+Claude will follow a 10-step research process:
 
+0. **Quick-Kill Screener** — 8-question gate (must pass before proceeding)
 1. **Identify & Scope** — clarify company, ticker, market, and research depth
 2. **Data Collection** — fetch filings from primary sources (SEC, HKEx, SGX, etc.)
 3. **Financial Analysis** — 10-year quantitative deep dive
-4. **Moat Assessment** — competitive advantage quality and durability
-5. **Intrinsic Valuation** — multiple methods triangulated into a fair value range
-6. **Margin of Safety** — compare current price to intrinsic value
-7. **Investment Decision** — BUY / ACCUMULATE / MONITOR / PASS / AVOID
-8. **Report Generation** — professional report + optional Excel model
+4. **Moat Assessment** — competitive advantage quality, durability, and **trend** (widening/stable/narrowing)
+5. **Industry Analysis** — sector-specific metrics and macro sensitivities **(NEW)**
+6. **Intrinsic Valuation** — multiple methods triangulated into a fair value range
+7. **Margin of Safety** — compare current price to intrinsic value
+8. **Risk & Sell Check** — value trap diagnostic, inflation scorecard, sell criteria **(NEW)**
+9. **Investment Decision** — BUY / ACCUMULATE / MONITOR / PASS / SELL / AVOID
+10. **Report Generation** — professional report + optional Excel model
 
 ## Web Report Skill (New)
 

@@ -36,11 +36,14 @@ defines the section structure, data requirements, and Chart.js visualizations fo
 
   <!-- CONTENT SECTIONS -->
   <main class="container">
-    <div id="tab-summary" class="tab-content active">...</div>
+    <div id="tab-screener" class="tab-content active">...</div>
+    <div id="tab-summary" class="tab-content">...</div>
     <div id="tab-financials" class="tab-content">...</div>
     <div id="tab-valuation" class="tab-content">...</div>
     <div id="tab-moat" class="tab-content">...</div>
+    <div id="tab-industry" class="tab-content">...</div>
     <div id="tab-risk" class="tab-content">...</div>
+    <div id="tab-monitoring" class="tab-content">...</div>
     <div id="tab-verdict" class="tab-content">...</div>
   </main>
 
@@ -224,15 +227,75 @@ renderSensitivityTable(container, matrix, growthRates, discountRates, currentPri
 </div>
 ```
 
+### Moat Trend Indicator (NEW — required)
+Show the moat's direction alongside its strength. This is critical — a narrowing wide moat is more dangerous than a widening narrow moat.
+
+```html
+<div class="moat-trend-panel">
+  <div class="moat-score-badge">9/15 — <span class="moat-wide">Wide Moat</span></div>
+  <div class="moat-trend-arrow trend-stable">● Stable <span class="zh">/ 稳定</span></div>
+  <div class="moat-trend-evidence">Gross margins stable at 44%, NRR >120%, no significant competitive erosion.</div>
+</div>
+```
+
+Trend arrow styling: `▲ Widening` = green, `● Stable` = amber, `▼ Narrowing` = red.
+
+### Franchise vs. Commodity Classification (NEW)
+```html
+<div class="business-model-badge franchise">
+  <span class="en">Franchise Business</span> <span class="zh">/ 特许经营型企业</span>
+</div>
+```
+Badge colors: Franchise = deep green background, Commodity = gray, Hybrid = amber.
+
 ---
 
-## Section 5: Risk Assessment (tab-risk)
+## Section 4b: Industry Analysis (tab-industry) — NEW
+
+### Required Content
+- Industry-specific key metrics (varies by sector) in a KPI card grid
+- Macro sensitivity assessment table
+- Sector-specific risk factors
+- Buffett case study reference (success or failure in this industry)
+
+### Industry KPI Cards Pattern
+```javascript
+// Insurance example
+const industryKPIs = [
+  { label: 'Combined Ratio', labelZh: '综合成本率', value: '95.2%', benchmark: '< 100%', status: 'good' },
+  { label: 'Float Size', labelZh: '浮存金', value: '$164B', benchmark: 'Growing', status: 'good' },
+  { label: 'Underwriting Profit', labelZh: '承保利润', value: '$2.8B', benchmark: '> 0', status: 'good' },
+];
+// Banking example
+const bankingKPIs = [
+  { label: 'ROA', labelZh: '资产回报率', value: '1.3%', benchmark: '> 1.2%', status: 'good' },
+  { label: 'NPL Ratio', labelZh: '不良贷款率', value: '0.8%', benchmark: '< 1%', status: 'good' },
+  { label: 'CET1 Ratio', labelZh: '核心一级资本', value: '12.5%', benchmark: '> 10%', status: 'good' },
+  { label: 'NIM', labelZh: '净利差', value: '2.8%', benchmark: 'vs peers', status: 'ok' },
+];
+```
+
+### Macro Sensitivity Table
+```html
+<table class="macro-sensitivity">
+  <tr><th>Macro Factor / 宏观因素</th><th>Impact / 影响</th><th>Severity</th></tr>
+  <tr><td>Rising Interest Rates</td><td>[sector-specific impact]</td><td class="moderate">Moderate</td></tr>
+  <tr><td>Inflation</td><td>[sector-specific impact]</td><td class="low">Low</td></tr>
+  <tr><td>Economic Recession</td><td>[sector-specific impact]</td><td class="high">High</td></tr>
+</table>
+```
+
+---
+
+## Section 5: Risk Assessment (tab-risk) — EXPANDED
 
 ### Required Content
 - 5–8 risk factors with severity ratings (1–5)
 - Visual risk meters for each factor
-- Impact probability matrix (optional)
-- Mitigation / monitoring checklist
+- **Sell Criteria Check** (4 criteria — mandatory for HOLD/SELL) (NEW)
+- **Value Trap Diagnostic** (5-type check) (NEW)
+- **Inflation Scorecard** (6-factor, if macro relevant) (NEW)
+- **Derivatives Exposure Check** (if applicable) (NEW)
 
 ### Risk Table Pattern
 ```javascript
@@ -244,12 +307,93 @@ const risks = [
 ];
 ```
 
+### Sell Criteria Check Table (NEW — required for HOLD/SELL verdicts)
+```javascript
+const sellCriteria = [
+  { num: 1, criterion: 'Severely Overvalued?', criterionZh: '严重高估？',
+    triggered: false, basis: 'Trading at 15% below base IV estimate' },
+  { num: 2, criterion: 'Moat Destroyed?', criterionZh: '护城河被摧毁？',
+    triggered: false, basis: 'Moat stable; ecosystem lock-in intact, NRR >120%' },
+  { num: 3, criterion: 'Integrity Issue?', criterionZh: '诚信问题？',
+    triggered: false, basis: 'No concerns; transparent reporting, consistent commentary' },
+  { num: 4, criterion: 'Better Opportunity?', criterionZh: '更好的机会？',
+    triggered: false, basis: 'No materially superior alternatives identified at present' },
+];
+// Render as table: green "✓ No" or red "⚠ YES" in the status column
+```
+
+### Value Trap Diagnostic Table (NEW)
+```javascript
+const valueTrapCheck = [
+  { type: 'Structural Decline', typeZh: '结构性衰退',
+    question: 'Will this industry exist in meaningful form in 10 years?', result: 'CLEAR' },
+  { type: 'Commodity Business', typeZh: '大宗商品型企业',
+    question: 'If prices raised 5%, what % of customers leave?', result: 'CLEAR' },
+  { type: 'Poor Capital Allocation', typeZh: '资本配置不良',
+    question: '10-year M&A track record: value-creating or destroying?', result: 'CLEAR' },
+  { type: 'Heavy Assets, Low Returns', typeZh: '重资产低回报',
+    question: 'Is ROIC persistently below WACC?', result: 'CLEAR' },
+  { type: 'Accounting Quality', typeZh: '会计质量问题',
+    question: 'Cash conversion ratio persistently below 70%?', result: 'CLEAR' },
+];
+// Result values: 'CLEAR' (green), 'WARNING' (orange), 'TRAPPED' (red)
+```
+
+### Inflation Scorecard (NEW — include when macro overlay is relevant)
+```javascript
+const inflationFactors = [
+  { factor: 'Pricing Power', factorZh: '定价权', score: +1, rationale: 'Can raise prices 5%+ without volume loss' },
+  { factor: 'Capital Intensity', factorZh: '资本密集度', score: +1, rationale: 'Capex/Rev < 5%' },
+  { factor: 'ROIC Level', factorZh: 'ROIC水平', score: +1, rationale: 'ROIC >15% sustained' },
+  { factor: 'Inventory Exposure', factorZh: '库存敞口', score: +1, rationale: 'Minimal inventory risk' },
+  { factor: 'Debt Structure', factorZh: '债务结构', score: 0, rationale: 'Mixed — some floating rate exposure' },
+  { factor: 'Input Cost Sensitivity', factorZh: '投入成本敏感度', score: 0, rationale: 'Moderate component cost sensitivity' },
+];
+const inflationTotal = 4; // +4 to +6 = resistant, +1 to +3 = moderate, ≤0 = vulnerable
+```
+
+---
+
+## Section 5b: Monitoring & Triggers (tab-monitoring) — NEW
+
+### Required Content
+- Quarterly review checklist (5–7 items to check each quarter)
+- Specific sell trigger signals (conditions that would trigger a position review or exit)
+- Key assumptions that must remain true for the thesis to hold
+- Next review date
+
+### Monitoring Checklist Pattern
+```html
+<div class="monitoring-section">
+  <h3><span class="en">Quarterly Review Checklist</span> <span class="zh">/ 季度审查清单</span></h3>
+  <div class="checklist">
+    <div class="check-item">☐ Revenue trend — accelerating, stable, or decelerating?</div>
+    <div class="check-item">☐ Gross margin trend — widening, stable, or narrowing?</div>
+    <div class="check-item">☐ Cash conversion — still above 80%?</div>
+    <div class="check-item">☐ Management tone — more or less honest than prior quarters?</div>
+    <div class="check-item">☐ Competitive landscape — any new threats or moat changes?</div>
+    <div class="check-item">☐ Capital allocation decisions — value-creating or destroying?</div>
+  </div>
+
+  <h3><span class="en">Sell Trigger Signals</span> <span class="zh">/ 卖出触发信号</span></h3>
+  <div class="trigger-list">
+    <div class="trigger-item trigger-red">⚠ ROIC falls below WACC for 2 consecutive years</div>
+    <div class="trigger-item trigger-red">⚠ Cash conversion drops below 60%</div>
+    <div class="trigger-item trigger-red">⚠ Management integrity scandal — sell immediately</div>
+    <div class="trigger-item trigger-orange">⚡ Moat score drops by 2+ points on the 0–15 scale</div>
+    <div class="trigger-item trigger-orange">⚡ Industry enters structural decline (not cyclical)</div>
+    <div class="trigger-item trigger-orange">⚡ Position appreciated beyond 2× intrinsic value</div>
+  </div>
+</div>
+```
+```
+
 ---
 
 ## Section 6: Investment Verdict (tab-verdict)
 
 ### Required Content
-- Final verdict: BUY / HOLD / AVOID with large badge
+- Final verdict: BUY / HOLD / SELL / AVOID with large badge
 - Position sizing recommendation (Full / Half / Watch)
 - Target price range (bear/base/bull)
 - Entry zone and exit zone
@@ -301,6 +445,16 @@ const risks = [
 5. Intrinsic value range (horizontal bar)
 6. Moat radar (5-dimension)
 7. Peer comparison (horizontal bar)
+
+### Additional Visual Components (NEW — non-Chart.js)
+
+8. Quick-Kill Screener grid (8-cell pass/fail)
+9. Moat Trend indicator (strength badge + directional arrow)
+10. Sell Criteria Check table (4-row traffic light)
+11. Value Trap Diagnostic table (5-row status check)
+12. Inflation Scorecard card (6-factor +1/0/−1)
+13. Industry KPI cards (sector-specific metrics)
+14. Monitoring checklist & sell triggers panel
 
 Optional extras: Sensitivity heatmap (rendered as HTML table), scenario bar chart,
 cash flow waterfall, dividend history, segment growth rates.
@@ -372,6 +526,43 @@ const company = {
     total: 9,  // out of 15
     rating: 'Wide'  // None / Narrow / Wide
   },
+  moatTrend: 'Stable',  // 'Widening' / 'Stable' / 'Narrowing' (NEW)
+  businessModelType: 'Franchise',  // 'Franchise' / 'Commodity' / 'Hybrid' (NEW)
+  
+  // Quick-Kill Screener (NEW)
+  quickKill: {
+    circleOfCompetence: 'PASS',
+    durability: 'PASS',
+    moat: 'PASS',
+    pricingPower: 'PASS',
+    earningsQuality: 'PASS',
+    debtSafety: 'CONDITIONAL',
+    managementIntegrity: 'PASS',
+    reasonablePrice: 'CONDITIONAL',
+    failCount: 0,
+    conditionalCount: 2
+  },
+  
+  // Sell Criteria (NEW)
+  sellCriteria: [
+    { num: 1, criterion: 'Severely Overvalued?', triggered: false, basis: '...' },
+    { num: 2, criterion: 'Moat Destroyed?', triggered: false, basis: '...' },
+    { num: 3, criterion: 'Integrity Issue?', triggered: false, basis: '...' },
+    { num: 4, criterion: 'Better Opportunity?', triggered: false, basis: '...' },
+  ],
+  
+  // Value Trap Check (NEW)
+  valueTrapCheck: {
+    structuralDecline: 'CLEAR',
+    commodityBusiness: 'CLEAR',
+    poorCapitalAllocation: 'CLEAR',
+    heavyAssetsLowReturns: 'CLEAR',
+    accountingQuality: 'CLEAR'
+  },
+  
+  // Inflation Scorecard (NEW)
+  inflationScore: { pricingPower: 1, capitalIntensity: 1, roicLevel: 1,
+                    inventoryExposure: 1, debtStructure: 0, inputCosts: 0, total: 4 },
   
   // Risks
   risks: [...],

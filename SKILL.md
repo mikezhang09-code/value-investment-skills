@@ -10,7 +10,10 @@ description: >
   reports. Trigger on ANY investment research request — even casual ones like
   "what do you think of Apple as an investment?" or "find me some good HK stocks".
   Markets covered: US (SEC EDGAR), Hong Kong (HKEx), China A-shares, Singapore (SGX),
-  India (NSE/BSE).
+  India (NSE/BSE). Also trigger for: sell decisions, hold vs sell reviews, value trap
+  identification, industry-specific analysis (insurance, banking, consumer, media, energy,
+  railroads, technology), inflation impact assessment, derivatives risk, economic goodwill
+  analysis, franchise vs commodity business classification, and behavioral bias checks.
 ---
 
 # Value Investing Research Skill
@@ -30,19 +33,41 @@ The goal is to find **wonderful companies at fair prices** (Buffett) or **fair c
 
 ---
 
+## Quick-Kill Screener (Do This FIRST)
+
+Before any deep analysis, run this 8-question gate. Two "No" answers require strong justification to continue; four "No" answers = pass and move on.
+
+| # | Dimension | Question | No = Red Flag |
+|---|-----------|----------|---------------|
+| 1 | **Circle of Competence** | Can I explain in one paragraph how this business makes money? | Can't explain = outside circle |
+| 2 | **Durability** | Will this company still exist and be stronger in 10 years? | No = disruption/obsolescence risk |
+| 3 | **Moat** | Could a well-funded competitor replicate its core advantage? | Yes = no moat |
+| 4 | **Pricing Power** | Can it raise prices 5–10% without losing significant customers? | No = commodity business |
+| 5 | **Earnings Quality** | Does profit genuinely convert to cash? | No = accounting quality problem |
+| 6 | **Debt Safety** | In a worst case (revenue −30%), can it survive without dilution? | No = leverage risk |
+| 7 | **Management Integrity** | Does management honestly confront problems? | **No = AUTOMATIC VETO** |
+| 8 | **Reasonable Price** | Is the gap between price and intrinsic value wide enough? | No = wait or skip |
+
+> **Q7 is an automatic veto.** Integrity failure overrides everything else.
+
+---
+
 ## Workflow Overview
 
-When asked to research a company or build a portfolio, follow this 8-step process:
+When asked to research a company or build a portfolio, follow this process:
 
 ```
-1. IDENTIFY & SCOPE       → Clarify company, ticker, market, and research depth
-2. DATA COLLECTION        → Fetch filings, reports, financials from primary sources
-3. FINANCIAL ANALYSIS     → 10-year financial deep dive (quantitative)
-4. MOAT ASSESSMENT        → Competitive advantage quality and durability
-5. INTRINSIC VALUATION    → Multiple methods → triangulated fair value range
-6. MARGIN OF SAFETY       → Compare price to intrinsic value
-7. INVESTMENT DECISION    → Buy / Monitor / Pass with clear rationale
-8. REPORT GENERATION      → Professional report + Excel model (if requested)
+0. QUICK-KILL SCREENER   → 8-question gate (must pass before proceeding)
+1. IDENTIFY & SCOPE      → Clarify company, ticker, market, and research depth
+2. DATA COLLECTION       → Fetch filings, reports, financials from primary sources
+3. FINANCIAL ANALYSIS    → 10-year financial deep dive (quantitative)
+4. MOAT ASSESSMENT       → Competitive advantage quality, durability, and TREND
+5. INDUSTRY ANALYSIS     → Sector-specific metrics and macro sensitivities
+6. INTRINSIC VALUATION   → Multiple methods → triangulated fair value range
+7. MARGIN OF SAFETY      → Compare price to intrinsic value
+8. RISK & SELL CHECK     → Value trap diagnostic, inflation/derivatives exposure, sell criteria
+9. INVESTMENT DECISION   → Buy / Monitor / Pass with clear rationale + behavioral bias check
+10. REPORT GENERATION    → Professional report + optional Excel model
 ```
 
 For portfolio construction requests, run steps 1–7 for each candidate, then apply `references/portfolio-construction.md` to build the final portfolio.
@@ -135,9 +160,28 @@ Apply the Fisher "scuttlebutt" lens: what do customers, competitors, employees, 
 
 Apply Munger's inversion: *What would have to be true for this business to fail over the next 10 years?* Explicitly list these threats.
 
+**Moat Trend Assessment** (critical — assess TREND not just current state):
+- **Widening signals**: Sustained gross margin improvement, steady market share gains, improving customer stickiness (renewal rates, NPS)
+- **Narrowing warnings**: Sustained margin decline, persistent market share loss, management discussing "intensifying competition", new technology rendering advantages obsolete
+
+**Franchise vs. Commodity Test** (Buffett's 1991 three-part standard):
+A true franchise business meets ALL three: (1) product/service is needed or desired, (2) customers perceive no close substitute, (3) not subject to price regulation.
+
 ---
 
-## Step 5: Intrinsic Valuation
+## Step 5: Industry Analysis (NEW)
+
+Read `references/industry-playbooks.md` for sector-specific evaluation frameworks.
+
+After identifying the industry, apply the sector-specific lens:
+- **Industry-specific key metrics** (e.g., Combined Ratio for insurance, NIM for banks, NRR for SaaS)
+- **Macro sensitivity analysis** (interest rate, inflation, recession, regulatory impacts)
+- **Buffett's historical case studies** in that industry (successes and failures)
+- **Cross-check against "Industries to Avoid"** — airlines, textiles, and other structural value traps
+
+---
+
+## Step 6: Intrinsic Valuation
 
 Read `references/intrinsic-value.md` for calculation methods.
 
@@ -160,7 +204,7 @@ Implied upside/downside: XX%
 
 ---
 
-## Step 6: Margin of Safety Check
+## Step 7: Margin of Safety Check
 
 Graham's principle: **never buy without a margin of safety**.
 
@@ -177,7 +221,41 @@ Guidelines:
 
 ---
 
-## Step 7: Investment Decision
+## Step 8: Risk Assessment & Sell Criteria Check (NEW)
+
+Read `references/sell-discipline-and-traps.md` for the full sell discipline framework.
+Read `references/inflation-goodwill-derivatives.md` for macro risk overlays.
+
+### Value Trap Diagnostic (5-type check)
+| Trap Type | Question | Status |
+|-----------|----------|--------|
+| Structural decline | Will this industry exist in meaningful form in 10 years? | |
+| Commodity business | If we raise prices 5%, what % of customers leave? | |
+| Poor capital allocation | 10-year M&A track record: value-creating or destroying? | |
+| Heavy assets, low returns | Is ROIC persistently below WACC? | |
+| Accounting quality | Cash conversion ratio persistently below 70%? | |
+
+### Sell Criteria Check (mandatory for hold/sell scenarios)
+1. Price severely overvalued? [Yes/No + basis]
+2. Moat fundamentally destroyed? [Yes/No + temporary vs permanent]
+3. Management integrity issue? [Yes/No; if Yes → sell immediately]
+4. Significantly better opportunity? [Yes/No + gap size]
+
+### Inflation & Derivatives Assessment (if relevant)
+- Apply the 6-factor inflation scorecard from `references/inflation-goodwill-derivatives.md`
+- Check derivatives exposure using the 7-question checklist
+- Assess economic goodwill vs. accounting goodwill if balance sheet goodwill is material
+
+### Behavioral Bias Self-Check (before every decision)
+1. **Confirmation bias** — Am I only seeking supporting evidence?
+2. **Sunk cost fallacy** — Would I buy at this price if I had no position?
+3. **Anchoring** — Am I fixated on purchase price instead of intrinsic value?
+4. **Recency bias** — Am I overweighting the last few quarters?
+5. **Action bias** — Is "do nothing" actually the best decision?
+
+---
+
+## Step 9: Investment Decision
 
 Deliver a clear, unambiguous recommendation:
 
@@ -185,6 +263,7 @@ Deliver a clear, unambiguous recommendation:
 **ACCUMULATE** — Strong business, approaching fair value, add on weakness
 **MONITOR** — Good business but fully valued; revisit if price falls
 **PASS** — Business quality insufficient or no margin of safety
+**SELL** — Sell criteria triggered (overvalued, moat destroyed, integrity issue, or better opportunity)
 **AVOID** — Structural decline, excessive debt, or integrity concerns
 
 Support the recommendation with:
@@ -192,10 +271,11 @@ Support the recommendation with:
 2. The single biggest risk that could invalidate the thesis
 3. A price target (12-month and intrinsic value-based)
 4. Key metrics to monitor quarterly
+5. Specific sell trigger signals (from Step 8)
 
 ---
 
-## Step 8: Report Generation
+## Step 10: Report Generation
 
 Read `assets/report-template.md` and produce:
 
@@ -227,11 +307,14 @@ Read these when needed — don't load all at once:
 |------|-------------|
 | `references/data-sources.md` | Step 2 — before fetching any data |
 | `references/financial-analysis.md` | Step 3 — scoring and ratio analysis |
-| `references/frameworks.md` | Steps 3–5 — applying investment checklists |
+| `references/frameworks.md` | Steps 3–6 — applying investment checklists |
 | `references/moat-analysis.md` | Step 4 — competitive analysis |
-| `references/intrinsic-value.md` | Step 5 — valuation calculations |
+| `references/industry-playbooks.md` | Step 5 — sector-specific metrics and macro sensitivities **(NEW)** |
+| `references/intrinsic-value.md` | Step 6 — valuation calculations |
+| `references/sell-discipline-and-traps.md` | Step 8 — sell criteria, value traps, behavioral biases **(NEW)** |
+| `references/inflation-goodwill-derivatives.md` | Step 8 — inflation/goodwill/derivatives risk **(NEW)** |
 | `references/portfolio-construction.md` | Portfolio construction or adding a new name |
-| `assets/report-template.md` | Step 8 — report generation |
+| `assets/report-template.md` | Step 10 — report generation |
 
 ---
 
