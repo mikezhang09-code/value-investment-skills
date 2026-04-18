@@ -203,3 +203,90 @@ When multiple sources conflict, trust in this order:
 6. **News articles** — useful for context, not for financial data
 
 **Always note**: fiscal year end dates vary — Apple (Sep), Berkshire (Dec), many HK companies (Dec or Mar). When comparing across companies, normalize to calendar year or clearly label fiscal years.
+
+---
+
+## Verdict-Moving Numbers — When to Escalate
+
+The hierarchy above tells you which sources to trust. This section tells you when to escalate from Tier 3 (aggregators) up to Tier 1 (filings).
+
+**The ±20% rule:** if shifting a number by ±20% would flip the recommendation (Buy / Hold / Avoid) or push intrinsic value outside the margin-of-safety band, that number is **verdict-moving** and must be verified against the primary filing before the report reaches verdict stage. Aggregator data is not sufficient for verdict-movers.
+
+Typical verdict-movers:
+- Net cash / net debt position
+- Owner earnings or FCF base used in DCF
+- Non-operating assets in SOTP valuations
+- Classification of items as recurring vs. one-time
+- Share count — basic vs. diluted vs. post-buyback
+- Segment revenue/profit for moat assessment
+
+Non-verdict-movers (Tier 3 aggregator acceptable):
+- Revenue figures 3+ years back
+- General margin trend direction
+- Historical ROE for context (not used in intrinsic-value calc)
+
+---
+
+## Red-Flag Patterns from Past Analyses — 历史教训
+
+Specific mistake classes that have surfaced in real work. Check for each explicitly on any SOTP, DCF, or verdict-stage analysis.
+
+### RF-1. Pending M&A in current SOTP
+Announced-but-not-closed acquisitions must not appear in the current sum-of-parts. Either exclude, or model pro-forma separately with the pending status clearly disclosed.
+*Case: TME — pending Ximalaya acquisition was initially double-counted in SOTP.*
+
+### RF-2. Unverified stakes or cross-holdings
+Minority investments and strategic stakes must come from the most recent annual report's notes, not from press summaries or legacy filings.
+*Case: TME — unverified Spotify stake estimate drove a ~$11B vs. ~$6.4B non-operating asset discrepancy until corrected against the balance sheet.*
+
+### RF-3. Headline loss vs. cash performance
+For companies reporting large GAAP losses, separate cash impact from non-cash impairments, fair-value remeasurements, and one-time writedowns before concluding anything about operating health.
+*Case: Fosun — headline loss was dominated by non-cash impairments; core operations were healthier than the bottom line suggested.*
+
+### RF-4. Mixed data vintage
+DCFs combining annual actuals with quarterly run-rates must label vintage per line. Do not silently blend annual and quarterly figures.
+*Case: BYD — FY2025 actuals (¥804B revenue, 17.7% GM) alongside Q1 2026 sales (700K units, -30% YoY) required explicit vintage labeling.*
+
+### RF-5. Currency and listing-venue mismatches
+Price in HKD, financials in RMB, ADR ratio ≠ 1:1 — verify the full conversion chain. For H-share vs. A-share dual listings, confirm which share class the EPS and book value correspond to.
+
+### RF-6. Share count confusion
+Match the share count to the period of the earnings figure. For companies with aggressive buybacks, current shares outstanding can diverge meaningfully from weighted-average diluted.
+
+---
+
+## Data Trail — 数据台账
+
+Any report reaching verdict stage should include a minimal audit trail for the top 5–10 inputs driving the valuation. Inline table or appendix — analyst's choice.
+
+| Metric | Value | Source | Date retrieved | Vintage |
+|--------|-------|--------|----------------|---------|
+| Revenue FY2025 | ¥804B | BYD FY2025 annual report, p.XX | 2026-04-10 | FY2025 reported |
+| Net cash | HK$62B | Xiaomi FY2025 annual report, balance sheet | 2026-04-08 | As of 2025-12-31 |
+| Q1 2026 units | 700K | BYD monthly sales press release | 2026-04-15 | Q1 2026 |
+
+Purpose: any report can be re-audited six months later to know exactly what went in and where it came from.
+
+---
+
+## Estimation Discipline
+
+When an exact number is unavailable and an estimate is used:
+
+1. **Label it** — prefix with `~` or annotate `(est.)` in tables
+2. **Cite the basis** — "estimated from peer-average EV/EBITDA of 8x" is acceptable; "estimated" alone is not
+3. **Sensitivity-test it** — if the estimate is verdict-moving (per §"Verdict-Moving Numbers" above), run the DCF/SOTP at the estimate ±20% and report the resulting range
+
+---
+
+## Pre-Verdict Checklist
+
+Run before finalizing any Buy / Hold / Avoid recommendation:
+
+- [ ] Every verdict-moving number has a Tier 1 or Tier 2 source
+- [ ] No pending M&A is embedded in current SOTP (RF-1)
+- [ ] Headline losses/gains decomposed into cash vs. non-cash (RF-3)
+- [ ] Data vintage labeled per line for time-sensitive figures (RF-4)
+- [ ] Currency and share-class conversions verified (RF-5, RF-6)
+- [ ] Data trail table present for top inputs
+- [ ] Estimates flagged with basis and sensitivity tested if verdict-moving
