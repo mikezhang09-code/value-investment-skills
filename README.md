@@ -8,16 +8,18 @@ When installed, this skill gives Claude the ability to:
 
 - Research any publicly listed company as a seasoned fundamental analyst
 - **Quick-Kill screen** stocks with an 8-question pass/fail gate before deep analysis
+- **Enforce a 4-Anchor Reconciliation Gate** (market cap, EPS back-check, per-share metrics, share-class structure) before any per-share valuation to completely eliminate calculation/input errors (e.g. H+A float underreporting, ADR ratio confusion)
 - Perform 10-year financial deep dives (revenue, margins, ROE, ROIC, FCF, etc.)
 - Assess competitive moats using Morningstar-style classification **with trend analysis** (widening/stable/narrowing)
 - **Apply industry-specific playbooks** for insurance, banking, consumer, media, energy, railroads, and technology
 - Calculate intrinsic value using multiple methods (DCF, EPV, Graham Formula, DDM)
+- **Apply Output Plausibility Checks** ("Too Good to Be True" check for mega-caps, peer multiple comparison, reverse DCF growth validation, analyst consensus divergence)
 - Apply margin of safety analysis and deliver a clear BUY / PASS / SELL recommendation
 - **Run sell discipline checks** — 4 explicit criteria for hold/sell decisions
 - **Identify value traps** using a 5-type diagnostic framework
 - **Assess inflation, goodwill, and derivatives risk** with structured scorecards
-- **Detect behavioral biases** in your own analysis with a 5-point self-check
-- Generate professional investor-grade research reports (Word, PDF, and interactive HTML)
+- **Detect behavioral biases** in your own analysis with a 5-point self-check and an **error recognition protocol**
+- Generate professional investor-grade research reports (Word, PDF, and interactive HTML) with a mandatory audited data trail
 - Screen for undervalued businesses across **5 markets**: US, Hong Kong, China A-shares, Singapore, and India
 
 ## Markets Covered
@@ -29,14 +31,14 @@ When installed, this skill gives Claude the ability to:
 | China A-Shares | SSE / SZSE | cninfo.com.cn |
 | Singapore | SGX | SGX Announcements |
 | India | NSE / BSE | BSE / NSE filings, Screener.in |
-
 ## File Structure
 
 ```
 value-investment-skills/
 ├── SKILL.md                                    # Main skill definition — 10-step workflow with quick-kill
 │                                               #   screener, industry analysis, sell discipline, and
-│                                               #   behavioral bias checks
+│                                               #   behavioral bias checks; includes mandatory Step 2.5
+│                                               #   Reconciliation Gate and Step 6.5 Plausibility Checks
 ├── assets/
 │   └── report-template.md                      # Professional Word/PDF investment report template
 │                                               #   (10 sections: exec summary → business overview →
@@ -45,8 +47,9 @@ value-investment-skills/
 ├── references/
 │   ├── data-sources.md                         # Filing URLs and search strategies for all 5 markets;
 │   │                                           #   data quality hierarchy; verdict-moving number rules;
-│   │                                           #   red-flag patterns from past analyses (RF-1 to RF-6);
-│   │                                           #   data trail audit template; estimation discipline
+│   │                                           #   red-flag patterns from past analyses (RF-1 to RF-7);
+│   │                                           #   data trail audit template; estimation discipline;
+│   │                                           #   share-class warnings and 4 reconciliation anchors
 │   ├── financial-analysis.md                   # 10-year financial summary table; income statement,
 │   │                                           #   balance sheet, and cash flow analysis; return metrics
 │   │                                           #   (ROE, ROIC, ROA); earnings quality assessment;
@@ -70,7 +73,8 @@ value-investment-skills/
 │   │                                           #   companies; macro risk overlay framework
 │   ├── intrinsic-value.md                      # Valuation methods: Owner Earnings DCF, EPV, Graham
 │   │                                           #   Formula, DDM, NCAV; sensitivity tables; reverse
-│   │                                           #   DCF; triangulated fair value range
+│   │                                           #   DCF; triangulated fair value range; pre-valuation
+│   │                                           #   anchoring and 4 output plausibility checks
 │   ├── moat-analysis.md                        # Competitive moat identification: 5 moat types scored
 │   │                                           #   0–3; moat trend assessment (widening/stable/narrowing);
 │   │                                           #   franchise vs. commodity test; Fisher scuttlebutt lens;
@@ -78,11 +82,16 @@ value-investment-skills/
 │   ├── portfolio-construction.md               # Building a concentrated 10–20 stock portfolio;
 │   │                                           #   position sizing; geographic & sector diversification;
 │   │                                           #   rebalancing rules
+│   ├── process-lessons.md                      # Self-improvement reference for analytical errors;
+│   │                                           #   Top 5 error classes (share counts, currency/scale, etc.);
+│   │                                           #   Top 5 sanity checks; Share-Class Trap Cheat Sheet;
+│   │                                           #   BYD May 2026 case study
 │   └── sell-discipline-and-traps.md            # 4 sell criteria (overvaluation, moat destruction,
 │                                               #   integrity, better opportunity); 5-type value trap
 │                                               #   diagnostic; institutional imperative; 5 behavioral
 │                                               #   bias self-checks; monitoring framework with quarterly
-│                                               #   review checklist and sell trigger signals
+│                                               #   review checklist and sell trigger signals; error
+│                                               #   recognition protocol and speed guidelines
 └── web-report/                                 # Interactive HTML web report generation skill
     ├── SKILL.md                                # Skill definition — triggers, workflow, quality
     │                                           #   checklist (25 items); bilingual EN/ZH glossary
@@ -166,14 +175,16 @@ Claude will follow a 10-step research process:
 0. **Quick-Kill Screener** — 8-question gate (must pass before proceeding)
 1. **Identify & Scope** — clarify company, ticker, market, and research depth
 2. **Data Collection** — fetch filings from primary sources (SEC, HKEx, SGX, etc.)
+2.5. **Reconciliation Gate** — mandatory 4-anchor check (market cap, EPS back-check, per-share metrics, share-class structure) to prevent calculation and scale errors
 3. **Financial Analysis** — 10-year quantitative deep dive
 4. **Moat Assessment** — competitive advantage quality, durability, and **trend** (widening/stable/narrowing)
 5. **Industry Analysis** — sector-specific metrics and macro sensitivities
 6. **Intrinsic Valuation** — multiple methods triangulated into a fair value range
+6.5. **Output Plausibility Checks** — four sanity checks ("Too Good to Be True", peer multiples, reverse DCF, analyst consensus divergence) before publishing
 7. **Margin of Safety** — compare current price to intrinsic value
-8. **Risk & Sell Check** — value trap diagnostic, inflation scorecard, sell criteria
+8. **Risk & Sell Check** — value trap diagnostic, inflation scorecard, sell criteria, and behavioral bias/analytical self-checks
 9. **Investment Decision** — BUY / ACCUMULATE / MONITOR / PASS / SELL / AVOID
-10. **Report Generation** — professional report + optional Excel model
+10. **Report Generation** — professional report (including mandatory reconciliation anchors in data trail) + optional Excel model
 
 ## Web Report Skill
 

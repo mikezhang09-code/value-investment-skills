@@ -132,6 +132,112 @@ Feeling pressure to "do something" — trade, rebalance, react to news.
 
 ---
 
+## Recognizing When Your Analysis Is Wrong ⚠️ NEW
+
+Errors in fundamental analysis are not rare; the difference between good and bad analysts is **recognition speed**. The faster you spot your own mistakes, the lower the cost. The longer they survive, the more they propagate into decisions, reports, and portfolio actions.
+
+This section adds the analytical equivalent of "looking both ways before crossing the street."
+
+### Five Signals That Your Analysis May Contain Errors
+
+#### Signal 1: External Discrepancy
+Your calculated metric (market cap, P/E, P/B, EV/EBITDA) differs materially from published values on 2+ reputable sources.
+
+**Right response:** "Let me verify which is correct."
+**Wrong response:** "The published figures must be wrong."
+
+The published market cap is the single most cross-referenced number in finance. If yours differs by >5%, your inputs are almost certainly wrong, not the world's.
+
+#### Signal 2: External Challenge from User or Reviewer
+Someone questions a specific number in your analysis.
+
+**Right response:** Pause analysis. Verify the challenged number against primary sources. Only respond after verification.
+
+**Wrong response:** Defend the number with elaborate reasoning. Defensive elaboration delays error correction and compounds the cost.
+
+This is especially important when the challenger is the user. Users often have domain context you lack (they know the market cap because they follow the stock daily). Treat their data points as priority verification triggers.
+
+#### Signal 3: Unusual Conclusion on a Heavily-Covered Stock
+A "screaming buy" verdict on a mega-cap covered by 20+ analysts. Or a "definite sell" on a name with broad analyst consensus the other way.
+
+The prior probability of finding obvious mispricing in efficient large-cap markets is low. **Unusual conclusions should automatically trigger re-verification of inputs** before being published.
+
+The mental check: *"Have many smart, well-resourced people been looking at this stock and missing what I'm seeing?"* If the answer is "yes" and your conclusion is dramatic, error probability is high.
+
+#### Signal 4: Reconciliation Failure
+Per-share metrics that don't multiply back to aggregate financials. Market cap that doesn't equal shares × price. Book value per share × shares that doesn't match total equity.
+
+This is mechanical and unambiguous. Mathematical reconciliation either passes or fails; there is no judgment call.
+
+**Reconciliation failures must be resolved before proceeding, not noted and bypassed.**
+
+#### Signal 5: Single-Input Sensitivity
+Your conclusion changes dramatically if one specific input is moved ±20%.
+
+If your "BUY at 50% MoS" verdict turns into "PASS at 0% MoS" when you change the share count, growth rate, or discount rate by 20%, the conclusion is fragile and likely error-prone. Robust conclusions survive reasonable input perturbations.
+
+### Error Recognition Protocol
+
+When error is detected (whether by yourself or external challenge):
+
+```
+1. ACKNOWLEDGE CLEARLY
+   Without minimization or hedging. "I made an error in [specific item]."
+   Not "the analysis could be refined" or "let me reconsider."
+
+2. ROOT-CAUSE THE ERROR
+   What specific process step failed?
+   - Did I skip the reconciliation gate?
+   - Did I rationalize a suspicious output?
+   - Did I source data without cross-checking?
+
+3. RESTATE FROM SCRATCH
+   Don't patch the old analysis. Rebuild it cleanly with corrected inputs.
+   Patches accumulate cognitive debt and obscure what's been fixed.
+
+4. MARK PRIOR VERSION SUPERSEDED
+   Place a visible correction notice on any prior deliverable.
+   Future readers must not encounter the wrong version without warning.
+
+5. UPDATE PROCESS TO PREVENT RECURRENCE
+   Add a specific check that would have caught this error.
+   Update relevant skill documents.
+   Generalize the lesson beyond just this one stock.
+```
+
+### Why Speed Matters
+
+Error correction speed compounds:
+- **Caught in 5 minutes** (during reconciliation): Cost = 5 minutes of redo
+- **Caught at output**: Cost = full report rewrite
+- **Caught by user**: Cost = full rewrite + trust damage
+- **Caught after position taken**: Cost = real money + potentially material loss
+- **Never caught**: Cost = the error permanently corrupts all future analyses building on the same flawed assumptions
+
+The goal is to push error detection as far upstream as possible. Reconciliation gates (Step 2.5 in SKILL.md) are the cheapest check; sanity tests on output (Step 6.5) are the next cheapest; user-caught errors are expensive; uncorrected errors are catastrophic.
+
+### Case Study: The BYD Share Count Error (May 2026)
+
+A useful reference case for what this protocol looks like in practice:
+
+**The error:** Used a share count of ~3.04 billion when the actual figure was ~9.085 billion (3x off). This caused all per-share intrinsic values to be overstated by 3x, flipping a correct PASS verdict into a wrong BUY verdict.
+
+**How it would have been caught with the protocol:**
+- Step 2.5 EPS back-check: Reported NI 32.62B ÷ EPS 3.58 = 9.11B shares ≠ assumed 3.04B → FAIL → STOP
+- Step 2.5 Market cap reconciliation: Computed 3.04B × HK$103.70 = HK$315B vs. published ~HK$849B → 63% gap → FAIL → STOP
+- Step 6.5 "Too good to be true": BUY verdict with 55%+ MoS on a top-50-by-market-cap heavily-covered stock → trigger re-verification
+- Step 6.5 Analyst consensus divergence: My fair value HK$229 vs. consensus ~HK$120 → 90% gap → required strong specific explanation → none available → STOP
+
+**How it was actually caught:** User flagged the published market cap. By that point, the wrong analysis had already been published in a deliverable, requiring full rewrite.
+
+**Lesson generalization:**
+1. Share-count errors on dual-listed Chinese companies (H+A) are a known trap class
+2. Per-share metrics must always be reconciled against reported EPS arithmetic
+3. Surprising conclusions on covered stocks must be challenged before published
+4. User data points are priority verification triggers, not items to be defended against
+
+---
+
 ## Monitoring Framework for Existing Holdings
 
 ### Quarterly Review Checklist
@@ -141,6 +247,7 @@ Feeling pressure to "do something" — trade, rebalance, react to news.
 - [ ] Management tone — more or less honest than previous quarters?
 - [ ] Competitive landscape — any new threats or moat changes?
 - [ ] Capital allocation decisions — value-creating or value-destroying?
+- [ ] **Reconciliation check on new period's reported numbers** (NEW)
 
 ### Sell Trigger Signals (Any One = Immediate Deep Review)
 - ROIC falls below WACC for two consecutive years

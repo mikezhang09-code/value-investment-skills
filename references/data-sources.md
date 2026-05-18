@@ -206,6 +206,188 @@ When multiple sources conflict, trust in this order:
 
 ---
 
+## Share-Class Structure Warnings ⚠️ NEW (May 2026)
+
+This is where the most expensive share-count errors happen. **Always document share-class structure explicitly before any per-share calculation.** Multi-class structures are the single most common single-point-of-failure in equity valuation.
+
+This section was added after the BYD May 2026 incident where H-share float was incorrectly used as total shares outstanding, producing per-share intrinsic values that were 3x too high and flipping a correct PASS verdict into a wrong BUY verdict.
+
+### Warning Class A: HK-Listed Chinese Companies (H + A Shares)
+
+HK-listed Chinese companies typically have multiple share classes:
+
+| Class | Listing | Investors | Currency |
+|-------|---------|-----------|----------|
+| H-shares | HKEx | Foreign + HK | HKD |
+| A-shares | Shanghai/Shenzhen | Domestic Chinese | CNY |
+| B-shares (rare) | Shanghai/Shenzhen | Foreign in domestic exchanges | USD/HKD |
+| ADRs (if applicable) | NYSE/Nasdaq | US | USD |
+
+**The trap:** HK-focused data sources (Google Finance, AAStocks) sometimes report H-share count (the float listed in HK) as "shares outstanding." This is wrong for total company valuation.
+
+**Example (BYD as of FY25):**
+- H-shares (HK-listed): ~1.10 billion
+- A-shares (Shenzhen-listed): ~7.99 billion
+- **Total diluted: ~9.09 billion**
+
+Using 1.10B alone understates true company by 8x. Using 3.04B (initial error) understates by 3x.
+
+**Example (Ping An as of FY25):**
+- H-shares (2318.HK): ~7.44 billion
+- A-shares (601318.SS): ~10.76 billion
+- **Total diluted: ~18.20 billion**
+
+Google Finance shows "shares outstanding · 7.45B" for Ping An — this is H-shares only, not total.
+
+**How to verify:**
+1. **Company annual report** — search for "Composition of Share Capital" or "Share Information"
+2. **EPS back-check** — Reported group net income ÷ reported EPS = total shares (always works mechanically)
+3. **HKEx CCASS reports** — show H-share split by holder type but ALSO total issued shares
+4. **Cross-check market cap** — published mcap ÷ price = total shares (sanity check)
+
+**Examples of HK-listed Chinese companies with dual H+A structure:**
+- BYD (1211.HK / 002594.SZ)
+- China Mobile (941.HK / 600941.SS)
+- Ping An Insurance (2318.HK / 601318.SS)
+- ICBC (1398.HK / 601398.SS)
+- China Construction Bank (939.HK / 601939.SS)
+- Bank of China (3988.HK / 601988.SS)
+- CNOOC (883.HK)
+- Petrochina (857.HK / 601857.SS)
+- China Life (2628.HK / 601628.SS)
+- Sinopec (386.HK / 600028.SS)
+
+**Special case — Tencent (0700.HK):** No A-share class. All shares are H-shares. ~9.2B shares total. Easier to handle correctly, but always confirm.
+
+### Warning Class B: US Dual-Class Structures
+
+| Company | Classes | Notes |
+|---------|---------|-------|
+| Alphabet | GOOGL (Class A, voting) + GOOG (Class C, non-voting) + Class B (private, super-voting) | Sum all three for total; GOOG and GOOGL trade publicly |
+| Meta | Class A + Class B (super-voting, private) | Class B held by founder/insiders |
+| Berkshire Hathaway | BRK.A + BRK.B | Different prices, but BRK.B is 1/1500 of BRK.A economic interest |
+| Visa | Class A (public) + Class B + Class C (held by banks) | Conversion ratios apply |
+| Snap | Class A (non-voting public) + Class B + Class C | Founder control via Class C |
+| Liberty Media | Multiple tracking stocks | Complex; verify carefully |
+
+**Action:** Always sum ALL classes for total shares. Most reported earnings/EPS are on a combined basis, so total shares = combined.
+
+### Warning Class C: Indian Equities (NSE + BSE)
+
+The same shares trade on both NSE and BSE. Total share count is NOT NSE + BSE.
+
+| Source | What it shows |
+|--------|---------------|
+| NSE listing | Same shares as BSE; price may differ slightly due to liquidity |
+| BSE listing | Same shares as NSE |
+| Company annual report | True total share count |
+
+**Don't double-count.** Look at the company's reported share capital.
+
+### Warning Class D: Chinese ADRs
+
+| Company | Underlying | ADR Ratio |
+|---------|-----------|-----------|
+| Alibaba (BABA) | 1 ADR = 8 ordinary shares | Confusing for per-share metrics |
+| JD.com (JD) | 1 ADR = 2 ordinary Class A shares | |
+| Baidu (BIDU) | 1 ADR = 8 Class A ordinary shares | |
+| Pinduoduo / PDD | 1 ADR = 4 ordinary shares | |
+| NetEase (NTES) | 1 ADR = 5 ordinary shares | |
+| NIO (NIO) | 1 ADR = 1 Class A ordinary share | Simpler |
+
+**Critical:** ADR price ≠ ordinary share price × ratio always — premium/discount exists. EPS reported per ADR ≠ EPS per ordinary share. Always confirm which basis you're using.
+
+### Warning Class E: SPAC / Recent IPO / Post-Placement Companies
+
+Companies that have recently:
+- Completed an IPO
+- Issued PIPE or follow-on offerings
+- Completed share placements (HK Chinese companies frequently)
+- Granted significant ESOPs / restricted stock units
+- Issued convertible notes
+
+...will have share counts that differ between pre/post-event reporting. Always use the most recent post-event count.
+
+**Example:** BYD completed a HK$43.5B placement in early 2025, adding ~130M H-shares. Pre-placement and post-placement share counts differ. Reports written in 2024 may still cite the lower count.
+
+### Warning Class F: Treasury Shares
+
+"Shares issued" can include treasury shares (shares the company has bought back but not retired). For valuation, use:
+
+```
+Diluted Shares Outstanding = Issued Shares - Treasury Shares + Dilutive Instruments
+```
+
+Where dilutive instruments include:
+- In-the-money options
+- Convertible notes (if dilutive under if-converted method)
+- Warrants
+- Restricted stock units
+
+The reported "diluted EPS" already accounts for these — back-solving from diluted EPS gives you the right count.
+
+### The Four Reconciliation Anchors
+
+Before any per-share calculation, verify all four (per SKILL.md Step 2.5):
+
+**Anchor 1: Market Cap Reconciliation**
+```
+Computed: Shares × Price = $X B
+Published (Yahoo): $Y B
+Published (Bloomberg/Reuters): $Z B
+Gap: ±X% — must be ≤ 5%
+```
+
+**Anchor 2: EPS Back-Check** (most reliable)
+```
+Reported Net Income: $X B
+Reported EPS: $Y per share
+Implied Shares = X / Y = Z B
+Gap vs. assumed share count: ±W% — must be ≤ 2%
+```
+
+**Anchor 3: Per-Share Metrics Cross-Check**
+```
+Reported BV per share × Shares = $X B ≈ Total Equity (within 5%)
+Reported DPS × Shares = $X M ≈ Total Dividends Paid (within 5%)
+```
+
+**Anchor 4: Share-Class Structure**
+```
+□ Class 1: ___ B shares (source: ___)
+□ Class 2: ___ B shares (source: ___)
+□ Class 3: ___ B shares (source: ___) [if applicable]
+□ Total: ___ B shares
+□ Reconciled with EPS back-check: Yes/No
+```
+
+If any anchor fails → STOP, re-source data from primary filings, re-run all four.
+
+### Quick-Lookup Patterns
+
+**"What's the right share count for an HK-listed Chinese company?"**
+1. Annual report → "Composition of Share Capital" section
+2. EPS back-check (NI ÷ EPS) using group-level numbers
+3. Cross-check via market cap arithmetic
+
+**"What's the right share count for a US company?"**
+1. Most recent 10-Q cover page (shares outstanding as of recent date)
+2. 10-K share count
+3. EPS back-check using group-level numbers
+
+**"What's the right share count for an Indian company?"**
+1. Annual report
+2. NSE listing page (NOT BSE — they're the same shares)
+3. EPS back-check
+
+**"What's the right share count for a SPAC / recent IPO?"**
+1. Most recent 10-Q
+2. Subtract any subsequently announced buybacks
+3. Add any subsequent issuances (read 8-K filings)
+4. EPS back-check using most recent quarter's reported EPS
+
+---
+
 ## Verdict-Moving Numbers — When to Escalate
 
 The hierarchy above tells you which sources to trust. This section tells you when to escalate from Tier 3 (aggregators) up to Tier 1 (filings).
@@ -217,7 +399,7 @@ Typical verdict-movers:
 - Owner earnings or FCF base used in DCF
 - Non-operating assets in SOTP valuations
 - Classification of items as recurring vs. one-time
-- Share count — basic vs. diluted vs. post-buyback
+- **Share count — basic vs. diluted vs. post-buyback vs. all-class total** (see Share-Class Structure Warnings above)
 - Segment revenue/profit for moat assessment
 
 Non-verdict-movers (Tier 3 aggregator acceptable):
@@ -253,6 +435,11 @@ Price in HKD, financials in RMB, ADR ratio ≠ 1:1 — verify the full conversio
 ### RF-6. Share count confusion
 Match the share count to the period of the earnings figure. For companies with aggressive buybacks, current shares outstanding can diverge meaningfully from weighted-average diluted.
 
+### RF-7. Wrong share class as total ⚠️ NEW (May 2026)
+For HK-listed Chinese companies (and other dual-class structures), HK-focused data sources sometimes report H-share float as "total shares outstanding." This understates true total by 2x–10x.
+*Case: BYD May 2026 — initially used 3.04B shares vs. actual 9.085B (H + A combined). 3x error. Caught only when user provided market cap. Required full report rewrite. See Share-Class Structure Warnings section above for the full reconciliation protocol.*
+*Reproduction test on Ping An: Google Finance shows "shares outstanding 7.45B" — this is H-share only. True total: ~18.2B (H + A). EPS back-check (NI ÷ EPS) confirmed.*
+
 ---
 
 ## Data Trail — 数据台账
@@ -264,8 +451,11 @@ Any report reaching verdict stage should include a minimal audit trail for the t
 | Revenue FY2025 | ¥804B | BYD FY2025 annual report, p.XX | 2026-04-10 | FY2025 reported |
 | Net cash | HK$62B | Xiaomi FY2025 annual report, balance sheet | 2026-04-08 | As of 2025-12-31 |
 | Q1 2026 units | 700K | BYD monthly sales press release | 2026-04-15 | Q1 2026 |
+| **Share count (total)** | **9.085B** | **BYD FY2025 AR composition + EPS back-check (32.62B ÷ 3.58 = 9.11B ✓)** | **2026-05-18** | **Post-2025 placement** |
 
 Purpose: any report can be re-audited six months later to know exactly what went in and where it came from.
+
+**Mandatory rows for share-class structure (added May 2026):** Any company with dual-class, dual-listing, or recent dilution must include explicit share-count row in the Data Trail with the reconciliation source noted (EPS back-check is the most reliable).
 
 ---
 
@@ -284,9 +474,10 @@ When an exact number is unavailable and an estimate is used:
 Run before finalizing any Buy / Hold / Avoid recommendation:
 
 - [ ] Every verdict-moving number has a Tier 1 or Tier 2 source
+- [ ] **Share count reconciled via all four anchors (per Share-Class Structure Warnings section)** ⚠️ NEW
 - [ ] No pending M&A is embedded in current SOTP (RF-1)
 - [ ] Headline losses/gains decomposed into cash vs. non-cash (RF-3)
 - [ ] Data vintage labeled per line for time-sensitive figures (RF-4)
-- [ ] Currency and share-class conversions verified (RF-5, RF-6)
-- [ ] Data trail table present for top inputs
+- [ ] Currency and share-class conversions verified (RF-5, RF-6, RF-7)
+- [ ] Data trail table present for top inputs (including share-count row for multi-class stocks)
 - [ ] Estimates flagged with basis and sensitivity tested if verdict-moving

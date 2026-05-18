@@ -57,17 +57,19 @@ Before any deep analysis, run this 8-question gate. Two "No" answers require str
 When asked to research a company or build a portfolio, follow this process:
 
 ```
-0. QUICK-KILL SCREENER   → 8-question gate (must pass before proceeding)
-1. IDENTIFY & SCOPE      → Clarify company, ticker, market, and research depth
-2. DATA COLLECTION       → Fetch filings, reports, financials from primary sources
-3. FINANCIAL ANALYSIS    → 10-year financial deep dive (quantitative)
-4. MOAT ASSESSMENT       → Competitive advantage quality, durability, and TREND
-5. INDUSTRY ANALYSIS     → Sector-specific metrics and macro sensitivities
-6. INTRINSIC VALUATION   → Multiple methods → triangulated fair value range
-7. MARGIN OF SAFETY      → Compare price to intrinsic value
-8. RISK & SELL CHECK     → Value trap diagnostic, inflation/derivatives exposure, sell criteria
-9. INVESTMENT DECISION   → Buy / Monitor / Pass with clear rationale + behavioral bias check
-10. REPORT GENERATION    → Professional report + optional Excel model
+0. QUICK-KILL SCREENER     → 8-question gate (must pass before proceeding)
+1. IDENTIFY & SCOPE        → Clarify company, ticker, market, and research depth
+2. DATA COLLECTION         → Fetch filings, reports, financials from primary sources
+2.5 DATA RECONCILIATION    → MANDATORY four-anchor verification (NEW)
+3. FINANCIAL ANALYSIS      → 10-year financial deep dive (quantitative)
+4. MOAT ASSESSMENT         → Competitive advantage quality, durability, and TREND
+5. INDUSTRY ANALYSIS       → Sector-specific metrics and macro sensitivities
+6. INTRINSIC VALUATION     → Multiple methods → triangulated fair value range
+6.5 PLAUSIBILITY CHECKS    → Sanity-check outputs before publishing (NEW)
+7. MARGIN OF SAFETY        → Compare price to intrinsic value
+8. RISK & SELL CHECK       → Value trap diagnostic, inflation/derivatives exposure, sell criteria
+9. INVESTMENT DECISION     → Buy / Monitor / Pass with clear rationale + behavioral bias check
+10. REPORT GENERATION      → Professional report + optional Excel model
 ```
 
 For portfolio construction requests, run steps 1–7 for each candidate, then apply `references/portfolio-construction.md` to build the final portfolio.
@@ -101,6 +103,100 @@ Minimum data to collect:
 - Most recent quarterly/interim filing
 - Any major news: acquisitions, management changes, regulatory issues (last 2 years)
 - Current share price and market cap
+
+---
+
+## Step 2.5: Data Reconciliation Gate (MANDATORY) ⚠️ NEW
+
+Before running ANY per-share calculation, you MUST verify these four anchors. Skipping this step is the single most common source of analytical errors. **One bad upstream number poisons every downstream calculation.**
+
+### The Four Reconciliation Anchors
+
+#### Anchor 1: Market Cap Reconciliation
+```
+Computed Market Cap = Shares Outstanding × Current Price
+
+This MUST match published market cap from 2+ sources (Yahoo, Bloomberg, 
+Investing.com, Google Finance) within ±5%.
+
+If gap > 5% → STOP. One of the following is wrong:
+  - Your share count
+  - Your price (wrong listing? wrong currency?)
+  - The published figure (rare but possible)
+
+Investigate before proceeding.
+```
+
+#### Anchor 2: EPS Back-Check (The Most Reliable Verification)
+```
+Implied Shares = Reported Net Income ÷ Reported EPS
+
+This MUST match your assumed share count within ±2%.
+
+This is mechanical arithmetic — no judgment involved. The company has 
+already done the division for you when they reported EPS. If your share 
+count doesn't reconcile, your share count is wrong.
+
+Example (BYD FY25):
+  Reported Net Income: RMB 32.62B
+  Reported EPS:        RMB 3.58
+  Implied shares:      32.62 ÷ 3.58 = 9.11B
+  
+If you had been using 3.04B shares, this check immediately reveals 
+the error.
+```
+
+#### Anchor 3: Per-Share Metrics Cross-Check
+```
+Reported BV per share × Shares ≈ Total Equity (within 5%)
+Reported DPS × Shares ≈ Total Dividends Paid (within 5%)
+Reported FCF per share × Shares ≈ Total FCF (within 5%)
+
+Any mismatch >10% = data quality issue. Do NOT proceed to valuation.
+```
+
+#### Anchor 4: Share-Class Structure Check (Critical for Multi-Class Stocks)
+```
+Total Diluted Shares = sum of ALL share classes
+
+Common multi-class structures:
+  HK-listed Chinese companies: H-shares + A-shares (+ ADRs if any)
+  US dual-class: Class A + Class B + Class C (Google: GOOGL + GOOG + non-voting)
+  Indian dual-listings: NSE + BSE (same shares, different exchanges — DON'T double count)
+  Chinese cross-listings: A-shares + H-shares + ADRs (often a single underlying share, 
+    but verify; some are separate)
+
+⚠️ HK Trap: HK-focused data sources sometimes report H-share float as 
+"shares outstanding." Total company shares = H + A combined.
+
+Document each class's count and source explicitly in the report.
+```
+
+### Reconciliation Output Format
+
+In the report's Data Trail section, document:
+
+```
+Share Count Reconciliation
+- H-shares (HK-listed):       X.XX billion (source: ...)
+- A-shares (Shenzhen-listed): X.XX billion (source: ...)
+- Total diluted:              X.XX billion
+
+Verification:
+- Market cap check:  Shares × Price = $XXB vs published $XXB → ±X% ✓/✗
+- EPS back-check:    NI ÷ EPS = X.XXB shares vs assumed → ±X% ✓/✗
+- BV cross-check:    BV/share × Shares = $XXB vs equity → ±X% ✓/✗
+```
+
+### Stop Conditions
+
+If ANY of the four anchors fails:
+1. **STOP** — do not proceed to Step 3
+2. Re-source data from primary filings (annual report "Composition of Share Capital")
+3. Re-run all four checks
+4. Only proceed when all four reconcile
+
+**This step is not optional.** It takes 5 minutes and prevents the most expensive class of errors in fundamental analysis.
 
 ---
 
@@ -169,7 +265,7 @@ A true franchise business meets ALL three: (1) product/service is needed or desi
 
 ---
 
-## Step 5: Industry Analysis (NEW)
+## Step 5: Industry Analysis
 
 Read `references/industry-playbooks.md` for sector-specific evaluation frameworks.
 
@@ -204,6 +300,52 @@ Implied upside/downside: XX%
 
 ---
 
+## Step 6.5: Output Plausibility Checks (NEW) ⚠️
+
+Before reporting valuation conclusions, apply these sanity checks. A surprising result is more often an analytical error than a market inefficiency — especially in heavily-covered large-cap markets.
+
+### Test 1: "Too Good to Be True"
+For a heavily-covered mega-cap stock (top 50 by market cap in any major index, or covered by 20+ analysts), a margin of safety >40% to base-case IV is **rare and warrants skepticism**. The market is not usually that wrong about widely-followed stocks.
+
+If your model says it is:
+1. Recheck the math (start with reconciliation anchors)
+2. Identify the specific assumption causing the gap vs. analyst consensus
+3. Stress-test that assumption — does it hold under scrutiny?
+
+A 40%+ MoS on a mega-cap should require an explicit explanation of "why is the market wrong here?" — not a default conclusion.
+
+### Test 2: Peer Multiple Cross-Check
+Compare your implied valuation multiples against industry peers:
+- P/E vs. peer median
+- EV/EBITDA vs. peer median
+- P/B vs. peer median
+
+If your "fair value" implies the stock should trade at 2-3x peer multiples, ask: *why are peers mispriced too?* If they aren't (similar business quality at similar multiples), your model has an error.
+
+### Test 3: Reverse DCF
+Solve for the implied growth rate at current market price:
+- If implied growth is 5–12% (reasonable for the industry) → stock is fairly valued
+- If implied growth is negative or > 20% → either rare opportunity OR (more commonly) model error
+
+Reverse DCF anchors your conclusion in *what the market believes* rather than just what your model says.
+
+### Test 4: Analyst Consensus Divergence
+If your fair value is >50% above or below analyst consensus, identify the specific driving assumption:
+- "I'm using a different normalization period for earnings"
+- "I'm assuming higher maintenance capex than the Street"
+- "I'm applying a higher discount rate for X risk"
+
+These are strong explanations. **"Analysts are wrong"** is a weak explanation — usually wrong itself.
+
+### Stop Conditions
+If your output fails 2+ of these tests:
+1. Return to reconciliation gate (Step 2.5)
+2. Verify all inputs
+3. Re-run valuation
+4. Only publish if the divergence can be explained by a specific, defensible assumption difference
+
+---
+
 ## Step 7: Margin of Safety Check
 
 Graham's principle: **never buy without a margin of safety**.
@@ -221,7 +363,7 @@ Guidelines:
 
 ---
 
-## Step 8: Risk Assessment & Sell Criteria Check (NEW)
+## Step 8: Risk Assessment & Sell Criteria Check
 
 Read `references/sell-discipline-and-traps.md` for the full sell discipline framework.
 Read `references/inflation-goodwill-derivatives.md` for macro risk overlays.
@@ -252,6 +394,11 @@ Read `references/inflation-goodwill-derivatives.md` for macro risk overlays.
 3. **Anchoring** — Am I fixated on purchase price instead of intrinsic value?
 4. **Recency bias** — Am I overweighting the last few quarters?
 5. **Action bias** — Is "do nothing" actually the best decision?
+
+### Self-Analysis Error Check (NEW)
+6. **Has any external data point challenged my numbers?** If yes, my first response must be verification, not defense.
+7. **Does my conclusion require the market to be obviously wrong on a heavily-covered stock?** If yes, error probability is high.
+8. **Have I documented the reconciliation anchors in the data trail?** If no, I haven't earned the conclusion.
 
 ---
 
@@ -284,6 +431,7 @@ Read `assets/report-template.md` and produce:
 - Structured per the template
 - Includes all tables from steps 3–6
 - Clear BUY/PASS recommendation with conviction level
+- **MUST include the four reconciliation anchors in the Data Trail section**
 
 **Excel Financial Model** (if requested):
 - 10-year historical data
@@ -305,14 +453,14 @@ Read these when needed — don't load all at once:
 
 | File | When to Read |
 |------|-------------|
-| `references/data-sources.md` | Step 2 — before fetching any data |
+| `references/data-sources.md` | Step 2 — before fetching any data; includes share-class structure guidance |
 | `references/financial-analysis.md` | Step 3 — scoring and ratio analysis |
 | `references/frameworks.md` | Steps 3–6 — applying investment checklists |
 | `references/moat-analysis.md` | Step 4 — competitive analysis |
-| `references/industry-playbooks.md` | Step 5 — sector-specific metrics and macro sensitivities **(NEW)** |
-| `references/intrinsic-value.md` | Step 6 — valuation calculations |
-| `references/sell-discipline-and-traps.md` | Step 8 — sell criteria, value traps, behavioral biases **(NEW)** |
-| `references/inflation-goodwill-derivatives.md` | Step 8 — inflation/goodwill/derivatives risk **(NEW)** |
+| `references/industry-playbooks.md` | Step 5 — sector-specific metrics and macro sensitivities |
+| `references/intrinsic-value.md` | Step 6 — valuation calculations; includes output plausibility checks |
+| `references/sell-discipline-and-traps.md` | Step 8 — sell criteria, value traps, behavioral biases, error recognition |
+| `references/inflation-goodwill-derivatives.md` | Step 8 — inflation/goodwill/derivatives risk |
 | `references/portfolio-construction.md` | Portfolio construction or adding a new name |
 | `assets/report-template.md` | Step 10 — report generation |
 
@@ -321,8 +469,12 @@ Read these when needed — don't load all at once:
 ## Key Principles to Uphold
 
 1. **Never fabricate data.** If you cannot find a number from a reliable source, say so.
-2. **Think long-term.** The holding period is ideally 5–10+ years.
-3. **Be conservative.** When in doubt, use lower growth rates and higher discount rates.
-4. **Business quality first, price second.** A mediocre business at a low price is rarely a good investment.
-5. **Circle of competence.** Clearly state if a business is outside your ability to predict (complex derivatives, speculative biotech, etc.).
-6. **Cite everything.** Every key claim needs a source (filing name, page, date).
+2. **Reconcile before you analyze.** The four anchors in Step 2.5 take 5 minutes and prevent the most expensive class of errors. Skipping them is unprofessional.
+3. **Trust reported per-share metrics over independent share counts.** EPS, BV/share, and DPS are ground truth — back-solve for shares from these rather than sourcing independently.
+4. **Treat surprising conclusions as flags, not validations.** A 40%+ MoS on a mega-cap should trigger re-verification, not confidence.
+5. **Think long-term.** The holding period is ideally 5–10+ years.
+6. **Be conservative.** When in doubt, use lower growth rates and higher discount rates.
+7. **Business quality first, price second.** A mediocre business at a low price is rarely a good investment.
+8. **Circle of competence.** Clearly state if a business is outside your ability to predict (complex derivatives, speculative biotech, etc.).
+9. **Cite everything.** Every key claim needs a source (filing name, page, date).
+10. **When an external data point challenges your numbers, verify before you defend.** Defensive elaboration delays error correction.
