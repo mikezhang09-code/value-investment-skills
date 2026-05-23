@@ -60,17 +60,24 @@ When asked to research a company or build a portfolio, follow this process:
 0. QUICK-KILL SCREENER     → 8-question gate (must pass before proceeding)
 1. IDENTIFY & SCOPE        → Clarify company, ticker, market, and research depth
 2. DATA COLLECTION         → Fetch filings, reports, financials from primary sources
-2.5 DATA RECONCILIATION    → MANDATORY four-anchor verification (NEW)
+2.5 DATA RECONCILIATION    → MANDATORY four-anchor verification (mechanical accuracy)
 3. FINANCIAL ANALYSIS      → 10-year financial deep dive (quantitative)
+3.5 EARNINGS QUALITY GATE  → MANDATORY 8-distortion check (interpretive accuracy) — NEW
 4. MOAT ASSESSMENT         → Competitive advantage quality, durability, and TREND
 5. INDUSTRY ANALYSIS       → Sector-specific metrics and macro sensitivities
 6. INTRINSIC VALUATION     → Multiple methods → triangulated fair value range
-6.5 PLAUSIBILITY CHECKS    → Sanity-check outputs before publishing (NEW)
+6.5 PLAUSIBILITY CHECKS    → Sanity-check outputs before publishing
 7. MARGIN OF SAFETY        → Compare price to intrinsic value
 8. RISK & SELL CHECK       → Value trap diagnostic, inflation/derivatives exposure, sell criteria
 9. INVESTMENT DECISION     → Buy / Monitor / Pass with clear rationale + behavioral bias check
 10. REPORT GENERATION      → Professional report + optional Excel model
 ```
+
+**Mental model: Two upstream gates protect the valuation work downstream.**
+- Step 2.5 = mechanical accuracy gate (are the numbers correct?)
+- Step 3.5 = interpretive accuracy gate (do the numbers mean what they appear to mean?)
+
+If either gate fails, no amount of valuation sophistication downstream will rescue the analysis.
 
 For portfolio construction requests, run steps 1–7 for each candidate, then apply `references/portfolio-construction.md` to build the final portfolio.
 
@@ -233,6 +240,90 @@ Build a **10-year financial summary table** with these rows:
 - FCF > Net Income (high earnings quality)
 - Share count flat or declining (buybacks)
 - Net cash or modest debt
+
+---
+
+## Step 3.5: Earnings Quality Gate (MANDATORY) ⚠️ NEW
+
+Read `references/earnings-quality-and-distortions.md` for the full framework.
+
+Before assessing moat or running any valuation, verify that **reported financials reflect underlying business economics**. Eight distortion classes can break this link — situations where the reported data is technically correct but produces wrong conclusions if accepted at face value.
+
+This step is the **interpretive twin** of Step 2.5 (mechanical reconciliation). Step 2.5 asks "are the numbers correct?"; Step 3.5 asks "do the numbers mean what they appear to mean?"
+
+### The 8 Distortion Classes
+
+| Class | What It Distorts | Quick Check |
+|-------|------------------|-------------|
+| 1. One-time items | Earnings level | Are there material gains (asset sales, FV remeasurements, subsidies) or costs (restructuring, impairments) in current NI? |
+| 2. Dilution drift | Per-share economics | Does 10-yr per-share growth track 10-yr aggregate growth? |
+| 3. Investment portfolios | Operating vs. investing returns | Is reported NI dominated by mark-to-market on investments? |
+| 4. Working capital quality | Revenue reality | DSO rising? Bills receivable significant? Cash conversion <80%? |
+| 5. Stock-based compensation | Earnings & dilution | Is non-GAAP adjusted upward by SBC without corresponding dilution accounting? |
+| 6. Related-party transactions | Value leakage | RPTs material? Pattern of value transfer to controlling shareholder? |
+| 7. Off-balance-sheet items | True leverage | Pension underfund? Guarantees? VIE exposure? Lease debt? |
+| 8. Goodwill / acquisitions | Organic vs. acquired growth | What % of recent growth is M&A vs. organic? ROIC ex-goodwill? |
+
+### Required Outputs
+
+**1. Normalized Earnings Bridge** (Class 1)
+
+Always show the bridge from reported to normalized:
+```
+Reported NI                            → XXX
+  − One-time gains (itemized)          → −XX
+  + One-time costs (itemized)          → +XX
+  ± Tax adjustment                     → ±X
+Normalized NI                          → XXX
+```
+
+If |Normalized − Reported| > 25% of Reported → flag prominently in executive summary.
+
+**2. Per-Share Scorecard** (Class 2)
+
+For each of revenue, NI, equity, FCF, dividends — compute both 10-yr aggregate CAGR and per-share CAGR. Dilution drag (aggregate − per-share) tells the story.
+
+If dilution drag > 3% annually → meaningful value transfer from existing to new shareholders → adjust verdict downward.
+
+See `references/frameworks.md` "Per-Share Scorecard" section for full template.
+
+**3. Earnings Quality Composite Score** (/40)
+
+Score the eight dimensions 1-5 each. Composite interpretation:
+- 32-40: Exceptional — reported numbers trustworthy
+- 24-31: Good — minor normalization needed
+- 16-23: Questionable — significant adjustments required
+- <16: Poor — deep skepticism warranted; consider passing regardless of valuation
+
+### Gate Condition
+
+If 3+ distortion classes show material issues:
+- Use normalized figures throughout subsequent valuation
+- Flag prominently in executive summary
+- Require larger margin of safety (add 10-15pp to threshold)
+- Cap conviction score (typically max 6/10)
+
+### Industry-Specific Hot Spots
+
+| Industry / Geography | Common Distortion Classes |
+|---------------------|--------------------------|
+| Chinese industrials (incl. 1651.HK CNC) | Class 1 (subsidies), 4 (bills receivable), 6 (RPTs with parent) |
+| HK property developers | Class 1 (investment property revaluation), 3 (holding company), 7 (off-BS guarantees) |
+| Chinese ADRs (PDD, BIDU, JD, NTES) | Class 5 (SBC), 7 (VIE), 8 (intangibles from acquired tech) |
+| HK conglomerates (CK, Swire, Jardine) | Class 3 (SOTP required), 7 (cross-holdings), 8 (goodwill) |
+| Insurance (Ping An, AIA, Prudential) | Class 1 (FV gains), 3 (float portfolio is core), 7 (provisioning) |
+| Banks (HSBC, Standard Chartered, Indian banks) | Class 1 (provisioning), 7 (off-BS exposures), 4 (loan quality) |
+| Indian family conglomerates | Class 6 (RPTs), 7 (promoter pledging), 8 (acquisition-led growth) |
+| US tech with heavy SBC | Class 5 (SBC + dilution), 8 (acquired tech), 2 (per-share drift) |
+| Recently IPO'd / SPAC merged | Class 2 (forward dilution, warrants), 5 (founder shares) |
+| Cyclicals near peak (semis, autos, materials) | Class 1 (peak-cycle earnings inflated), 4 (channel stuffing) |
+
+### Stop Conditions
+
+If the earnings quality composite is < 16 OR Class 6 (RPTs) shows material value leakage:
+1. Document the issues prominently
+2. Consider whether the business is investable at any price
+3. If proceeding, use deeply normalized figures and demand >50% MoS
 
 ---
 
@@ -455,7 +546,8 @@ Read these when needed — don't load all at once:
 |------|-------------|
 | `references/data-sources.md` | Step 2 — before fetching any data; includes share-class structure guidance |
 | `references/financial-analysis.md` | Step 3 — scoring and ratio analysis |
-| `references/frameworks.md` | Steps 3–6 — applying investment checklists |
+| `references/earnings-quality-and-distortions.md` | Step 3.5 — distortion checks (one-time items, dilution, investment portfolios, RPTs, etc.) |
+| `references/frameworks.md` | Steps 3–6 — applying investment checklists; includes per-share scorecard |
 | `references/moat-analysis.md` | Step 4 — competitive analysis |
 | `references/industry-playbooks.md` | Step 5 — sector-specific metrics and macro sensitivities |
 | `references/intrinsic-value.md` | Step 6 — valuation calculations; includes output plausibility checks |
@@ -478,3 +570,5 @@ Read these when needed — don't load all at once:
 8. **Circle of competence.** Clearly state if a business is outside your ability to predict (complex derivatives, speculative biotech, etc.).
 9. **Cite everything.** Every key claim needs a source (filing name, page, date).
 10. **When an external data point challenges your numbers, verify before you defend.** Defensive elaboration delays error correction.
+11. **Normalize before you value.** Reported earnings are designed to comply with accounting standards, not to reveal economic reality. Bridge the gap in Step 3.5 before any valuation work.
+12. **Per-share is the only share that matters.** Aggregate growth means nothing to the existing shareholder if it's diluted away. Always compute both aggregate and per-share growth.

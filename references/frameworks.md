@@ -241,6 +241,92 @@ Apply all four frameworks and produce a summary score:
 
 ---
 
+## Per-Share Scorecard (Required for All Long-Form Analyses)
+
+A wonderful business that dilutes its shareholders is not a wonderful investment. This scorecard ensures we measure value creation *per share* — the only metric that matters to the long-term holder.
+
+### The 10-Year Per-Share Test
+
+For every multi-year analysis, compute both aggregate AND per-share growth:
+
+| Metric | 10-yr Aggregate CAGR | 10-yr Per-Share CAGR | Dilution Drag (pp) | Quality |
+|--------|---------------------|---------------------|--------------------|---------| 
+| Revenue | | | | |
+| Net Income / Owner Earnings | | | | |
+| Book Value (equity) | | | | |
+| Free Cash Flow | | | | |
+| Dividends | | | | |
+
+**Computation note:**
+- Per-share CAGR uses end-of-period diluted share count
+- For maximum rigor, also compute per-share metrics using each year's own diluted share count (catches mid-period dilution that round-trips by year-end)
+
+### Dilution Drag Interpretation
+
+| Annual Dilution Drag | Assessment | Common Cause |
+|---------------------|-----------|--------------|
+| <0% (negative drag) | Net buyback creating value | Disciplined capital return |
+| 0-1% | Healthy | Minor ESOP, mostly offset |
+| 1-3% | Moderate | ESOP-heavy comp; M&A; acceptable if returns are high |
+| 3-5% | Significant | Frequent placements or expensive M&A; requires justification |
+| >5% | Severe | Capital structure problem; thesis may be flat per-share economics |
+
+### Cross-Check Against Buffett's Standard
+
+Buffett's intrinsic value test for a business he owns: "Does our per-share intrinsic value grow at a rate exceeding the S&P 500's gain?" For an outside investor analyzing a candidate, the question is similar: **does per-share intrinsic value grow at a rate justifying the equity risk premium?**
+
+- Per-share NI/equity growth < 6%: weak — barely beating bonds on a risk-adjusted basis
+- 6-10%: acceptable for a defensive holding
+- 10-15%: good compounding
+- 15%+: exceptional — true compounder
+
+If aggregate growth is 15% but per-share growth is 7%, the company looks like a great growth story but is actually mediocre for owners.
+
+### Capital Allocation Quality
+
+Every material equity issuance in the analysis period:
+
+| Year | Shares Issued (M) | % of Then-Outstanding | Use of Proceeds | Issue Price | IV at Time | Value Impact |
+|------|-------------------|----------------------|-----------------|-------------|-----------|--------------|
+| | | | M&A / Capex / Refi / GenCorp | | | + / 0 / − |
+
+**Test:** Issue Price ≥ Intrinsic Value at issuance? If yes → potentially value-neutral or accretive. If no → mathematically value-destructive to existing holders, regardless of deployment quality.
+
+Symmetrically for buybacks:
+
+| Year | Shares Bought (M) | % of Then-Outstanding | Avg Price | IV at Time | Value Impact |
+|------|-------------------|----------------------|-----------|-----------|--------------|
+| | | | | | + / 0 / − |
+
+**Test:** Avg Price ≤ Intrinsic Value at buyback? If yes → value-accretive. If no → value-destructive, no matter how friendly the gesture.
+
+### Forward Dilution Overhang
+
+Items not yet in the diluted count but coming:
+
+| Item | Quantity | % of Diluted Shares | Trigger / Timing |
+|------|----------|-------------------|-----------------|
+| Out-of-money options | | | Stock price recovery |
+| Unvested RSUs | | | Vesting schedule |
+| Convertible bonds | | | If-converted threshold |
+| Warrants | | | Various |
+| Announced placements | | | Closing date |
+| **Total overhang** | | | |
+
+If total overhang > 5% of diluted shares, model both basic and fully-diluted scenarios in valuation.
+
+### Integration with Verdict
+
+The per-share scorecard feeds the final verdict:
+
+- **BUY conviction reduced by 1-2 points** if dilution drag > 3% AND not offset by demonstrably high-IRR deployment
+- **WATCHLIST or PASS** if dilution drag > 5% AND per-share economics are flat
+- **AVOID** if dilution drag > 5% AND management has issued at prices below IV historically (proven value-destroyer)
+
+**Why this is non-negotiable:** Buffett's most-quoted dilution comment: *"If a company issues stock at a price below its intrinsic value, the per-share value of the remaining shareholders is reduced — even if the cash is well-deployed."* This is mechanical, not theoretical. The math is independent of how good the M&A or capex turns out to be.
+
+---
+
 ## Warning Signs Across All Frameworks
 
 These are immediate disqualifiers or require extraordinary justification to overcome:
