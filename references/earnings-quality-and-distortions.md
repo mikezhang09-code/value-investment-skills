@@ -161,7 +161,7 @@ Symmetric to issuance — buybacks at the right price create value, at the wrong
 Items NOT yet in the share count but will dilute future EPS:
 - Out-of-the-money options near strike
 - Unvested RSUs
-- Convertible bonds (track if-converted scenarios)
+- Convertible bonds (track if-converted scenarios) — **MANDATORY scan**: also check whether any convert/preferred *converted within the comparison window* (tells: convert-interest → 0; basic shares jump while diluted flat; diluted-EPS note drops its convert add-back). A completed conversion is a one-time step-up, not chronic dilution — anchor on diluted and assess conversion price vs IV (see Process Lesson Class 11)
 - Warrants
 - Anti-dilution provisions in preferred shares
 - ESOP allocations announced but not granted

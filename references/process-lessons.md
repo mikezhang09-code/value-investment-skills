@@ -128,6 +128,19 @@ Both families need separate defenses. Mechanical errors are stopped at Step 2.5 
 
 **Prevention:** Step 3.5 — compute true net debt including pensions, leases, guarantees, JV proportionate debt.
 
+
+### 11. Convertible / Hybrid Conversion Misread
+**Family:** Interpretive
+**Frequency:** Common — HK/China names financed via convertible bonds or convertible preferreds; warrant-heavy US names; post-restructuring capital stacks.
+
+**Cost:** Two opposite failure modes. (a) **Missed live instrument** — a convertible/preferred not yet in the basic count is ignored → forward dilution understated, IV overstated. (b) **Misread completed conversion** — a convert that has already converted is mistaken for chronic dilution → conviction wrongly cut, or a flat basic EPS misread as an earnings problem.
+
+**Prevention:** At Step 2.5/3.5, inventory every convertible bond, convertible preferred, and warrant. For each: (1) run the **if-converted test** — compute the fully-diluted share count and per-share IV; if overhang > 5%, value on a fully-diluted basis. (2) Check whether a conversion occurred **within the comparison window**. A completed conversion is a *one-time basic-share step-up, not recurring dilution* — anchor on diluted / fully-diluted per-share metrics, and judge the **value transfer separately** (conversion price vs IV at conversion; converting below IV is a one-off transfer to bondholders, usually small).
+
+**Conversion-in-transit tells:** convertible-interest line drops to zero; weighted-average **basic** shares jump while **diluted** barely moves; the diluted-EPS note drops its prior-year convertible add-back (interest + assumed conversion).
+
+**Case study:** Bosideng (3998.HK) H1 FY26 — profit attributable +5.3% but **basic EPS flat** (diluted +1.5%), driven by the US$275M 1% CB due 2024 converting into ~560M shares at HK$3.83 between the comparison periods. One-time; convert interest fell RMB 36.6M → 0; the diluted-EPS note dropped its convert add-back. Overhang now cleared; mild value transfer (converted below ~HK$5 IV). The trap was over-penalizing it as chronic dilution; correct read was a cleared one-off.
+
 ---
 
 ## Most Useful Sanity Checks
@@ -213,6 +226,18 @@ If I change [share count / growth rate / discount rate /
 If yes → conclusion is fragile, verify the key input.
 ```
 
+
+### Check 11: Convertible / Hybrid Scan (1 minute)
+```
+Any convertible bonds, convertible preferreds, or warrants — now OR in the comparison window?
+  FORWARD:  compute fully-diluted share count; if overhang > 5% → value fully-diluted.
+  IN-TRANSIT: did one convert this period?
+     Tells = convert-interest line → 0; basic shares jump while diluted flat;
+             diluted-EPS note drops its convertible add-back.
+  IF CONVERTED → one-time step-up, NOT chronic dilution. Anchor on diluted.
+                 Assess conversion price vs IV (value transfer). Mark overhang cleared.
+```
+
 ---
 
 ## Process Behaviors to Reinforce
@@ -221,6 +246,7 @@ If yes → conclusion is fragile, verify the key input.
 - [ ] State share count explicitly at top of analysis
 - [ ] Document source for share count (annual report, EPS back-check, etc.)
 - [ ] Identify share-class structure (single-class, dual-class, dual-listed, ADR)
+- [ ] Inventory hybrid/convertible instruments (convertible bonds, convertible preferreds, warrants); note any conversion within the comparison window
 
 ### During Analysis
 - [ ] Run all four reconciliation anchors before any per-share calculation
@@ -358,3 +384,8 @@ If all three agree, you're safe. If they disagree, dig deeper.
 |------|--------------|---------|
 | 2026-05-18 | Share count reconciliation (BYD case) | User caught wrong market cap on BYD deep dive |
 | 2026-05-23 | Interpretive error framework (8 distortion classes) | User identified gap: one-time items, dilution, investment portfolios not systematically addressed |
+
+### Pattern: "Net income rose but basic EPS is flat (or basic and diluted EPS diverge)"
+**Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves
+**Diagnosis:** A convertible (bond or preferred) likely converted — shares crossing from *potential* (diluted-only) to *actual* (basic). Not chronic dilution; not an earnings miss.
+**Response:** Confirm via the convert-interest line (→ 0) and the diluted-EPS note (add-back dropped). Anchor on diluted per-share growth; assess conversion price vs IV for value transfer; mark the overhang cleared going forward.
