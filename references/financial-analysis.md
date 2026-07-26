@@ -274,10 +274,19 @@ While you don't need to formally calculate the M-Score, be alert to:
 ## 8. Industry-Specific Adjustments
 
 ### Banks & Insurance
+> **Quick reference only. The detailed version is `industry-playbooks.md` §F (Financials), which
+> overrides this section — load it before analysing any bank or insurer.** §F carries the full metric
+> substitution table, quick-kill screener substitutions, valuation method set, the I-1/I-2/I-3 and
+> B-1 distortion classes, and the underwriting-improvement signature test. Validated 2026-07-26
+> against two live insurance deep dives.
+
 - Use Price/Book instead of P/E as primary valuation
 - Focus on Net Interest Margin, Loan Loss Provisions, Capital Ratios (Tier 1)
-- Insurance: Combined Ratio (< 100% = profitable underwriting)
+- Insurance: Combined Ratio (< 100% = profitable underwriting) — **always decompose into expense
+  ratio and loss ratio; never report the headline alone** (§F.3)
 - Don't use debt metrics the same way — leverage is inherent to banking
+- **Delete gross margin, the D/E red flag, and FCF-quality logic entirely** — they do not exist or
+  actively mislead for financials (§F.2)
 
 ### Real Estate (REITs)
 - Use FFO (Funds From Operations) and AFFO instead of EPS

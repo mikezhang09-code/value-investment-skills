@@ -326,70 +326,43 @@ Conviction:      [High / Medium / Low]
 
 ---
 
-# Deliverable 2 — HTML Dashboard (Dark Luxe)
+# Deliverable 2 — HTML Dashboard
 
-*Added 2026-07-26. The ten-section Markdown structure above is unchanged and remains the primary
-deliverable; this specifies the companion dashboard, which previously had no written spec.*
+> ### ⚠️ Authoritative spec lives elsewhere — do not duplicate it here
+>
+> The HTML dashboard is fully specified in **`web-report/references/single-stock-report.md`**:
+> the complete HTML skeleton, the twelve tab definitions, required content per tab, `Charts Required`
+> lists, JS data-object schemas, stat-card and sensitivity-table layouts. Load that file, plus
+> `web-report/references/design-system.md`, before writing any HTML. Routing is in
+> `web-report/SKILL.md`.
+>
+> **The canonical twelve tabs are:**
+> `summary` · `business` · `management` · `financials` · `valuation` · `moat` ·
+> `industry` · `risk` · `monitoring` · `verdict` · `sources` · `screener`
+>
+> This list is reproduced here **for cross-checking only**. If it ever disagrees with
+> `web-report/references/single-stock-report.md`, that file wins and this note is the thing to correct.
 
-**Filename:** `report_<TICKER>_<YYYY-MM-DD>.html`
-**Theme:** Dark Luxe (`#06090f` background, `#c9a84c` gold accent). Playfair Display / Source Sans 3 /
-IBM Plex Mono / Noto Sans SC. Single self-contained file, Chart.js from CDN.
+**Mapping — Markdown section → dashboard tab**
 
-**Structure: 12 tabs = 10 fixed + up to 2 situational.**
+| Markdown §  | Dashboard tab |
+|---|---|
+| 1 Executive Summary | `summary` |
+| 2 Business Overview | `business` |
+| 3 Management Assessment | `management` |
+| 4 Financial Analysis | `financials` |
+| 5 Valuation | `valuation` |
+| 6 Moat Assessment | `moat` |
+| 7 Industry Context | `industry` |
+| 8 Risk & Trap Diagnostic | `risk` |
+| 9 Monitoring & Catalysts | `monitoring` |
+| 10 Verdict / Sources | `verdict`, `sources` |
+| Step 0 output | `screener` |
 
-Fixed:
-
-| # | Tab | Maps to |
-|---|---|---|
-| 1 | Summary | §1 |
-| 2 | Quick-Kill Screener | Step 0 |
-| 3 | Business & Moat | §2–3 |
-| 4 | Industry | §4 |
-| 5 | 10-Yr Financials | §5 |
-| 6 | Valuation | §6 |
-| 7 | Margin of Safety | §7 |
-| 8 | Frameworks | §8 |
-| 9 | Trap Check & Risk | §9 |
-| 10 | Verdict & Position | §1, §7 |
-| 11 | Sources | §10 |
-
-Situational — insert 1–2 where the thesis demands, ahead of Valuation:
-
-- **Quarter Delta** — for earnings-reaction and thesis-refresh scopes (used for 0700.HK Q1 FY26)
-- **Segments** — where segment mix is the thesis (0700.HK)
-- **Named thesis tab** — where one issue dominates (BABA "AI Capex"; an insurer would use
-  "Underwriting vs. Investment")
-
-Eleven fixed tabs plus one situational is the common case; twelve is the ceiling, not a quota. Do not
-pad to twelve with an empty tab.
-
-### Charts
-
-Target 10–12 Chart.js visualizations. Standard set:
-
-revenue/profit 10-yr · margin trend · ROIC vs. WACC · FCF vs. NI · share count · moat radar ·
-framework radar · valuation method comparison · IV scenario range (bear/base/bull vs. price) ·
-peer multiple comparison · DCF sensitivity matrix (colour-graded table, growth × discount rate)
-
-For financials, substitute per `references/industry-playbooks.md` §1.2: combined ratio decomposed
-(expense vs. loss, stacked) or NIM vs. credit cost replaces margin trend; ROIC vs. WACC is dropped;
-BVPS growth is promoted.
-
----
-
-## Rules That Apply to Both
-
-1. **Presentation order: HTML dashboard first, then Markdown report.** Then command-center.md, then
-   command-center.html.
-2. **Never fabricate a number to fill a cell.** An empty cell marked "not disclosed" is correct; an
-   invented one is not. ▲ marks anything approximate, in both files.
-3. **The verdict, conviction, fair value, and entry zone must be identical** across report,
-   dashboard, and command center. A mismatch is the most common source of downstream drift — check
-   before presenting.
-4. **Bilingual headers in both deliverables.** Chart axis labels may be English-only.
-5. **A cross-boundary CAGR is never printed as a number.** Mark it non-meaningful and say why.
-
----
+**Do not invent tabs.** A thesis-specific analysis (an SOTP walk-through, a named hypothesis test)
+belongs *inside* the tab it bears on — SOTP in `valuation`, a moat-durability test in `moat` — not in
+an additional tab. Deviating from the twelve produces dashboards that look bespoke and read
+inconsistently across the coverage book.
 
 ---
 
