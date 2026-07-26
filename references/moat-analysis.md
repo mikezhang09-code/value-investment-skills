@@ -231,3 +231,71 @@ For each moat type, common threats:
 
 If threats are **concrete and near-term** → narrow moat at best
 If threats are **speculative and distant** → likely wide moat
+
+---
+
+## The Deflation Sign Test: Which Line Does Cheap Technology Hit?
+
+A general test for assessing how a cost-deflating technology affects a business. Apply during moat
+durability assessment and Munger inversion, whenever a technology is plausibly about to make some
+input dramatically cheaper.
+
+**The central observation: the same technology can be existential or accretive to two different
+businesses, and the sign is set by the pricing convention, not by the technology.**
+
+### Test A — What is the customer buying?
+
+| The customer is buying | Cheap technology deflates | Effect |
+|---|---|---|
+| **Hours or headcount** | The **revenue** line | Existential. The customer can now see what the work should cost, and repricing follows |
+| **An outcome, access, or permission** | The **cost** line | Accretive. The saving stays in the margin, at least initially |
+
+The input cost and the revenue are the same number in a billable-hours model. Anything that collapses
+the cost of the input collapses the price of the output with it.
+
+*Prior application:* IT services (Infosys) was assessed as structurally disrupted **not** because AI
+performs IT work, but because the industry bills per person per hour. A business performing identical
+work under a fixed-price or outcome contract faces the opposite sign.
+
+### Test B — Was the input previously rationed?
+
+Where a business currently cannot afford to apply an input to every customer, claim, or transaction —
+and instead approximates with broad categories — cheap supply of that input does not merely reduce
+cost. It makes previously uneconomic activity viable. The effect is non-linear rather than
+incremental.
+
+Rationing is usually visible as a deliberate crudeness that everyone in the industry accepts:
+broad-brush risk classes, sampled rather than complete inspection, tolerated leakage booked as a cost
+of doing business.
+
+### Test C — Is the deflation retainable?
+
+Cost deflation stays in the margin only if competitors cannot force it into price.
+
+- **Fragmented industry** → competed away, typically within two cycles. The saving passes to the
+  customer and the analysis produces zero excess return despite being descriptively correct.
+- **Concentrated industry** → potentially retainable, but still requires a specific reason *this*
+  company captures it: proprietary data, scale, distribution, or regulatory position.
+
+**Test C is the one that usually fails.** A technology thesis that passes A and B but fails C is a
+true statement about the world that is worth nothing to a shareholder.
+
+### The Proprietary-Input Counter (apply always)
+
+If the advantage rests on the technology itself, and the technology is the thing becoming cheap and
+widely available, there is no moat — competitors buy the same capability. A durable advantage must
+rest on something the technology cannot supply: proprietary data, regulatory permission,
+distribution, or switching costs.
+
+Ask directly: **after this technology is universally available, what does this company still have
+that a competitor cannot buy?** If the answer is "nothing," the deflation is real and the moat is
+not.
+
+### Scoring
+
+All three tests plus the counter must pass before a deflation argument counts as moat evidence. Even
+then it is **qualitative evidence only** until it appears in the financial series — see
+`industry-playbooks.md` §1.8 for the general form of that discipline (track the line the effect
+should hit *first* against the line it should hit *later*; movement in the first line alone proves
+nothing). A deflation argument does not enter the valuation and is not a verdict-moving input under
+the ±20% rule until the series confirms it.

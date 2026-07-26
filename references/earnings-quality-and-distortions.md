@@ -518,6 +518,60 @@ Discount rate sensitivity is huge — a 1% drop in discount rate can increase pe
 
 Companies with material pension exposure (>10% of market cap) should have their net debt adjusted for net pension liability.
 
+### Accounting-Standard Transition Breaks ⚠️
+
+**The house standard is a 10-year table. Several accounting standards changed inside that window.
+A series computed straight through a transition is not a series — it is two series concatenated,
+and any CAGR drawn across it is invalid.**
+
+This is not an obscure edge case. It affects most of the coverage book at least once:
+
+| Standard | Effective | Who is affected | What breaks |
+|---|---|---|---|
+| **IFRS 17 / CAS 25** | 2023 | HK and mainland listed insurers | Revenue definition, profit recognition timing, equity. The most severe break of the four |
+| **IFRS 9 / CECL** | 2018 / 2020 | Banks, insurers, any holder of a large securities book | Provisioning basis (incurred → expected loss); FV movements routed through P&L |
+| **IFRS 16 / ASC 842** | 2019 | Every lessee — retail, restaurants, airlines, logistics | Operating leases capitalized. EBITDA, operating margin, and reported debt all step-change (see §Class 7) |
+| **IFRS 15 / ASC 606** | 2018 | Software, construction, long-contract businesses | Revenue recognition timing |
+
+**Rule:**
+1. Identify every transition inside the analysis window before building the table.
+2. Compute pre- and post-transition series **separately**, or use restated figures only where the
+   company published them (most publish 1–2 restated comparative years, rarely more).
+3. **Flag any cross-boundary growth rate as non-meaningful rather than reporting a number.** A
+   footnoted invalid CAGR still gets read as a fact.
+4. State the basis used in the Data Trail: pre-transition / post-transition / restated.
+
+**Diagnostic:** a step-change in a ratio in a single year, with no operational explanation and no
+comparable move at peers on a different reporting basis, is a transition artifact until proven
+otherwise. Check the effective-date table above before hunting for a business cause.
+
+Sector-specific applications, including the insurance instance (I-3), are in
+`industry-playbooks.md`.
+
+---
+
+## Sector-Specific Distortion Classes
+
+The eight classes above are **universal** and are not renumbered. Sectors whose economics break the
+generic template carry additional classes, defined in `industry-playbooks.md` with a sector prefix:
+
+| Prefix | Sector | Classes |
+|---|---|---|
+| **I-n** | Insurance | I-1 prior-year reserve development; I-2 long-tail discount rate assumptions; I-3 IFRS 17 / CAS 25 comparability break |
+| **B-n** | Banking | B-1 provisioning and ECL discretion |
+
+**Two rules govern these:**
+
+1. **Numbering.** A bare "Class 3" always means the universal class above. Sector classes always
+   carry their prefix. This also keeps them clear of the separately-numbered error classes in
+   `process-lessons.md`, which run 1–11 on their own scheme — note that "Process Lesson Class 11"
+   (convertible/hybrid conversion misread, cross-referenced under Class 2 above) is a different
+   series entirely.
+2. **Scoring.** Sector classes do **not** enter the /40 composite. The composite stays at 8
+   dimensions × 5 so scores remain comparable across the whole coverage book. Sector classes are
+   binary gating flags: clear or flagged, each flag raised appears in the executive summary, and
+   two or more flags cap conviction at 6/10 and require normalized figures throughout the valuation.
+
 ---
 
 ## Step 3.5 Workflow Integration

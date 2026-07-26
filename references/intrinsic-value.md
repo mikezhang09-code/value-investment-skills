@@ -213,6 +213,96 @@ Liquidation Value (more conservative):
 
 ---
 
+## Method 6: Sum-of-the-Parts (SOTP)
+
+**Mandatory** for holding companies, conglomerates, and any business where distinct segments have
+materially different economics or would command materially different multiples standalone.
+`earnings-quality-and-distortions.md` Class 3 (Type B, holding company portfolios) requires an SOTP
+reconciliation; this section is the method it requires.
+
+```
+For each part:
+  Value = segment metric × justified multiple
+          (or a standalone DCF/EPV where the segment merits it)
+
+Then:
+  Gross asset value      = Σ (all parts)
+  − Net holdco debt
+  − Capitalized holdco corporate costs (see below)
+  − Tax on unrealized gains where disposal is the realization path
+  = Net asset value (NAV)
+  NAV per share = NAV / total diluted shares (all classes — Step 2.5 Anchor 4)
+```
+
+**Valuing each part:**
+
+| Part type | Basis |
+|---|---|
+| Listed stake | Market value of the stake × ownership %. Use the market price, not your own IV — the discount you are testing for is the *holdco* discount, not a double-counted subsidiary discount |
+| Unlisted operating subsidiary | Peer multiple on the subsidiary's own earnings, or standalone EPV |
+| Non-operating assets (property, cash, investments) | Book value if recently marked; independent estimate if stale |
+| Loss-making segment | Value it. A negative number is a legitimate SOTP input — do not floor it at zero |
+
+**Holdco corporate costs are a real deduction.** Unallocated head-office cost is a perpetual charge
+against the parts. Capitalize it (annual cost ÷ discount rate) and subtract. Omitting this is the
+most common way an SOTP overstates NAV.
+
+**The discount question is the whole analysis.** A holdco trading below NAV is not automatically
+mispriced. A persistent structural discount — state control, poor capital allocation history, no
+realization path, tax friction on disposal — is a *feature* of the security, not a mispricing.
+
+> **Required before any SOTP-based verdict:** state a specific reason the discount narrows, with a
+> mechanism and a timeframe. "It is too wide" is not a reason. If no mechanism exists, value the
+> stock at the historical average discount rather than at NAV.
+
+### ⚠️ The duplicate-exposure test (amendment 2026-07-26)
+
+**When one listed stake is the large majority of a holdco's value, holdco-vs-NAV is the wrong
+comparison. The right one is holdco vs. owning the subsidiary directly.**
+
+```
+Stake concentration = (listed stake at market) ÷ (holdco market cap)
+```
+
+| Concentration | Reading |
+|---|---|
+| > 80% | **Run the duplicate-exposure test — it usually decides the case.** The holdco is a wrapper |
+| 50–80% | Test as a cross-check |
+| < 50% | Genuine conglomerate; standard SOTP governs |
+
+Above ~80%, buying the holdco is substantially buying the subsidiary plus a bundle of *everything
+else the holdco contains*, wrapped in a discount. Ask directly:
+
+1. What does the holdco give me that owning the subsidiary directly does not? (Usually: nothing —
+   no control, no better access, no cheaper entry.)
+2. What does it *add*? (Corporate cost, a tax layer on realization, the other subsidiaries' economics,
+   governance distance, and a discount that may never close.)
+3. **Is the discount large enough to pay for what it adds?**
+
+If the answer to (3) is no, the subsidiary is the better instrument and the holdco is a WATCHLIST at
+best regardless of how wide the NAV discount looks.
+
+*Live example — PICC Group (1339.HK), 2026-07-26.* The 68.98% PICC P&C stake at market was **95.3%**
+of group market cap (112.7% at the lower price print), so ~95% of the capital bought an exposure
+available directly and more cleanly at 2328.HK — plus a life insurer writing over 40% of the sector's
+loss-making new business, inside a discount with no closing mechanism. The duplicate-exposure test,
+not the NAV discount, decided the verdict.
+
+> **Portfolio consequence.** A parent and its listed subsidiary are **one exposure held two ways, not
+> two positions.** If both are held, the combined position cap is the subsidiary's cap — **never the
+> sum.** Record them as a single line for concentration purposes.
+
+**Error checks (both are on the `data-sources.md` red-flag list):**
+- **RF-1** — no pending M&A embedded on both sides. A target being acquired must appear once: either
+  as consideration outflow or as an acquired asset, never as both.
+- **RF-2** — every stake percentage verified from a filing, listed *and* unlisted. Unverified stakes
+  are the canonical double-count setup.
+
+Also confirm the sum of segment earnings reconciles to consolidated earnings before you start; if it
+does not, the segments are not exhaustive and something is being valued at zero by omission.
+
+---
+
 ## Triangulation and Final Estimate
 
 After running at least two methods, compare results:
@@ -223,7 +313,14 @@ After running at least two methods, compare results:
 | EPV | | | |
 | Graham Formula | | | |
 | DDM (if applicable) | | | |
+| SOTP (if holdco/conglomerate) | | | |
 | **Weighted Average** | | | |
+
+**Method selection is not universal.** Financials (insurers, banks) use a different method set —
+P/B calibrated to sustainable ROE as the primary anchor, EPV as floor, DDM or SOTP alongside, and
+**no Graham Formula and no NCAV**. See `industry-playbooks.md` §1.5 before valuing any financial.
+Where the standard DCF-led set is not used, say so explicitly in the report rather than leaving the
+reader to assume it was skipped.
 
 **When methods diverge significantly:**
 - EPV << DCF: The market is paying a lot for growth. Risky if growth disappoints.
@@ -289,6 +386,20 @@ For a heavily-covered mega-cap stock (top 50 by market cap in any major index, o
 4. Cross-check against analyst consensus — what specifically do you see differently?
 
 A 40%+ MoS on a mega-cap should require an explicit explanation of "why is the market wrong here?" Default to error probability, not market inefficiency.
+
+**Coverage condition (when Test 1 does NOT apply).** This test derives its force from the number of
+professional eyes on the stock. It is not a general rule that large discounts are errors. Test 1 does
+not fire by default where:
+- Analyst coverage is thin (roughly <5 sell-side analysts), or
+- The name is a small/micro-cap outside major indices, or
+- The stock was deliberately sourced from a neglect screen, where a wide discount is the *thesis*
+  rather than an anomaly
+
+In those cases, substitute Tests 2 and 3 (peer multiple cross-check and reverse DCF) as the primary
+discipline — they test the model against observable prices rather than against consensus attention.
+State in the report which test set was applied and why. Applying Test 1 by reflex to a neglected name
+inverts its purpose: it would systematically talk you out of exactly the setups the neglect screen
+exists to find.
 
 ### Test 2: Peer Multiple Cross-Check
 

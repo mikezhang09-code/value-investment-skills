@@ -4,6 +4,277 @@
 
 ---
 
+## §F — Financials Cross-Cutting Rules (Insurance + Banking)
+
+> **Validated 2026-07-26** against two live deep dives — PICC P&C (2328.HK) and PICC Group (1339.HK).
+> These rules **override the generic workflow** for any insurer, reinsurer, insurance holding company,
+> bank, or holding company whose earnings are mostly a regulated financial subsidiary. They apply in
+> addition to the sector narratives in §Insurance and §Banking below, which remain the primary
+> qualitative frameworks.
+
+## How This File Overrides the Generic Workflow
+
+| Step | Override status |
+|---|---|
+| Step 0 quick-kill screener | **Partial override** — specific questions are substituted per sector (see §F.1). Q7 (integrity) is never overridden. |
+| Step 2.5 reconciliation gate | **No override.** All four anchors apply unchanged to every sector. |
+| Step 3 metric table | **Full override** where a sector section specifies substitutions. |
+| Step 3.5 earnings quality | **Additive.** Core Classes 1–8 and the /40 composite are unchanged. Sector classes are additional binary gating flags. |
+| Step 6 valuation | **Full override** of method selection where specified. |
+| Step 6.5 plausibility | **No override**, one conditioning note (see §F.6). |
+
+**Rule:** if a sector section is silent on something, the generic workflow governs. Sector sections
+narrow the generic template; they never loosen the gates.
+
+## §F.0 Why the Generic Template Misfires on Financials
+
+For a financial, taking deposits or premiums and investing the proceeds *is* the business. The
+generic template reads that structure as distress:
+
+- **Leverage is the product, not the risk.** Regulatory leverage of 8–15× equity is structural for a
+  bank and an insurer. The generic "Debt/Equity > 1.0 = red flag" fires on every healthy financial.
+- **There is no cost of goods sold.** Gross margin does not exist. Operating margin has no
+  comparable construction.
+- **Operating cash flow is a growth signal, not a quality signal.** Premiums and deposits arrive
+  before claims and withdrawals leave. A strong operating cash-flow print usually means the book is
+  *growing*. The generic "FCF > NI = high earnings quality" is not merely unhelpful here — it is
+  inverted, and will read balance-sheet expansion as earnings integrity.
+- **Risk is recognised on a lag.** Underwriting losses and credit losses show up years after the
+  business was written. Current-period profit is substantially a management estimate.
+
+The last point is the one that matters most. For an industrial, the main earnings-quality question is
+whether reported profit converts to cash. For a financial, it is **whether the reserve or provision
+against future losses is adequate** — a question cash conversion cannot answer.
+
+## §F.1 Step 0 — Quick-Kill Screener Substitutions
+
+Six of the eight questions apply unchanged. Two misfire and are substituted. **Q7 (management
+integrity) remains an automatic veto and is never substituted** — for a financial it arguably carries
+more weight than elsewhere, because reserve and provision adequacy is unverifiable from outside and
+rests on management honesty.
+
+| # | Generic question | Financials substitution |
+|---|---|---|
+| 5 | Does profit genuinely convert to cash? | **Insurance:** is the combined ratio earned by current underwriting, or flattered by prior-year reserve releases? **Banking:** is the credit cost normalized, or is the current year benefiting from provision write-backs? |
+| 6 | In a worst case (revenue −30%), can it survive without dilution? | **Insurance:** does the solvency ratio hold above the regulatory intervention threshold under a stress scenario (1-in-200 catastrophe for P&C; a 100bp+ rate move plus equity drawdown for life)? **Banking:** does CET1 hold above requirement plus buffer under stressed credit costs? |
+
+Q6's substitution is the reason the generic version fails: an insurer does not fail from a revenue
+decline, it fails from a capital shortfall against liabilities it already wrote.
+
+## §F.2 Step 3 — Metric Substitutions (all financials)
+
+| Generic metric | Status | Replacement |
+|---|---|---|
+| Gross margin % | **Delete** | Does not exist |
+| Operating margin % | **Delete** | Insurance: combined ratio (综合成本率) — inverse sense, below 100% = underwriting profit. Banking: cost-to-income ratio (成本收入比) |
+| Debt/Equity > 1.0 = red flag | **Delete** | Insurance: solvency ratio (偿付能力充足率), both comprehensive and core, under C-ROSS II. Banking: CET1 / total capital adequacy ratio. Regulatory leverage is structural, not a warning |
+| FCF persistently < NI = red flag | **Delete — actively misleading** | Operating cash flow is dominated by premium/deposit timing and reserve/provision movement. Track book value growth and reserve or provision adequacy instead |
+| FCF > NI = quality green flag | **Delete — actively misleading** | Usually signals a growing book, not clean earnings |
+| ROE % | **Keep — primary** | The core compounding measure. **Always decompose** — insurance: underwriting vs. investment contribution; banking: NIM vs. fee vs. credit cost |
+| ROIC % | **Delete** | Invested capital has no clean construction when the liability side is the funding source |
+| Book value / share | **Keep — promote to primary** | BVPS growth (plus dividends) is the core long-run scorecard, especially for P&C |
+| EPS (diluted) | **Keep** | Unchanged |
+| Revenue | **Keep, redefine** | Insurance: gross written premium *and* net earned premium — state which. Banking: net interest income + non-interest income |
+
+> ⚠️ **Book-value quality caveat (amendment, 2026-07-26).** BVPS is promoted to a primary metric
+> above, and for financials it is usually the P/B denominator — but **book value is itself
+> mark-to-market** for any institution carrying a large equity or FVTPL portfolio. Striking P/B at a
+> market high therefore re-imports the exact cyclicality that normalizing the ROE numerator was meant
+> to remove, and the error compounds: the numerator is normalized while the denominator is not.
+> **Where the equity weight exceeds ~15% of investment assets, state the equity weight next to the
+> P/B, and sanity-check fair value against a normalized book value as well as the reported one.**
+> PICC P&C carried a 27.9% equity weight into a market high; its Q1 FY26 net profit fell 24% on
+> mark-to-market losses, which hits earnings *and* book simultaneously.
+
+**The undecomposed-ROE rule.** Never report a financial's ROE as a single number. An insurer earning
+its ROE from investment gains while underwriting at a loss is a leveraged bond fund with a
+distribution network, and should be valued as one. The same logic applies to a bank whose ROE is
+carried by trading income rather than net interest margin.
+
+## §F.5 Step 6 — Valuation Adaptations
+
+| Method | Insurance | Banking |
+|---|---|---|
+| **P/B calibrated to sustainable ROE** | **Primary anchor.** Justified P/B ≈ (ROE − g) / (r − g) | **Primary anchor.** Same construction |
+| **EPV on normalized underwriting profit** | **Floor.** Establishes the no-growth downside per house discipline | **Floor**, on normalized pre-provision profit less normalized credit cost |
+| **SOTP** | **Mandatory for holdcos.** Now defined as Method 6 in `intrinsic-value.md` | Mandatory for holdcos |
+| **Embedded value** | **Life only.** Dense with management assumptions (discount rate, mortality, lapse). Stress-test each; never accept as reported | N/A |
+| **DDM** | Usable for mature, stable-payout insurers | Usable — often the cleanest method for a mature bank |
+| **Owner Earnings DCF** | **Degrades badly.** "Owner earnings" require float adjustment; the maintenance-capex construction has no clean analogue. If used at all, use as a cross-check, never as the primary anchor | Same caveat |
+| **Graham Formula** | **Do not use.** Close to meaningless on an insurer | **Do not use** |
+| **NCAV / asset-based** | Not applicable | Not applicable |
+
+> ⚠️ **P/B and EPV are NOT independent methods (amendment, 2026-07-26).** Justified P/B is
+> (ROE − g)/(r − g) and EPV is E/r. As normalized ROE approaches r, the two converge by construction —
+> they are the same statement about earning power expressed against different denominators.
+> **Triangulating on both and calling it two confirmations overstates confidence.** On PICC P&C the
+> base case produced a P/B fair value of HK$17.52 and an EPV of HK$16.55; that 6% agreement is
+> arithmetic, not corroboration. Where both are used, say so explicitly and treat them as **one**
+> method for the purpose of the probability weighting, then reach for a genuinely independent third —
+> DDM, SOTP, or a peer multiple cross-check.
+
+This means a financial will usually triangulate on **P/B-on-sustainable-ROE + EPV + DDM or SOTP**,
+not on the DCF-led combination used elsewhere. State the method set explicitly in the report — a
+reader who sees no DCF should be told why, not left to assume it was skipped.
+
+## §F.6 Step 6.5 — One Conditioning Note
+
+Test 1 ("too good to be true") conditions its skepticism on heavy analyst coverage, and correctly so.
+Several financials in the relevant markets are structurally under-covered. **On a name with thin
+coverage, Test 1 does not fire by default** — a wide MoS there is not automatically a model error.
+Substitute Tests 2 and 3 (peer multiple cross-check and reverse DCF) as the primary discipline, and
+say in the report which test set was applied. Tests 2–4 otherwise apply unchanged.
+
+## §F.7 Sector Distortion Classes (Step 3.5 add-on)
+
+**Numbering rule.** The core earnings-quality classes 1–8 in `earnings-quality-and-distortions.md`
+are universal and are **not** renumbered. Sector classes carry a sector prefix — I-n for insurance,
+B-n for banking — so that a bare "Class 3" always means the universal class, and so these never
+collide with the separately-numbered error classes in `process-lessons.md`.
+
+**Scoring rule.** These do **not** enter the /40 earnings-quality composite. The composite stays at
+8 dimensions × 5 so that scores remain comparable across the whole coverage book. Sector classes are
+**binary gating flags**: each is either clear or flagged. Any flag raised must appear in the
+executive summary. **Two or more flags raised caps conviction at 6/10** and requires normalized
+figures throughout the valuation, mirroring the core gate condition.
+
+### I-1 — Prior-year reserve development
+The single largest discretionary earnings lever in P&C. Favourable development releases prior
+reserves into current-year income; adverse development does the reverse. A combined ratio flattered
+by releases is not the same as one earned by underwriting.
+*Check (harvesting):* Is the current-year result dependent on prior-year releases? What is the multi-year pattern?
+Persistent favourable development may indicate systematic over-reserving (conservative, benign) or
+reserve harvesting to smooth results (not benign). Distinguish by whether releases are stable in size
+or conveniently sized to hit a target.
+
+*Check (strengthening — the positive case, amendment 2026-07-26):* **This class is not only a
+detector of bad news.** Run the test in both directions:
+
+| Signal | Reading |
+|---|---|
+| Reserve ratio **falling**, reserves growing slower than earned premium | Possible harvesting — the reported CoR is flattered. Investigate |
+| Reserve ratio **rising**, reserves growing faster than earned premium | **Strengthening.** The reported CoR is *understated* relative to a constant-reserving peer, and its credibility is enhanced |
+
+A rising reserve ratio is a **credibility multiplier on every other underwriting number in the
+report**, and should be stated as such rather than passed over. On PICC P&C, reserves grew 7.6%
+against revenue of +5.4% with the reserve ratio up 1.6pp — which is what allowed the §F.8 expense-only
+finding to be read as a genuine operating fact rather than a possible reserving artifact. Without
+clearing I-1 in the positive direction, that conclusion would have been unsafe.
+
+### I-2 — Long-tail discount rate assumptions
+Under IFRS 17, discount rates on long-duration liabilities materially affect reported profit and
+equity. Small assumption changes move large numbers.
+*Check:* Disclosed discount rate vs. peers. Direction of assumption change vs. direction of the
+earnings surprise — if they move together, the surprise is partly manufactured.
+
+### I-3 — IFRS 17 / CAS 25 comparability break
+The insurance instance of the universal transition-break rule now in
+`earnings-quality-and-distortions.md` ("Accounting-Standard Transition Breaks"). Adopted 2023 by HK
+and mainland listed insurers. **A ten-year table spanning that boundary is not comparable, and any
+CAGR computed straight through it is invalid.** Compute pre- and post-transition series separately,
+or use restated figures only. State the basis in the Data Trail.
+*Open question — **RESOLVED 2026-07-26** (PICC P&C):* pre-2023 series are **not** usable. HKFRS 17 and
+HKFRS 9 were adopted 1 January 2023 with **only FY2022 restated**, so the comparable window is
+FY2022(restated) → present. For a 2026 analysis that is **four years, not ten.** The constraint is
+more severe than originally anticipated:
+
+- **A ten-year table is impossible for any HK/mainland insurer.** Do not build one. State the
+  four-year limit explicitly in the report rather than silently truncating.
+- Pre-transition figures may be shown for context **only** if labelled non-comparable and excluded
+  from every growth calculation.
+- Combined ratio specifically is redefined by the standard (the HKFRS 17 formula includes insurance
+  finance income/expense), so pre-2023 CoR is not merely differently-based — it is a different
+  measure.
+
+*Bonus resolution:* the comprehensive-vs-core solvency labelling ambiguity is settled by convention —
+**comprehensive > core** always. Verified on PICC Group (249.9% / 201.3%) and applied to PICC P&C
+(232.4% / 213.4%).
+
+### B-1 — Provisioning and ECL discretion
+The banking analogue of I-1. Expected-credit-loss provisioning under IFRS 9 / CECL is
+management-estimated and cycle-sensitive. Write-backs flatter current earnings; front-loading
+depresses them.
+*Check:* Credit cost in bps vs. the bank's own 10-year range and vs. peers. Is the current year's
+profit growth explained by lower provisions rather than higher pre-provision profit? Compute
+pre-provision operating profit growth separately — it is the cleaner series.
+
+## §F.8 The Underwriting-Improvement Signature (monitoring rule)
+
+Applies whenever a thesis, a management narrative, or a sell-side note claims an insurer's
+underwriting is structurally improving — from technology, data, pricing discipline, or anything else.
+
+**Cost improvements hit the expense ratio first and the loss ratio later.**
+
+- **Expense ratio improvement alone = cost-cutting.** Anyone can do it, it competes away, and it
+  proves nothing about risk selection.
+- **Loss ratio improvement at constant business mix = risk selection genuinely improved.** That is
+  the real claim.
+
+**The test is the divergence, not either series alone.** If only the expense ratio moves, the claim
+is unproven regardless of how compelling the narrative sounds.
+
+**Monitoring procedure:**
+1. Track expense ratio and loss ratio as separate quarterly series.
+2. Control for business mix — a loss-ratio shift caused by re-weighting toward non-motor is not
+   evidence.
+3. Control for the pricing cycle — soft and hard markets move loss ratios for unrelated reasons.
+4. Require multi-year persistence. One good year is weather, reserve release, or luck.
+
+**Binding classification.** Until the loss-ratio series confirms divergence, any such claim is
+**qualitative moat evidence only**. It does **not** enter the valuation and is **not** a
+verdict-moving input under the ±20% rule in `data-sources.md`. Acting on it before the series
+confirms is paying for a forecast, not reading a fact.
+
+*Provenance note:* this rule was developed while stress-testing a specific directional thesis about
+cheap machine cognition and insurance margins. That thesis is deliberately **not** in Project
+Knowledge — an unproven directional argument sitting in the default load path becomes a prior that
+the analysis is then run to confirm, which is the failure mode `sell-discipline-and-traps.md` guards
+against. The test above is thesis-neutral and survives on its own merits. If a live thesis is being
+evaluated in a session, it belongs in that session's context, not here.
+
+## §F.9 Data Sources for Financials
+
+Extends `data-sources.md`. Same primary-source discipline applies.
+
+**Mainland China insurers and banks**
+- **NFRA** (国家金融监督管理总局) — regulatory rulings, permitted pricing granularity, industry
+  aggregates. Note that permitted motor-pricing granularity is a policy variable, not a technical
+  one, and can change.
+- **Quarterly solvency reports** (偿付能力季度报告) — published separately from annual reports,
+  usually on the insurer's own site. Contains comprehensive and core solvency ratios, risk
+  comprehensive rating, and stress-test disclosures. **This is the primary source for the §F.1 Q6
+  substitution and is not in the annual report.**
+- **Industry association aggregates** (中国保险行业协会 / 中国银行业协会) for market share and
+  premium-pool trajectory.
+
+**HK-listed (H-share) insurers and banks**
+- HKEx News annual and interim reports — combined ratio, NBV, EV, solvency all disclosed here.
+- ⚠️ **Step 2.5 Anchor 4 is live on every A+H financial.** Verify share-class structure before any
+  per-share work. This is the trap that produced the Ping An discrepancy (18.2B true vs. 7.45B
+  shown) and the BYD error. Cross-listed insurers and banks are among the most common instances.
+
+**Indian banks (HDFC Bank, ICICI)**
+- RBI disclosures and the bank's own quarterly investor presentation — NIM, NPL, provision coverage,
+  CET1 are all in the quarterly deck, usually before they appear in any filing.
+
+**US filers**
+- SEC EDGAR 10-K Schedule P (P&C loss development triangles) is the primary source for I-1. It is
+  the most useful single disclosure in US insurance filing and has no direct equivalent in most
+  other jurisdictions — where it is absent, I-1 must be assessed from narrative disclosure and
+  flagged as lower-confidence.
+
+## §F.10 Report and Command-Center Integration
+
+- The 10-year table in the report replaces the deleted rows with the §F.2 substitutions. Do not print
+  an empty gross-margin row.
+- State the transition basis (pre-2023 / post-2023 / restated) in the Data Trail wherever a
+  multi-year series crosses the IFRS 17 boundary.
+- The command-center `note` field should carry combined ratio (decomposed) and solvency for an
+  insurer, or NIM and CET1 for a bank, in place of the margin figures used for industrials.
+- Sector distortion flags raised (I-n / B-n) are recorded in the note alongside any core EQ flag.
+
+---
+
 ## Insurance
 
 Buffett's most deeply understood industry and the core engine of Berkshire.
@@ -53,6 +324,52 @@ Float only has value when its cost is below the return on investment. The abilit
 - **Catastrophe events:** Short-term underwriting losses, but often bring pricing hardening — disciplined companies expand as competitors retreat
 - **Economic recession:** P&C premium volumes shrink; but catastrophe demand is inelastic
 
+### Additional Metrics — validated 2026-07-26
+
+**Combined ratio, always decomposed.** Split into expense ratio (费用率) and loss ratio (赔付率).
+Never report the headline alone — the split is load-bearing for §F.8.
+
+**Underwriting profit and investment income, tracked separately and never netted.** Two businesses,
+two earnings qualities, two multiples.
+
+**Float — MANDATORY, report in the table not the prose (amendment, 2026-07-26).**
+
+| Float metric | Formula | Why |
+|---|---|---|
+| Float size | ≈ net loss & LAE reserves (+ unearned premium where disclosed) | The scale of the free capital |
+| **Float cost** | **− underwriting profit ÷ average float** | **Negative = the insurer is *paid* to hold it. The Buffett condition** |
+| Float growth | YoY change in the above | Compounding capacity |
+
+This is the single most important structural number for any insurer and it must appear in the
+report's metrics table, not only in commentary. On the first live run it was the fact that separated
+"WATCHLIST" from "PASS": PICC P&C's float cost of roughly −6.4% is what makes a commodity business
+with a narrow moat still worth tracking.
+
+**Reserve adequacy.** Prior-year development and run-off triangles where disclosed. See I-1 below.
+
+**By sub-sector:**
+
+| Sub-sector | Add |
+|---|---|
+| P&C | Combined ratio by line, retention rate, mix (motor vs. non-motor) |
+| Life | New business value (NBV/新业务价值), NBV margin, embedded value, persistency/lapse rates, **PV of loss-making new contracts (mandatory — see below)**, channel mix (agency vs bancassurance), agent headcount trend |
+| Reinsurance | Combined ratio by treaty year, catastrophe exposure (PML), retrocession dependence |
+| Health | Medical loss ratio, claims leakage |
+
+> ⚠️ **Life new-business quality — NBV growth alone actively misleads (amendment, 2026-07-26).**
+> Under IFRS 17 / CAS 25, insurers disclose the **present value of loss-making (onerous) new
+> contracts**. This is the metric that reveals whether growth is being *earned* or *bought*, and it
+> can point the opposite way to NBV. PICC Life posted the **fastest** one-year NBV growth in the
+> Chinese sector (+64.5%) and the **fastest** premium growth (+18.8%) while writing **over 40% of the
+> five listed insurers' combined RMB 310bn of loss-making new contracts** — the worst in the sector
+> by a wide margin. On NBV alone it was the best performer; on new-business quality it was the worst.
+>
+> **Always pair NBV growth with the onerous-contract disclosure, and always check the channel mix
+> alongside it.** A shift from agency to bancassurance is a shift from an owned distribution moat to
+> a rented channel with worse economics — PICC Life's bancassurance share crossed 54.2% (+6pp,
+> overtaking agency for the first time) while agent headcount fell 7%. Rapid growth through a rented
+> channel at negative contract economics is the specific pattern to look for.
+
 ---
 
 ## Banking
@@ -93,6 +410,23 @@ The "black box" nature means loan quality, derivatives exposure, and trader beha
 - **Economic recession:** Loan defaults rise; under high leverage, modest losses amplified dramatically
 - **Deflation/falling asset prices:** Collateral values decline; loan quality deteriorates sharply
 - **Liquidity crisis:** Bank runs happen fast; confidence collapse can destroy an apparently healthy bank in days
+
+### Additional Metrics — added 2026-07-26 (unvalidated)
+
+Applies to the existing coverage (HDFC Bank, ICICI) and any future bank.
+
+- **Net interest margin (NIM)** and its direction against the policy-rate cycle
+- **Cost-to-income ratio**
+- **Asset quality:** gross and net NPL ratio (不良率), provision coverage ratio (拨备覆盖率), credit
+  cost (bps of average loans), and the restructured/watchlist book where disclosed
+- **Capital:** CET1, total CAR, and headroom over requirement
+- **Funding:** CASA ratio, loan-to-deposit ratio, deposit cost trend
+- **Growth quality:** loan growth vs. system growth, and mix shift toward higher-yield/higher-risk
+  segments
+
+**The credit-cost normalization rule.** A bank's reported profit in a benign credit year is not its
+mid-cycle profit. Value banks on normalized credit cost across a full cycle, in the same way the
+house treats commodity cyclicals on mid-cycle rather than peak earnings.
 
 ---
 
@@ -269,3 +603,45 @@ When applying these playbooks to HK/China-listed companies:
 3. **Apply the industry-specific metrics** alongside (not replacing) the standard Graham-Buffett framework
 4. **Check macro sensitivities** against the current macro environment
 5. **Cross-reference with the "Industries to Avoid" section** — if the business matches the structural patterns described there, increase skepticism regardless of apparent cheapness
+
+---
+
+## Change Log
+
+- **2026-07-26 (b)** — **Validated against two live deep dives** (PICC P&C 2328.HK; PICC Group
+  1339.HK). Eight amendments applied across four files:
+
+  | # | Amendment | File |
+  |---|---|---|
+  | 1 | Float cost promoted from prose to a **mandatory metrics table** in §F.3 | this file |
+  | 2 | **Book-value quality caveat** added to §F.2 — BVPS is itself mark-to-market for equity-heavy insurers, so P/B struck at a market high re-imports the cyclicality that normalizing the numerator removed | this file |
+  | 3 | §F.7 **I-1 given a positive-case diagnostic** — a *rising* reserve ratio is strengthening and acts as a credibility multiplier on every other underwriting number, not merely the absence of harvesting | this file |
+  | 4 | §F.5 notes that **P/B and EPV are not independent** (they converge as normalized ROE → r); count them as one method in the probability weighting | this file |
+  | 5 | **Step 2.5 Anchor 1 must run in reverse** (market cap ÷ share count → implied price, matched to the listing under analysis) — catches dual-listing *price-basis* errors that the forward test passes | `SKILL.md`, `data-sources.md` |
+  | 6 | **Duplicate-exposure test** added to SOTP Method 6 — above ~80% stake concentration, holdco-vs-subsidiary replaces holdco-vs-NAV as the deciding comparison | `intrinsic-value.md` |
+  | 7 | §F.3 requires **PV of loss-making (onerous) new contracts** and channel mix for life — NBV growth alone actively misled (sector's fastest NBV belonged to its worst new business) | this file |
+  | 8 | **Parent + listed subsidiary = one exposure** for concentration caps; combined cap is the subsidiary's, never the sum | `intrinsic-value.md`, `SKILL.md` |
+
+  Two open questions **resolved**: the pre-2023 insurance series is unusable (comparable window is
+  four years, not ten — a ten-year table is impossible for any HK/mainland insurer), and
+  comprehensive solvency is always > core.
+
+  What performed as designed and needed no change: the §F.2 metric substitutions, the §F.8 signature
+  test (which returned a clean, decision-relevant negative on its first use), the I-3 transition
+  break, and the §F.9 data-source routing.
+
+- **2026-07-26 (a)** — File created. Resolves the dangling `references/industry-playbooks.md` reference in
+  SKILL.md Step 5. §F Financials written, covering insurance and banking, adapted from an external
+  insurance sector draft. Changes from that source: scope widened from insurance-only to all
+  financials (the existing book holds two banks that hit the identical misfires); proposed earnings
+  quality Classes 9–11 renumbered to I-1/I-2/I-3 to avoid collision with the `process-lessons.md`
+  error-class series, and made binary gating flags rather than scored dimensions so the /40 composite
+  stays comparable across the book; screener Q5/Q6 substitutions added (the source asserted the
+  screener applied unchanged, which contradicted its own deletion of cash-conversion logic); banking
+  metrics and class B-1 added; data-source block added; the IFRS 17 rule generalized into
+  `earnings-quality-and-distortions.md` with I-3 retained as the sector instance; the underlying
+  directional thesis and its candidate shortlist deliberately excluded from Project Knowledge.
+
+- **Pre-2026-07** — Original ten-sector playbook (Insurance, Banking, Consumer Brands & Retail, Media
+  & Publishing, Energy & Utilities, Railways, Technology, Industries to Avoid, HK/China notes).
+  Retained in full; the §F financials block was added alongside it, not in place of it.

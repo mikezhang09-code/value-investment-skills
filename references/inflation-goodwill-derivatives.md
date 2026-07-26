@@ -184,3 +184,64 @@ When completing any stock analysis, overlay these macro risk factors as a final 
 4. **Currency exposure:** For companies with significant non-domestic revenue, assess hedging and translation risk.
 5. **Geopolitical risk:** Supply chain dependencies, market access restrictions, regulatory divergence across jurisdictions. Especially relevant for US/HK/China cross-border investments.
 6. **Derivatives exposure:** Apply the derivatives checklist. If material and opaque, increase required margin of safety.
+
+---
+
+## Additions — 2026-07-26
+
+*The scorecard, checklist and Look-Through Earnings sections above are unchanged. The following were
+missing and are added; nothing was replaced.*
+
+### Quantifying economic goodwill — the threshold test
+
+The concept is defined above; this makes it measurable.
+
+```
+Return on unleveraged net tangible assets
+  = Operating earnings after tax
+  ÷ (Net working capital + net PP&E)      [exclude goodwill and acquired intangibles]
+```
+
+| Return | Reading |
+|---|---|
+| > 25% | Large economic goodwill — a franchise (the See's Candies range) |
+| 12–25% | Moderate economic goodwill |
+| ≈ cost of capital | Little or none; the assets *are* the business |
+| < cost of capital | Value-destroying; assets worth more elsewhere |
+
+**Resolution rule:** a moat rated "wide" at Step 4 alongside a sub-cost-of-capital return on net
+tangible assets is a **contradiction** — one of the two assessments is wrong. Resolve it before the
+verdict rather than reporting both.
+
+### The "cost of standing still" cross-check
+
+Inflation scorecard factors **capital intensity** and **inventory exposure** should be read together,
+not separately. Both scoring −1 means the business must reinvest heavily just to sustain current
+physical output — nominal earnings growth will overstate the economics. That combination routes the
+name directly to the *heavy assets, low returns* trap in `references/sell-discipline-and-traps.md`,
+regardless of how good the pricing-power story sounds.
+
+**Corollary for owner earnings:** for capital-intensive businesses, maintenance capex should approach
+**replacement cost**, not book depreciation. Depreciation on assets bought decades ago understates
+what replacement actually costs — the most common way owner earnings get overstated for industrials.
+
+### Derivatives — two additions to the checklist above
+
+| # | Question | Red flag |
+|---|---|---|
+| 7 | **Do rating downgrades trigger collateral posting?** | Any downgrade trigger. Quantify the cash call at each notch |
+| 8 | **Can management explain the book in plain language?** | Deflection to complexity. **Complexity offered as reassurance is itself the red flag** |
+
+**Question 7 is the one that kills companies.** A solvent business with a rating-linked collateral
+trigger can fail on liquidity in weeks — this is the AIG mechanism, a liquidity failure rather than a
+solvency failure. Where such triggers exist, model the cash call explicitly alongside the Step 0
+stress test.
+
+### Gate conditions
+
+- **2+ red flags on the derivatives checklist → treat as outside the circle of competence**, unless
+  the business is a financial where derivatives use is core, disclosed and understood.
+- **Any undisclosed net exposure → cap conviction at 5/10.** You cannot size a position against a
+  risk you cannot bound.
+- For financials specifically, see `references/industry-playbooks.md` §F — derivatives use is normal
+  there and the checklist becomes a disclosure-quality test, not a disqualifier.

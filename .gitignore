@@ -1,3 +1,10 @@
 # macOS Finder configuration files
 .DS_Store
 **/.DS_Store
+
+# Live portfolio data and generated deliverables — never commit to a public repo
+command-center.md
+command-center.html
+report_*.md
+report_*.html
+research-note-*.md

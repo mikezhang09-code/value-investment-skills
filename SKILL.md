@@ -79,7 +79,8 @@ When asked to research a company or build a portfolio, follow this process:
 
 If either gate fails, no amount of valuation sophistication downstream will rescue the analysis.
 
-For portfolio construction requests, run steps 1–7 for each candidate, then apply `references/portfolio-construction.md` to build the final portfolio.
+For portfolio construction requests, run steps 1–7 for each candidate, then apply
+`references/portfolio-construction.md` to build the final portfolio.
 
 ---
 
@@ -133,6 +134,28 @@ If gap > 5% → STOP. One of the following is wrong:
 
 Investigate before proceeding.
 ```
+
+**⚠️ Run Anchor 1 in REVERSE as well — mandatory for every dual-listed name (amendment 2026-07-26).**
+
+```
+Implied Price = Published Market Cap ÷ Your Share Count
+
+This implied price MUST match the quoted price OF THE LISTING YOU ARE ANALYSING.
+```
+
+The forward test alone is not sufficient. On an A+H or dual-listed name the aggregator's error is
+often **not** a share-count error but a **price-basis error** — the market cap is struck on the *other*
+listing's price and then displayed beside the quote you are reading. The forward test can pass on
+that, because the numbers are internally consistent; they are just consistent with a different stock.
+
+*Live example — PICC Group (1339.HK), 2026-07-26.* Published market cap HK$331.40B beside a quoted
+H-share price of HK$5.40 implies 61,370mn shares, against a true count of 44,224mn (+39%). Running it
+in reverse: HK$331.40B ÷ 44,224mn = **HK$7.49**, which is the **A-share** price converted. Any ratio
+built from that market cap against the H-share price is overstated by roughly the A/H premium. A
+second source claimed 69,410mn shares (+57%).
+
+**Where the two directions disagree, Anchor 2 (EPS back-check) is the tiebreaker** — it is
+listing-agnostic because both net income and EPS come from the same filing.
 
 #### Anchor 2: EPS Back-Check (The Most Reliable Verification)
 ```
@@ -210,6 +233,8 @@ If ANY of the four anchors fails:
 ## Step 3: Financial Analysis
 
 Read `references/financial-analysis.md` for the full scoring framework and ratio definitions.
+See also `references/frameworks.md` (Combined Scoring /10, Per-Share Scorecard) and
+`references/earnings-quality-and-distortions.md` (ratio-quality interpretation).
 
 Build a **10-year financial summary table** with these rows:
 
@@ -241,6 +266,13 @@ Build a **10-year financial summary table** with these rows:
 - Share count flat or declining (buybacks)
 - Net cash or modest debt
 
+> ⚠️ **Financials carve-out.** The margin rows and the debt and cash-flow flags above are wrong for
+> insurers and banks — gross margin does not exist, regulatory leverage is structural rather than a
+> warning, and "FCF > NI" signals a growing book rather than clean earnings. **Before building the
+> table for any financial, read `references/industry-playbooks.md` §1.2** for the metric
+> substitutions. This applies to the coverage book today (HDFC Bank, ICICI, Berkshire, Waterdrop),
+> not only to future insurers.
+
 ---
 
 ## Step 3.5: Earnings Quality Gate (MANDATORY) ⚠️ NEW
@@ -263,6 +295,17 @@ This step is the **interpretive twin** of Step 2.5 (mechanical reconciliation). 
 | 6. Related-party transactions | Value leakage | RPTs material? Pattern of value transfer to controlling shareholder? |
 | 7. Off-balance-sheet items | True leverage | Pension underfund? Guarantees? VIE exposure? Lease debt? |
 | 8. Goodwill / acquisitions | Organic vs. acquired growth | What % of recent growth is M&A vs. organic? ROIC ex-goodwill? |
+
+> **Sector classes.** Some sectors carry additional distortion classes, prefixed by sector and
+> defined in `references/industry-playbooks.md`: **I-1/I-2/I-3** (insurance — reserve development,
+> long-tail discount rates, IFRS 17 break) and **B-1** (banking — provisioning/ECL discretion). These
+> are **binary gating flags, not scored dimensions** — the composite below stays at /40 so scores
+> remain comparable across the coverage book. Two or more sector flags raised caps conviction at
+> 6/10.
+>
+> Separately, check for **accounting-standard transition breaks** (IFRS 17, IFRS 9/CECL, IFRS 16,
+> IFRS 15) inside the 10-year window before computing any CAGR — see
+> `references/earnings-quality-and-distortions.md`.
 
 ### Required Outputs
 
@@ -360,6 +403,12 @@ A true franchise business meets ALL three: (1) product/service is needed or desi
 
 Read `references/industry-playbooks.md` for sector-specific evaluation frameworks.
 
+⚠️ **Load this file early, not at Step 5.** Where a sector playbook exists, it overrides the metric
+table at Step 3 and the valuation method set at Step 6 — both of which run before this step. Check
+the sector index at the top of that file during Step 1 (Scope) and load it then if the subject is
+covered. Sector sections narrow the generic template; they never loosen Step 2.5, Step 6.5, or the
+Q7 integrity veto.
+
 After identifying the industry, apply the sector-specific lens:
 - **Industry-specific key metrics** (e.g., Combined Ratio for insurance, NIM for banks, NRR for SaaS)
 - **Macro sensitivity analysis** (interest rate, inflation, recession, regulatory impacts)
@@ -379,6 +428,13 @@ Use **at least two** of these methods and triangulate:
 3. **Graham Formula**: for simpler businesses with predictable earnings
 4. **Dividend Discount Model**: for mature dividend-paying companies
 5. **Asset-based / NCAV**: for deeply distressed situations (Graham-style)
+6. **Sum-of-the-Parts (SOTP)**: mandatory for holdcos and conglomerates, and for any business whose
+   segments would command materially different standalone multiples
+
+⚠️ **Method selection is not universal.** Financials use a different set — P/B calibrated to
+sustainable ROE as the primary anchor, EPV as floor, DDM or SOTP alongside, and **no Graham Formula,
+no NCAV**. See `references/industry-playbooks.md` §1.5. Where the standard set is not used, say so
+explicitly in the report.
 
 Present as a range:
 ```
@@ -515,7 +571,8 @@ Support the recommendation with:
 
 ## Step 10: Report Generation
 
-Read `assets/report-template.md` and produce:
+Read `assets/report-template.md` for the deliverable specification — the ten Markdown sections,
+the dashboard tab structure, and the rules that apply to both — and produce:
 
 **Written Investment Report** (always):
 - Professional, investor-grade language
@@ -532,6 +589,9 @@ Read `assets/report-template.md` and produce:
 
 **Portfolio Addition Summary** (if adding to portfolio):
 - Read `references/portfolio-construction.md`
+- ⚠️ **Parent and listed subsidiary are ONE exposure, not two.** Where the book holds (or might hold)
+  both a holding company and a listed subsidiary that constitutes most of its value, the **combined**
+  position cap is the subsidiary's cap — never the sum. See `references/intrinsic-value.md` Method 6.
 - Suggested position size as % of portfolio
 - How this fits with existing holdings
 - Portfolio-level metrics after addition
@@ -544,17 +604,17 @@ Read these when needed — don't load all at once:
 
 | File | When to Read |
 |------|-------------|
-| `references/data-sources.md` | Step 2 — before fetching any data; includes share-class structure guidance |
 | `references/financial-analysis.md` | Step 3 — scoring and ratio analysis |
+| `references/data-sources.md` | Step 2 — before fetching any data; includes share-class structure guidance |
 | `references/earnings-quality-and-distortions.md` | Step 3.5 — distortion checks (one-time items, dilution, investment portfolios, RPTs, etc.) |
 | `references/frameworks.md` | Steps 3–6 — applying investment checklists; includes per-share scorecard |
 | `references/moat-analysis.md` | Step 4 — competitive analysis |
-| `references/industry-playbooks.md` | Step 5 — sector-specific metrics and macro sensitivities |
+| `references/industry-playbooks.md` | **Step 1 (check sector index), then Steps 0/3/5/6** — sector-specific metric substitutions, valuation method overrides, and sector distortion classes. Financials (insurance + banking) written; other sectors use the generic workflow |
 | `references/intrinsic-value.md` | Step 6 — valuation calculations; includes output plausibility checks |
 | `references/sell-discipline-and-traps.md` | Step 8 — sell criteria, value traps, behavioral biases, error recognition |
 | `references/inflation-goodwill-derivatives.md` | Step 8 — inflation/goodwill/derivatives risk |
 | `references/portfolio-construction.md` | Portfolio construction or adding a new name |
-| `assets/report-template.md` | Step 10 — report generation |
+| `assets/report-template.md` | Step 10 — the 10-section report and 12-tab dashboard spec |
 
 ---
 

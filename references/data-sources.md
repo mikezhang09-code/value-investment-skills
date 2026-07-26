@@ -330,13 +330,20 @@ The reported "diluted EPS" already accounts for these — back-solving from dilu
 
 Before any per-share calculation, verify all four (per SKILL.md Step 2.5):
 
-**Anchor 1: Market Cap Reconciliation**
+**Anchor 1: Market Cap Reconciliation** — run in BOTH directions
 ```
-Computed: Shares × Price = $X B
-Published (Yahoo): $Y B
-Published (Bloomberg/Reuters): $Z B
-Gap: ±X% — must be ≤ 5%
+Forward:  Computed: Shares × Price = $X B
+          Published (Yahoo): $Y B
+          Published (Bloomberg/Reuters): $Z B
+          Gap: ±X% — must be ≤ 5%
+
+Reverse:  Implied Price = Published Market Cap ÷ Your Share Count
+          ⚠️ MANDATORY for dual-listed (A+H, ADR+local) names.
+          The implied price must match the listing you are analysing.
 ```
+The reverse test catches **price-basis** errors that the forward test passes: an aggregator striking
+market cap on the *other* listing's price and displaying it beside your quote. Caught live on PICC
+Group (1339.HK) — see SKILL.md Step 2.5. Anchor 2 is the tiebreaker when the two directions disagree.
 
 **Anchor 2: EPS Back-Check** (most reliable)
 ```

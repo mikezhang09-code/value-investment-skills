@@ -323,3 +323,100 @@ Conviction:      [High / Medium / Low]
 
 **DISCLAIMER**: *This report is for informational and educational purposes only. It does not constitute personalized investment advice or a solicitation to buy or sell any security. All investments involve risk, including possible loss of principal. Past performance does not guarantee future results. Investors should conduct their own due diligence and consult a qualified financial advisor before making investment decisions.*
 ```
+
+---
+
+# Deliverable 2 — HTML Dashboard (Dark Luxe)
+
+*Added 2026-07-26. The ten-section Markdown structure above is unchanged and remains the primary
+deliverable; this specifies the companion dashboard, which previously had no written spec.*
+
+**Filename:** `report_<TICKER>_<YYYY-MM-DD>.html`
+**Theme:** Dark Luxe (`#06090f` background, `#c9a84c` gold accent). Playfair Display / Source Sans 3 /
+IBM Plex Mono / Noto Sans SC. Single self-contained file, Chart.js from CDN.
+
+**Structure: 12 tabs = 10 fixed + up to 2 situational.**
+
+Fixed:
+
+| # | Tab | Maps to |
+|---|---|---|
+| 1 | Summary | §1 |
+| 2 | Quick-Kill Screener | Step 0 |
+| 3 | Business & Moat | §2–3 |
+| 4 | Industry | §4 |
+| 5 | 10-Yr Financials | §5 |
+| 6 | Valuation | §6 |
+| 7 | Margin of Safety | §7 |
+| 8 | Frameworks | §8 |
+| 9 | Trap Check & Risk | §9 |
+| 10 | Verdict & Position | §1, §7 |
+| 11 | Sources | §10 |
+
+Situational — insert 1–2 where the thesis demands, ahead of Valuation:
+
+- **Quarter Delta** — for earnings-reaction and thesis-refresh scopes (used for 0700.HK Q1 FY26)
+- **Segments** — where segment mix is the thesis (0700.HK)
+- **Named thesis tab** — where one issue dominates (BABA "AI Capex"; an insurer would use
+  "Underwriting vs. Investment")
+
+Eleven fixed tabs plus one situational is the common case; twelve is the ceiling, not a quota. Do not
+pad to twelve with an empty tab.
+
+### Charts
+
+Target 10–12 Chart.js visualizations. Standard set:
+
+revenue/profit 10-yr · margin trend · ROIC vs. WACC · FCF vs. NI · share count · moat radar ·
+framework radar · valuation method comparison · IV scenario range (bear/base/bull vs. price) ·
+peer multiple comparison · DCF sensitivity matrix (colour-graded table, growth × discount rate)
+
+For financials, substitute per `references/industry-playbooks.md` §1.2: combined ratio decomposed
+(expense vs. loss, stacked) or NIM vs. credit cost replaces margin trend; ROIC vs. WACC is dropped;
+BVPS growth is promoted.
+
+---
+
+## Rules That Apply to Both
+
+1. **Presentation order: HTML dashboard first, then Markdown report.** Then command-center.md, then
+   command-center.html.
+2. **Never fabricate a number to fill a cell.** An empty cell marked "not disclosed" is correct; an
+   invented one is not. ▲ marks anything approximate, in both files.
+3. **The verdict, conviction, fair value, and entry zone must be identical** across report,
+   dashboard, and command center. A mismatch is the most common source of downstream drift — check
+   before presenting.
+4. **Bilingual headers in both deliverables.** Chart axis labels may be English-only.
+5. **A cross-boundary CAGR is never printed as a number.** Mark it non-meaningful and say why.
+
+---
+
+---
+
+## Rules That Apply to Both Deliverables
+
+1. **Presentation order: HTML dashboard first, then Markdown report.** Then command-center.md, then
+   command-center.html.
+2. **Never fabricate a number to fill a cell.** An empty cell marked "not disclosed" is correct; an
+   invented one is not. ▲ marks anything approximate, in both files.
+3. **The verdict, conviction, fair value and entry zone must be identical** across report, dashboard
+   and command center. A mismatch is the most common source of downstream drift — check before
+   presenting.
+4. **Bilingual EN/ZH headers in both deliverables.** Chart axis labels may be English-only.
+5. **A cross-boundary CAGR is never printed as a number.** Mark it non-meaningful and say why — see
+   the accounting-standard transition rule in
+   `references/earnings-quality-and-distortions.md`.
+
+---
+
+## Scope Variations
+
+| Scope | Markdown | HTML | Stage 6 |
+|---|---|---|---|
+| Full deep dive | All 10 sections | Full 12 tabs | Yes |
+| Quick thesis | §1, 2, 5, 6, 7, 9, 10 | Skip | Yes |
+| Thesis refresh | Refresh structure (what changed / does verdict hold / updated FV / updated entry / what to watch) | Skip | Yes |
+| Earnings reaction | §1 + delta analysis + §6–7 revised + §10 | Skip | Yes |
+| Comparison | Side-by-side across §3, 5, 6, 7, 8 | Optional | Yes, both names |
+
+Stage 6 runs for every scope that produces or changes a verdict. No exceptions.
