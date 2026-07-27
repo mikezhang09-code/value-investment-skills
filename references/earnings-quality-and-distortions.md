@@ -533,6 +533,34 @@ This is not an obscure edge case. It affects most of the coverage book at least 
 | **IFRS 16 / ASC 842** | 2019 | Every lessee — retail, restaurants, airlines, logistics | Operating leases capitalized. EBITDA, operating margin, and reported debt all step-change (see §Class 7) |
 | **IFRS 15 / ASC 606** | 2018 | Software, construction, long-contract businesses | Revenue recognition timing |
 
+### Corporate-Transaction Breaks — amendment 2026-07-26
+
+**The rule is not limited to accounting standards.** A material merger, demerger, spin-off, or
+disposal breaks a time series exactly as an accounting transition does, and for the same reason: the
+reporting entity on one side of the line is not the reporting entity on the other.
+
+**The binding test is the issuer's own statement.** Where a company states in its own filings or
+investor materials that prior periods are not comparable, **that statement is binding on the
+analysis.** It is not a boilerplate disclaimer to be noted and stepped past. Treat it with the same
+force as an IFRS 17 adoption date.
+
+| Transaction type | What breaks |
+|---|---|
+| Merger / large acquisition | Every ratio with a balance-sheet denominator; margin structure; funding mix for financials |
+| Demerger / spin-off | Revenue base, margin mix, and the entire per-share series |
+| Major disposal | Revenue and segment continuity; often the ROE denominator |
+
+*Live case (HDFC Bank, 2026-07-26):* HDFC Ltd merged into HDFC Bank effective **1 July 2023**, and
+the bank's own earnings deck states *"Prior period numbers are not comparable."* A 2026 analysis
+therefore has a comparable window of **FY24–FY27 — three years, not ten.** The pre-merger ROE series
+(16–18%) is not merely a different level; it belongs to a differently-funded institution. Anchoring a
+recovery thesis to it was the substantive error in the May-2026 analysis of that name.
+
+Note the parallel to **I-3** in `industry-playbooks.md`, where HKFRS 17 adoption with only one
+restated comparative year collapsed the usable insurance window to four years. **Both cases produce
+the same instruction: state the truncated window explicitly in the report rather than silently
+building a ten-row table and hoping the reader notices the footnote.**
+
 **Rule:**
 1. Identify every transition inside the analysis window before building the table.
 2. Compute pre- and post-transition series **separately**, or use restated figures only where the
@@ -668,3 +696,19 @@ Score interpretation:
 Reported financials are not designed to fool you, but they are designed to comply with accounting standards, not to reveal underlying economics. The gap between compliance and economic reality is where distortions live.
 
 The value investing analyst's job is to bridge that gap, gate by gate, distortion by distortion, until the normalized economic picture emerges. **No valuation method can compensate for unfaithful inputs.** This file's eight distortion classes are upstream of all valuation work — they determine whether your DCF and EPV are computing anything meaningful at all.
+
+---
+
+## Change Log
+
+- **2026-07-26** — **Amendment #12: transition-break rule extended to corporate transactions.** A
+  material merger, demerger, spin-off or disposal breaks a time series exactly as an accounting
+  transition does. **The binding test is the issuer's own statement** — where a company states that
+  prior periods are not comparable, that statement governs the analysis and is not boilerplate to be
+  noted and stepped past. Derivation: HDFC Bank's own deck states prior periods are not comparable
+  after the 1-Jul-2023 HDFC Ltd merger, collapsing a 2026 analysis to a **three-year** comparable
+  window (FY24–FY27); the pre-merger 16–18% ROE series belongs to a differently-funded institution,
+  and anchoring a recovery thesis to it was the substantive error in the May-2026 analysis of that
+  name. Parallels **I-3** in `industry-playbooks.md`, where HKFRS 17 collapsed the insurance window
+  to four years. Both produce the same instruction: **state the truncated window explicitly rather
+  than silently building a ten-row table.**

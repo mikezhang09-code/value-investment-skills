@@ -303,6 +303,47 @@ does not, the segments are not exhaustive and something is being valued at zero 
 
 ---
 
+## ⚠️ Mandatory Fade Disclosure (financials) — amendment 2026-07-26 · **UNVALIDATED**
+
+> **Status: provisional, single-case derivation.** This rule was written from one deep dive
+> (HDFC Bank, 2026-07-26) and has **not** been validated against a second financial. Apply it, but
+> flag its use in the report. **Scheduled validation: ICICI Bank (IBN)** — same market, same sector,
+> *non*-merged balance sheet, which isolates whether the fade problem is general to financials or
+> specific to a post-merger franchise. Until then, do not extend it beyond financials.
+
+For any bank or insurer valued on **justified P/B** or **residual income**, the terminal assumption —
+how long above-cost-of-capital returns persist before fading — routinely dominates every other input
+in the model. It must be surfaced, not buried.
+
+**Two requirements:**
+
+**1. Print the fade-sensitivity ladder.** Show base fair value at a minimum of four fade
+assumptions plus the no-fade bound. If the reader cannot see the ladder, the point estimate is
+false precision.
+
+**2. Demote justified P/B where the spread is narrow.** Justified P/B = (ROE − g)/(r − g) is
+**degenerate as (r − g) → 0**. Where **(r − g) < 3pp**, the method is demoted to *corroborative* and
+**may not carry primary weight** in the triangulation. Use residual income with an explicit fade as
+the primary anchor instead.
+
+Note the trap: for a bank, g is not a free parameter. Sustainable g = ROE × (1 − payout). A bank
+earning 15% ROE and retaining 68% has an implied g of 10.2%, so an r of 12% leaves a spread of just
+1.8pp — the narrow-spread condition is the *normal* case for a healthy bank, not an edge case.
+
+*Live case (HDFC Bank, 2026-07-26):* base fair value ranged **₹542 (10-yr fade to r+1%) → ₹1,051
+(no fade)** — a **94% swing on one assumption**, from the same ROE and the same discount rate. A
+10-year fade to cost of capital is a *commodity* assumption and is indefensible for a franchise with
+two decades of 16–18% ROE; no fade is equally indefensible. The house calibration adopted was a
+**20-year fade to r+2%, terminal g 5.5%.** Roughly two-thirds of the gap between the resulting fair
+value and the sell-side consensus was attributable to this choice alone rather than to any difference
+in forecast. **Stating that split is more useful to the reader than the point estimate.**
+
+**Cross-reference:** `industry-playbooks.md` §F.5 already notes that P/B and EPV are not independent
+(they converge as normalized ROE → r) and must be counted as one method. This amendment is the
+companion constraint on the same family of methods.
+
+---
+
 ## Triangulation and Final Estimate
 
 After running at least two methods, compare results:
@@ -501,3 +542,20 @@ Particularly common share-count errors:
 - Pre/post-split or pre/post-placement confusion (timing of equity raises)
 - Treasury shares not subtracted from "shares issued"
 - Dilutive instruments (convertibles, warrants, ESOPs) not added to basic count
+
+---
+
+## Change Log
+
+- **2026-07-26** — **Amendment #11: Mandatory Fade Disclosure (financials) added.** ⚠ **UNVALIDATED —
+  single-case derivation from HDFC Bank (HDB) Q1 FY27 refresh.** Requires the fade-sensitivity ladder
+  to be printed for any financial valued on justified P/B or residual income, and demotes justified
+  P/B to corroborative where **(r − g) < 3pp**. Derivation: HDB base fair value swung **₹542 → ₹1,051
+  (94%)** on the fade assumption alone, from an identical ROE and discount rate; roughly two-thirds of
+  the gap to sell-side consensus was attributable to that one choice. Note that for a bank the
+  narrow-spread condition is the **normal** case, since sustainable g = ROE × (1 − payout).
+  **Scheduled validation: ICICI Bank (IBN)** — non-merged balance sheet in the same market and
+  sector. Do not extend beyond financials until validated. Companion to `industry-playbooks.md` §F.5
+  (P/B and EPV are not independent — count as one method).
+- **2026-07-26 (b)** — Method 6 (SOTP) duplicate-exposure test and the parent/subsidiary
+  single-exposure rule for concentration caps added (amendments #6 and #8, PICC session).

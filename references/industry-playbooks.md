@@ -91,6 +91,37 @@ its ROE from investment gains while underwriting at a loss is a leveraged bond f
 distribution network, and should be valued as one. The same logic applies to a bank whose ROE is
 carried by trading income rather than net interest margin.
 
+### The post-merger funding-mix rule (banking) — amendment 2026-07-26
+
+Whenever a bank's margin is compressed following a merger, **decompose the compression before
+assuming any of it reverses**:
+
+| Component | Side | Nature | Reverses? |
+|---|---|---|---|
+| Credit-deposit ratio normalization, loan-book re-gearing | **Asset** | Transitional | **Yes** — with balance-sheet growth |
+| High-cost acquired borrowings rolling off | **Liability** | Transitional | **Yes** — with maturity schedule |
+| **CASA / deposit-mix change** | **Liability** | **Structural** | **No** — the funding franchise itself changed |
+
+**Never assume a merged bank recovers to the acquirer's pre-merger NIM.** The acquirer's margin was
+a function of its *own* liability mix. Absorbing a wholesale-funded balance sheet permanently dilutes
+that mix, and no amount of asset-side normalization restores it.
+
+**Track the CASA ratio as the deciding series** — and specifically whether CASA growth is running
+ahead of or behind time-deposit growth. A CASA ratio that is falling *while* the CD ratio normalizes
+is the signature of a thesis that will half-deliver: growth returns, margin does not.
+
+*Live case (HDFC Bank, 2026-07-26):* CASA 44% (FY23, pre-merger) → 34.1% (FY26) → **32.3% (Q1 FY27)**,
+with time deposits +17.4% against CASA +9.4%. Gross advances grew **+15.4%** — the asset-side thesis
+delivered in full — while NIM fell to a **record-low 3.26%**. The May-2026 analysis had treated 100%
+of the compression as transitional and carried a BUY at a fair value ~48% above the refreshed number.
+**This rule is the direct output of that error.**
+
+> **Numbering note (2026-07-26).** The 2026-07-26 (b) change log entries reference "§F.3" for the
+> float-cost and life new-business amendments, but **no §F.3 or §F.4 header exists in this file** —
+> the sections run §F.2 → §F.5, and that content sits inside §F.2. This rule is therefore placed in
+> §F.2 with the rest of the metric substitutions. Either create §F.3/§F.4 headers or correct the
+> dangling references on next touch; do not add more of them.
+
 ## §F.5 Step 6 — Valuation Adaptations
 
 | Method | Insurance | Banking |
@@ -116,6 +147,12 @@ carried by trading income rather than net interest margin.
 This means a financial will usually triangulate on **P/B-on-sustainable-ROE + EPV + DDM or SOTP**,
 not on the DCF-led combination used elsewhere. State the method set explicitly in the report — a
 reader who sees no DCF should be told why, not left to assume it was skipped.
+
+> ⚠️ **Fade disclosure is mandatory (amendment 2026-07-26, UNVALIDATED).** Justified P/B and
+> residual income are both dominated by the terminal fade assumption. The full rule — print the
+> fade-sensitivity ladder, and demote justified P/B to corroborative where **(r − g) < 3pp** — is in
+> `intrinsic-value.md`. Note that for a healthy bank the narrow-spread condition is the *normal*
+> case, not an edge case, since sustainable g = ROE × (1 − payout). Pending validation on ICICI (IBN).
 
 ## §F.6 Step 6.5 — One Conditioning Note
 
@@ -194,9 +231,34 @@ more severe than originally anticipated:
 The banking analogue of I-1. Expected-credit-loss provisioning under IFRS 9 / CECL is
 management-estimated and cycle-sensitive. Write-backs flatter current earnings; front-loading
 depresses them.
-*Check:* Credit cost in bps vs. the bank's own 10-year range and vs. peers. Is the current year's
-profit growth explained by lower provisions rather than higher pre-provision profit? Compute
-pre-provision operating profit growth separately — it is the cleaner series.
+*Check (harvesting):* Credit cost in bps vs. the bank's own 10-year range and vs. peers. Is the
+current year's profit growth explained by lower provisions rather than higher pre-provision profit?
+Compute pre-provision operating profit growth separately — it is the cleaner series.
+
+*Check (integrity — the positive case, amendment 2026-07-26):* **Like I-1, this class is not only a
+detector of bad news.** Run it in both directions:
+
+| Signal | Reading |
+|---|---|
+| Provisions **falling**, credit cost below the bank's own range, profit growth tracking the release | Possible harvesting — reported profit is flattered. Investigate |
+| Provisions **rising**, credit cost rising, and a **discretionary buffer left unreleased through a consensus miss** | **Reporting integrity demonstrated.** A credibility multiplier on every other figure in the release |
+
+**The diagnostic is a ratio, not a direction: compare the size of the consensus miss to the size of
+the unreleased buffer.** A management that could have converted a miss into a beat by releasing a
+trivial fraction of a discretionary buffer, and did not, has told you something about the reliability
+of the whole release — and the signal is strongest precisely when the incentive to release was
+highest.
+
+*Live case (HDFC Bank, Q1 FY27, 2026-07-26):* provisions **+17.3% QoQ**, credit cost 35bp → 40bp,
+against a consensus miss of **₹272cr** while carrying a **~₹9,000cr** floating/contingency buffer
+built a year earlier and never released. Releasing **3.0%** of it would have produced a beat. The
+bank declined — during a governance crisis, with the CEO's reappointment before the RBI. That
+finding set the verdict floor at HOLD rather than AVOID and lifted conviction from ~4 to 6. **No
+sell-side note surfaced it.**
+
+> ⚠️ **Buffer figures are frequently not restated in the quarterly presentation.** Where the
+> unreleased balance is inferred rather than confirmed, mark it ▲, log it under RF-1, and state the
+> positive reading as *conditional*. If the buffer was quietly drawn down, the finding inverts.
 
 ## §F.8 The Underwriting-Improvement Signature (monitoring rule)
 
@@ -607,6 +669,36 @@ When applying these playbooks to HK/China-listed companies:
 ---
 
 ## Change Log
+
+- **2026-07-26 (c)** — **Validated against a third live deep dive** (HDFC Bank, HDB — Q1 FY27 thesis
+  refresh). Amendments **#9–12** applied, continuing the #1–8 series from 2026-07-26 (b). The refresh
+  downgraded HDB from BUY 8/10 to HOLD 6/10 and cut base FV from $31.23 to $21.00; three of the four
+  amendments are direct outputs of root-causing that error.
+
+  | # | Amendment | File |
+  |---|---|---|
+  | 9 | **§F.7 B-1 given a positive-case diagnostic** — mirrors amendment #3 (I-1). A bank that leaves a discretionary buffer unreleased through a consensus miss has demonstrated reporting integrity; the diagnostic is the **ratio of the miss to the buffer**. On HDB, 3.0% of an unreleased ~₹9,000cr buffer would have turned a ₹272cr miss into a beat. Set the verdict floor at HOLD rather than AVOID | this file |
+  | 10 | **§F.2 post-merger funding-mix rule** — decompose margin compression into asset-side (CD ratio, transitional) and liability-side (CASA mix, **structural**). **Never assume a merged bank recovers to the acquirer's pre-merger NIM.** Track CASA as the deciding series | this file |
+  | 11 | **Mandatory fade disclosure** — print the fade-sensitivity ladder; demote justified P/B to corroborative where **(r − g) < 3pp**. ⚠ **UNVALIDATED** — single-case derivation | `intrinsic-value.md`, §F.5 note here |
+  | 12 | **Transition-break rule extended to corporate transactions** — merger/demerger/disposal breaks a series like an accounting standard does, and **the issuer's own "not comparable" statement is binding on the analysis** | `earnings-quality-and-distortions.md` |
+
+  **What performed as designed:** the B-1 harvesting check returned a clean negative on first use and
+  the positive-case extension then produced the decision-relevant finding — the same two-step that
+  I-1 produced on PICC P&C. The Step 2.5 four-anchor gate passed cleanly (single share class, ADR
+  1:3), and the A1-reverse test from amendment #5 correctly landed on the ADR as the listing under
+  analysis.
+
+  **What did not, and is now flagged:** amendment **#11 is provisional.** It was derived from one
+  name and would retroactively demote the primary valuation method for every financial in the book
+  (CMB, ICICI, Berkshire, PICC ×2, Waterdrop). **Scheduled validation: ICICI Bank (IBN)** — same
+  market and sector but a *non*-merged balance sheet, which isolates whether the fade problem is
+  general to financials or specific to post-merger franchises. Do not extend #11 beyond financials
+  until that run completes.
+
+  **File-hygiene defect logged:** the 2026-07-26 (b) entries reference **§F.3** and **§F.4**, but no
+  such headers exist — the file runs §F.2 → §F.5 and that content sits inside §F.2. Amendment #10 was
+  placed in §F.2 accordingly. Either create the headers or correct the dangling references on next
+  touch; do not add more of them.
 
 - **2026-07-26 (b)** — **Validated against two live deep dives** (PICC P&C 2328.HK; PICC Group
   1339.HK). Eight amendments applied across four files:
