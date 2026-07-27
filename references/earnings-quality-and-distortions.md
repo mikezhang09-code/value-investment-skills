@@ -701,7 +701,7 @@ The value investing analyst's job is to bridge that gap, gate by gate, distortio
 
 ## Change Log
 
-- **2026-07-26** — **Amendment #12: transition-break rule extended to corporate transactions.** A
+- **2026-07-26 (c)** — **Amendment #12: transition-break rule extended to corporate transactions.** A
   material merger, demerger, spin-off or disposal breaks a time series exactly as an accounting
   transition does. **The binding test is the issuer's own statement** — where a company states that
   prior periods are not comparable, that statement governs the analysis and is not boilerplate to be

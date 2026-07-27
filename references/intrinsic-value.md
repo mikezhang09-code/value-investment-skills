@@ -357,20 +357,18 @@ For any bank or insurer valued on **justified P/B** or **residual income**, the 
 how long above-cost-of-capital returns persist before fading — routinely dominates every other input
 in the model. It must be surfaced, not buried.
 
-**Two requirements:**
+> ⚠️ **Superseded text removed 2026-07-26 (d).** This section previously ended with a "Two
+> requirements" block stating that justified P/B is *"demoted to corroborative where (r − g) < 3pp."*
+> **That threshold is superseded by "The rule" above and has been deleted** — it was left in place by
+> an incomplete edit and, for roughly one working session, this section contained two contradictory
+> thresholds for the same test. The binding condition is **g ≥ r → VOID**. Retained below is only the
+> rationale and the live case, neither of which conflicts.
 
-**1. Print the fade-sensitivity ladder.** Show base fair value at a minimum of four fade
-assumptions plus the no-fade bound. If the reader cannot see the ladder, the point estimate is
-false precision.
-
-**2. Demote justified P/B where the spread is narrow.** Justified P/B = (ROE − g)/(r − g) is
-**degenerate as (r − g) → 0**. Where **(r − g) < 3pp**, the method is demoted to *corroborative* and
-**may not carry primary weight** in the triangulation. Use residual income with an explicit fade as
-the primary anchor instead.
-
-Note the trap: for a bank, g is not a free parameter. Sustainable g = ROE × (1 − payout). A bank
-earning 15% ROE and retaining 68% has an implied g of 10.2%, so an r of 12% leaves a spread of just
-1.8pp — the narrow-spread condition is the *normal* case for a healthy bank, not an edge case.
+**Why the terminal assumption dominates.** Justified P/B = (ROE − g)/(r − g) is degenerate as
+(r − g) → 0 and inverts once (r − g) < 0. And for a bank g is not a free parameter: sustainable
+g = ROE × (1 − payout). A bank earning 15% ROE and retaining 68% has an implied g of 10.2%, so an
+r of 12% leaves a spread of just 1.8pp — **a narrow spread is the *normal* case for a healthy bank,
+not an edge case, and a negative spread is normal for an excellent one.**
 
 *Live case (HDFC Bank, 2026-07-26):* base fair value ranged **₹542 (10-yr fade to r+1%) → ₹1,051
 (no fade)** — a **94% swing on one assumption**, from the same ROE and the same discount rate. A
@@ -590,13 +588,13 @@ Particularly common share-count errors:
 
 ## Change Log
 
-- **2026-07-26 (c)** — **#11 VALIDATED on ICICI Bank (IBN) → promoted to #11-R, binding.** Threshold
+- **2026-07-26 (d)** — **#11 VALIDATED on ICICI Bank (IBN) → promoted to #11-R, binding.** Threshold
   rewritten from "(r − g) < 3pp" to **g ≥ r**; where g ≥ r the method is **void**, not demoted. IBN
   returned a negative justified P/B (−1.62×). Perverse property identified: the method breaks down
   precisely on high-ROE, low-payout compounders. §F.5 method table corrected in the same commit —
   P/B demoted from primary anchor to conditional; residual income with explicit fade promoted in its
   place. Materiality: ~33% FV cut on HDB, ~17% on IBN.
-- **2026-07-26** — **Amendment #11: Mandatory Fade Disclosure (financials) added.** ⚠ **UNVALIDATED —
+- **2026-07-26 (c)** — **Amendment #11: Mandatory Fade Disclosure (financials) added.** ⚠ **UNVALIDATED —
   single-case derivation from HDFC Bank (HDB) Q1 FY27 refresh.** Requires the fade-sensitivity ladder
   to be printed for any financial valued on justified P/B or residual income, and demotes justified
   P/B to corroborative where **(r − g) < 3pp**. Derivation: HDB base fair value swung **₹542 → ₹1,051
@@ -608,3 +606,9 @@ Particularly common share-count errors:
   (P/B and EPV are not independent — count as one method).
 - **2026-07-26 (b)** — Method 6 (SOTP) duplicate-exposure test and the parent/subsidiary
   single-exposure rule for concentration caps added (amendments #6 and #8, PICC session).
+
+> **Commit-letter convention (set 2026-07-26 (d)).** Suffix letters are **session-level, not
+> per-file**: (a) file created · (b) PICC session · (c) HDB session · (d) IBN validation session.
+> A given letter therefore means the same commit in every knowledge file, so cross-file references
+> resolve. Corrected here on 2026-07-26 (d), where the IBN commit had been labelled (c) in this file
+> and (d) in `industry-playbooks.md` while a cross-reference in the same file pointed to (d).
