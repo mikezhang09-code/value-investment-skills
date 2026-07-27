@@ -176,6 +176,84 @@ If you had been using 3.04B shares, this check immediately reveals
 the error.
 ```
 
+**⚠️ Subtract senior-instrument distributions before dividing — mandatory (amendment #13, 2026-07-27).**
+
+**Step 1 — the classification gate (added 2026-07-27, sweep-validated).** Before doing any
+arithmetic, establish **where the instrument sits**:
+
+```
+Is the perpetual / AT1 / preference instrument classified as EQUITY or as a LIABILITY?
+
+  EQUITY      → the trap is LIVE. Its distribution is NOT in net profit.
+                Subtract it. Continue to Step 2.
+
+  LIABILITY   → NO TRAP. The coupon is already in interest expense and
+                net profit is net of it. Anchor 2 is clean by construction.
+                Record "classification gate: liability — #13 not applicable"
+                and move on.
+```
+
+**The discriminator is not whether the instrument is called "perpetual." It is where it sits.**
+Indian banks report AT1 under *borrowings* (RBI Basel III framework, Banking Regulation Act
+schedule format); mainland insurers' capital supplementary bonds are subordinated debt. Both are
+liability-classified and neither creates the trap. HK/PRC insurer **perpetual capital securities**
+are equity-classified and do. Skip this gate and #13 false-alarms on most of a financials sleeve.
+
+**Step 2 — the arithmetic** (only where the gate returned EQUITY):
+
+```
+Implied Shares = (Profit attributable to owners
+                  − distributions to perpetual / AT1 / preference holders)
+                 ÷ Reported basic EPS
+```
+
+The numerator is **not** "profit attributable to owners" as printed. Perpetual capital securities,
+preference shares and other AT1-style instruments sit *inside* equity but are **senior in substance**.
+The issuer removes their coupon before striking basic EPS, even where the income statement does not
+show the deduction on its face. Omit the step and you overstate the share count — and every
+per-share figure built on it.
+
+**Step 3 — state the resolution (added 2026-07-27, sweep-validated).** Anchor 2's precision is
+bounded by the **decimal places in reported EPS**, and across a book it varies by two orders of
+magnitude:
+
+```
+resolution (±%) = (0.5 × 10^−dp) ÷ EPS × 100
+
+  China Taiping  HK$7.251 (3dp) → ±0.007%   detects anything
+  PICC P&C       RMB 1.815 (3dp) → ±0.028%   detects ~0.1%
+  PICC Group     RMB 1.04  (2dp) → ±0.481%   detects only >1%
+```
+
+**Never report an unqualified pass.** Report *"passes at ±X% resolution"* — which means
+"no distortion above X%", not "no distortion". Where resolution is worse than ~0.5% **and** the
+gate returned EQUITY, confirm against the statement of changes in equity rather than resting on the
+arithmetic. This is why China Taiping was catchable: its 3.83% gap was **~550×** the diagnostic's
+resolution. The same proportional error on a low-EPS name would have hidden completely.
+
+**Diagnostic.** If Anchor 2 disagrees with the dividend-derived and BVPS-derived counts by **1–5%**
+while those two agree with *each other* to <0.1%, the gap is a senior-instrument distribution — not
+a rounding artifact and not a share-class problem. Locate the figure in the statement of changes in
+equity. **Check the gap against the resolution first** — a sub-resolution gap is rounding, and is
+not evidence of anything.
+
+**Second-order — carry the correction into every per-share value metric.** Any per-share figure the
+issuer strikes off *total* equity (embedded value per share, NAV per share, book value per share) may
+carry perpetual capital in the numerator while the claim it represents belongs to someone else.
+Compute an **ex-perpetual** version before using it in valuation.
+
+*Live example — China Taiping (0966.HK), 2026-07-27.* Naive back-check HK$27,059.28mn ÷ HK$7.251 =
+3,731.8mn shares against a true count of **3,594.2mn — a 3.83% overstatement** — because HK$997.63mn
+of perpetual securities distribution had not been removed. Dividend-derived (3,594.0mn) and
+BVPS-derived counts agreed to 0.01%, which is what isolated the error to Anchor 2 alone. Reported
+embedded value per share HK$58.297 fell to **HK$53.85 ex-perpetual (−7.6%)**, and P/EV was one of
+five valuation methods.
+
+**This is structurally different from the A+H trap.** China Taiping has a single share class, a
+single listing and no A-share twin — **Anchor 4 was clean**. The trap lives in the *capital stack*,
+not the share register, so a name can pass every share-class test and still fail here. Run this on
+every financial and on any issuer carrying hybrid capital.
+
 #### Anchor 3: Per-Share Metrics Cross-Check
 ```
 Reported BV per share × Shares ≈ Total Equity (within 5%)
@@ -214,7 +292,11 @@ Share Count Reconciliation
 
 Verification:
 - Market cap check:  Shares × Price = $XXB vs published $XXB → ±X% ✓/✗
-- EPS back-check:    NI ÷ EPS = X.XXB shares vs assumed → ±X% ✓/✗
+- Senior instruments: classification gate = EQUITY / LIABILITY / none present
+                     if EQUITY: distribution = $XXmn — deducted ✓/✗
+                     if LIABILITY: "#13 not applicable — coupon in interest expense"
+- EPS back-check:    (NI − senior distributions) ÷ EPS = X.XXB shares vs assumed → ±X%
+                     resolution ±X.XX% (EPS to N dp) → PASSES AT ±X.XX% ✓/✗
 - BV cross-check:    BV/share × Shares = $XXB vs equity → ±X% ✓/✗
 ```
 
@@ -631,4 +713,7 @@ Read these when needed — don't load all at once:
 9. **Cite everything.** Every key claim needs a source (filing name, page, date).
 10. **When an external data point challenges your numbers, verify before you defend.** Defensive elaboration delays error correction.
 11. **Normalize before you value.** Reported earnings are designed to comply with accounting standards, not to reveal economic reality. Bridge the gap in Step 3.5 before any valuation work.
-12. **Per-share is the only share that matters.** Aggregate growth means nothing to the existing shareholder if it's diluted away. Always compute both aggregate and per-share growth.
+12. **Senior claims come out before per-share anything.** Perpetuals, AT1 and preference capital sit
+    inside equity and rank ahead of it. Deduct their distributions before back-calculating shares, and
+    strike an ex-perpetual version of any per-share value metric before valuing on it.
+13. **Per-share is the only share that matters.** Aggregate growth means nothing to the existing shareholder if it's diluted away. Always compute both aggregate and per-share growth.

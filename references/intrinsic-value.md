@@ -255,6 +255,42 @@ realization path, tax friction on disposal — is a *feature* of the security, n
 > mechanism and a timeframe. "It is too wide" is not a reason. If no mechanism exists, value the
 > stock at the historical average discount rather than at NAV.
 
+### ⚠️ A discount requires a named enforcing mechanism (amendment #14, 2026-07-27)
+
+**Do not apply a holding-company discount because the entity is structurally a holding company.**
+Structural resemblance is not a mechanism. Name which of the following is present, and size the
+discount to *that*:
+
+| # | Mechanism | What makes it real |
+|---|---|---|
+| 1 | **Separately listed subsidiary** | The stub is directly observable. The market quotes the discount — you are *measuring* it, not assuming it |
+| 2 | **Cross-listing arbitrage** (A/H, ADR+local) | An observable price on the same underlying claim, struck in another venue |
+| 3 | **Documented cash-flow leakage** | Minority leakage, trapped regulatory capital, or dividend-upstreaming restrictions **not already removed** by using attributable figures |
+
+**If none is present, apply no discount.** Where the analysis already works from profit and equity
+*attributable to owners*, leakage to minorities has been deducted once — applying a discount on top
+**double-counts it**.
+
+> **This list is explicitly non-exhaustive.** It enumerates the mechanisms observed to date, not the
+> set of mechanisms that can exist. A fourth candidate under consideration is a controlling
+> shareholder with a demonstrated history of value transfer — but that is a **governance** discount
+> with different sizing logic and a different evidence bar, and it should be argued as such rather
+> than folded into the structural list. Extend the table when a new mechanism is found and named;
+> do not stretch an existing row to cover it.
+
+**Decompose bundled discounts.** A single range covering "SOE / holdco / leverage" is three claims
+wearing one number. Each needs its own mechanism, its own size and its own evidence, or it comes out.
+
+*Live example — China Taiping (0966.HK) vs PICC Group (1339.HK), 2026-07-27.* Both are holding
+companies over regulated insurance subsidiaries, and the reflex was to carry the discount across.
+It does not transfer. PICC Group's discount is enforced by mechanism 1 — PICC P&C (2328.HK) is
+separately listed — plus mechanism 2, an A/H pair: the stub is observable and a 22% discount is
+*measured*. China Taiping's subsidiaries are **not** separately listed, there is no A-share twin, and
+minority leakage was already removed by working from attributable figures throughout. **No discount
+applied.** Materiality: a reflexive 15% would have cut base fair value HK$24.51 → ~HK$20.83, i.e. **to
+roughly spot**, converting a WATCHLIST carrying 15% margin of safety into a false PASS on a
+manufactured number.
+
 ### ⚠️ The duplicate-exposure test (amendment 2026-07-26)
 
 **When one listed stake is the large majority of a holdco's value, holdco-vs-NAV is the wrong
@@ -587,6 +623,24 @@ Particularly common share-count errors:
 ---
 
 ## Change Log
+
+- **2026-07-27** — **Amendment #14: a Method 6 holding-company discount now requires a named
+  enforcing mechanism.** **BINDING on adoption** — the rule is a *restraint*, not a number: it demands
+  that an assumption be stated rather than imposing a valuation input, so adopting it can only surface
+  an assumption, never manufacture one. Derived from the **China Taiping (0966.HK) vs PICC Group
+  (1339.HK)** contrast: both are holding companies over regulated insurance subsidiaries, but PICC
+  Group's 22% discount is *enforced* by a separately listed subsidiary (PICC P&C, 2328.HK) plus an A/H
+  pair — observable stub — while CTIH has no listed subsidiary, no A-share twin, and minority leakage
+  already removed via attributable figures. **No discount applied to CTIH.** Materiality: a reflexive
+  15% would have cut base FV HK$24.51 → ~HK$20.83, **to roughly spot**, turning a 15%-MoS WATCHLIST
+  into a false PASS on a manufactured number. General form: **structural resemblance is not a
+  mechanism.** The mechanism table (1–3) is **explicitly non-exhaustive** and is the part still open —
+  a fourth candidate (controlling shareholder with a demonstrated history of value transfer) is a
+  *governance* discount with different sizing logic and should be argued separately rather than folded
+  in. Companion rule added in the same commit: **decompose bundled discounts** — a single "SOE /
+  holdco / leverage" range is three claims wearing one number. Retrospective scope: PICC Group (#49)
+  **passes** as written; **Shenzhen International (#43)** carries a bundled 30–40% discount ▲ on a name
+  where the SOTP *is* the valuation, and is flagged for re-examination.
 
 - **2026-07-26 (d)** — **#11 VALIDATED on ICICI Bank (IBN) → promoted to #11-R, binding.** Threshold
   rewritten from "(r − g) < 3pp" to **g ≥ r**; where g ≥ r the method is **void**, not demoted. IBN

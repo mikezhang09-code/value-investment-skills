@@ -298,6 +298,28 @@ is unproven regardless of how compelling the narrative sounds.
 verdict-moving input under the ±20% rule in `data-sources.md`. Acting on it before the series
 confirms is paying for a forecast, not reading a fact.
 
+**Three outcomes, not two (amendment #15, 2026-07-27).** The test can **PASS**, **FAIL**, or be
+**UNRUNNABLE**. Where the issuer does not disclose the inputs the test requires:
+
+1. Record the test as **UNRUNNABLE** and **name the missing disclosure**.
+2. **Do not let the headline substitute for the split.** A combined ratio that improved is not
+   evidence about risk selection; it is an undiagnosed number that could be underwriting discipline,
+   expense leverage or reserve release — three findings with three different persistence profiles.
+3. The improvement **does not enter fair value**, on the same footing as an unconfirmed PASS.
+4. **Log the gap in the moat and management assessment.** An issuer that withholds the split is
+   telling you something about disclosure quality, which is itself a governance datapoint. Do not
+   discard the observation just because the test failed to run.
+
+**Never collapse UNRUNNABLE into PASSED** (the charitable error) **or into FAILED** (the lazy one).
+They are different information and they justify different position sizes.
+
+*Live contrast, 2026-07-27.* **PICC P&C (2328.HK)** — the test **ran and failed**: expense ratio moved,
+loss ratio did not, so the improvement claim was unproven and classified as cost-cutting.
+**Taiping Insurance (P&C arm of 0966.HK)** — the test is **UNRUNNABLE**: only a headline combined ratio
+is disclosed (98.8%, −1.3pt) with no expense/loss split at all. The −1.3pt is real and undiagnosable.
+Recorded as unrunnable, excluded from fair value, and logged against disclosure quality. Conflating
+the two would have credited Taiping with PICC P&C's *finding* while it had produced no finding at all.
+
 *Provenance note:* this rule was developed while stress-testing a specific directional thesis about
 cheap machine cognition and insurance margins. That thesis is deliberately **not** in Project
 Knowledge — an unproven directional argument sitting in the default load path becomes a prior that
@@ -680,6 +702,32 @@ When applying these playbooks to HK/China-listed companies:
 ---
 
 ## Change Log
+
+- **2026-07-27** — **Amendment #15: §F.8 outcome set extended to UNRUNNABLE.** **BINDING on adoption**
+  — the amendment adds a third bucket to an outcome set, and a category meaning *"we do not know"*
+  cannot produce a worse answer than forcing the case into PASSED or FAILED. Derivation: Taiping
+  Insurance (the P&C arm of China Taiping, 0966.HK) discloses only a **headline combined ratio
+  (98.8%, −1.3pt)** with no expense/loss split, so the improvement is real but undiagnosable — it could
+  be underwriting discipline, expense leverage or reserve release, three findings with three different
+  persistence profiles. Recorded as **unrunnable, not failed**; improvement **excluded from fair
+  value**; the disclosure gap logged as a governance datapoint. Contrast **PICC P&C (#48)**, where the
+  same test **ran and failed** — materially different information that must not be conflated.
+  Companion to Amendment #12 (`earnings-quality-and-distortions.md`): both hold that **the issuer's
+  disclosure perimeter constrains the analysis**, and that saying so explicitly beats manufacturing a
+  number to fill the gap.
+
+- **2026-07-27** — **#11-R: third live case, and the first PASS. No rule change.** China Taiping
+  (0966.HK) **cleared** the gate — g = ROE 11.5% × (1 − 0.70 payout) = **8.05%** against r = 11.0%,
+  **(r − g) = +2.95pp** — where HDB and IBN both failed it. It passed **precisely because ROE is low
+  and payout is high**, which is the perverse property #11-R was written to capture, now **observed
+  from the passing side** rather than inferred from two failures. The rule has therefore been tested
+  on both sides of the threshold and **stands as written**. Second observation, logged for future
+  calibration: where **ROE ≈ r**, the mandatory fade ladder is unusually **fade-*insensitive***. CTIH's
+  full ladder spanned 282% (HK$16.79–64.17), but the *defensible* rungs clustered tightly at
+  **HK$25–33**, against HDB's ₹542–1,051 (94%) swing across the same rungs. Reading: **the ladder's
+  informativeness scales with (ROE − r)** — printing it remains mandatory in all cases, but where
+  ROE ≈ r it is *confirming* the answer rather than *choosing* it, and the analyst should say so
+  rather than presenting the wide headline spread as though it were live uncertainty.
 
 - **2026-07-26 (d)** — **Amendment #11 validated on ICICI Bank (IBN) and promoted to binding as
   #11-R.** The scheduled validation ran the same day and **confirmed the rule while proving the

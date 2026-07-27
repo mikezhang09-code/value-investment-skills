@@ -41,6 +41,11 @@ Both families need separate defenses. Mechanical errors are stopped at Step 2.5 
 ---
 
 ### 3. Mixed Data Vintage
+**Includes the cum/ex-dividend leg (added 2026-07-27).** A stale price is not only stale — if an
+ex-dividend date has passed since the quote, the number is also *cum-dividend* and not comparable to
+today's screen. Two errors compound in the same direction, and on a high-payout name the dividend
+leg alone can be verdict-relevant. See Check 12.
+
 **Family:** Mechanical
 **Frequency:** Common — blending annual actuals with quarterly run-rates without labeling.
 
@@ -155,8 +160,25 @@ If gap > 5% → STOP, investigate.
 
 ### Check 2: EPS Back-Check (10 seconds)
 ```
-Reported NI ÷ Reported EPS = my share count?
+(Reported NI − perpetual/AT1/preference distribution) ÷ Reported EPS = my share count?
 If gap > 2% → STOP, share count is wrong.
+
+⚠️ FIRST run the classification gate (added 2026-07-27, sweep-validated).
+   EQUITY-classified  -> trap live, subtract the distribution.
+   LIABILITY-classified -> NO TRAP, coupon already in interest expense.
+   Indian bank AT1 and mainland capital supplementary bonds are LIABILITIES.
+   HK/PRC insurer perpetual capital securities are EQUITY.
+   The instrument's NAME tells you nothing; its CLASSIFICATION tells you all.
+
+⚠️ ALWAYS state resolution: ±(0.5 x 10^-dp) / EPS.
+   A gap below resolution is rounding, NOT a finding.
+   EPS 2dp on a ~1.00 base resolves only ~±0.5% -> "no distortion above 1%",
+   never "no distortion". China Taiping was catchable because its 3.83% gap
+   was ~550x the resolution of a 3dp EPS on a HK$7.25 base.
+
+Signature: Anchor 2 off by 1–5% while the dividend-derived and BVPS-derived
+counts agree with EACH OTHER to <0.1% → look for a senior distribution in
+the statement of changes in equity, not for a share-class problem.
 ```
 
 ### Check 3: Currency Self-Consistency (10 seconds)
@@ -240,7 +262,70 @@ Any convertible bonds, convertible preferreds, or warrants — now OR in the com
 
 ---
 
+### Check 12: Price Vintage and Ex-Dividend (30 seconds)
+```
+1. What DATE is my price? Is it stated in the report?
+2. Has an EX-DIVIDEND date passed between that date and today?
+3. If yes → the quote is CUM-dividend and the comparable price is lower.
+```
+Staleness alone has now bitten twice (sportswear v1/v2; PICC P&C). The dividend leg is the
+newer half: on China Taiping a HK$1.23 ex-div step moved margin of safety **15.0% → 20.0%** on
+no news whatsoever — a third of the way to the entry threshold. For high-payout financials the
+step-down is verdict-relevant by itself. **Confirm both legs before finalizing any verdict.**
+
+### Check 13: Record-Keeping Assertion (10 seconds)
+
+Prose is not validated. Data is. Anything stated in a header, a title or a summary line drifts
+silently because no check touches it.
+
+```
+assert header_universe_size == len(json_data) == master_table_row_count
+```
+
+*Derivation, 2026-07-27.* The command centre header read **46** while the JSON block already held
+**49** contiguous entries — stale across roughly three sessions. The definitive cross-file
+parsed-dict equality check passed perfectly and caught nothing, because **agreement between the two
+checked artifacts said nothing about the unchecked third.** Generalize: when adding a validation,
+ask what the check *cannot* see, and whether anything downstream is relying on it anyway.
+
+### Check 14: Is the Book-Value Denominator Real? (60 seconds)
+
+Where a valuation rests on P/B, the denominator deserves the same scrutiny as the numerator.
+Three failure modes, all found live in the 2026-07-27 sweep, none of them the one being hunted:
+
+```
+1. DERIVED, NOT READ   Was BVPS taken off a balance sheet, or backed out of ROE?
+                       (PICC P&C: RMB13.34 reverse-engineered from a ratio)
+2. GAAP-BASIS UNNAMED  Does the issuer publish more than one equity figure?
+                       (ICICI 20-F: US GAAP Rs409,093cr vs Indian GAAP
+                        Rs363,060cr — a 12.7% gap on the same page)
+3. SINGLE-SOURCED      One aggregator, never tied to a filing?
+                       (ICICI BVPS Rs527 — sits BETWEEN the two bases above)
+```
+
+**Name the basis, name the source, and read it to a filing.** A denominator that cannot survive
+those three questions makes every multiple built on it decorative.
+
 ## Process Behaviors to Reinforce
+
+### Validate new rules by sweeping backwards, not by waiting forwards
+
+When a rule is derived from a single case, the instinct is to mark it unvalidated and wait for the
+next name that triggers it. **Sweep the existing book instead.** The retrospective run is faster,
+it is bounded (the population is known), and it tests the rule against more variation than any
+single future case will.
+
+*Derivation, 2026-07-27.* Amendment #13 was adopted with "validates on the next issuer carrying
+perpetual or AT1 capital." Sweeping the seven financials already in coverage instead produced,
+within hours: (1) **two defects in the rule itself** — no classification gate, no resolution
+statement — either of which would have generated false findings for months; (2) confirmation that
+**no existing entry was corrupted**; and (3) a **larger, unrelated error** on ICICI's P/B
+denominator that no #13-triggered future case would ever have surfaced.
+
+The general form: **a rule derived from one case encodes that case's peculiarities as though they
+were general.** Only contact with the rest of the population separates the two, and that population
+is already sitting in the book.
+
 
 ### Pre-Analysis
 - [ ] State share count explicitly at top of analysis
@@ -384,6 +469,12 @@ If all three agree, you're safe. If they disagree, dig deeper.
 |------|--------------|---------|
 | 2026-05-18 | Share count reconciliation (BYD case) | User caught wrong market cap on BYD deep dive |
 | 2026-05-23 | Interpretive error framework (8 distortion classes) | User identified gap: one-time items, dilution, investment portfolios not systematically addressed |
+| 2026-07-27 | Check 12 — price vintage + ex-dividend leg | China Taiping: price 6.5 weeks stale AND cum-dividend; the HK$1.23 ex-div step alone moved MoS 15.0% → 20.0% |
+| 2026-07-27 | Check 13 — record-keeping assertion (header == data == table) | Command-centre header read 46 against 49 live entries; cross-file equality passed and caught nothing, because both checked artifacts agreed with each other |
+| 2026-07-27 | Check 2 extended — senior-instrument subtraction (amendment #13) | China Taiping: perpetual distribution omitted from Anchor 2 numerator overstated share count 3.83%; EVPS overstated 7.6% |
+| 2026-07-27 (b) | Check 2 extended again — classification gate + resolution statement | #13 sweep: HDB and IBN both carry AT1 and neither produced the trap (liability-classified); PICC Group's +0.47% gap proved indistinguishable from EPS rounding at ±0.48% resolution |
+| 2026-07-27 (b) | Check 14 — is the book-value denominator real? | The #13 sweep found three weak P/B denominators, none weak for the reason #13 predicted: derived-not-read, GAAP-basis unnamed, single-sourced |
+| 2026-07-27 (b) | **Run a new rule's validation as a retrospective sweep, not as a wait** | #13 was adopted with "validates on the next issuer carrying perpetual capital". Sweeping the existing book instead surfaced two defects in the rule within hours, and a larger unrelated error (ICICI, 12.7%) on the way |
 
 ### Pattern: "Net income rose but basic EPS is flat (or basic and diluted EPS diverge)"
 **Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves

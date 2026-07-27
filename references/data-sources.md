@@ -326,6 +326,57 @@ Where dilutive instruments include:
 
 The reported "diluted EPS" already accounts for these — back-solving from diluted EPS gives you the right count.
 
+### Warning Class G: Perpetual / AT1 / Preference Capital ⚠️ NEW (July 2026)
+
+**FIRST — run the classification gate.** The trap only exists where the instrument is classified as
+**equity**. Check before anything else:
+
+```
+EQUITY-classified    → trap LIVE. Distribution is NOT in net profit. Subtract it.
+                       HK/PRC insurer perpetual capital securities live here.
+
+LIABILITY-classified → NO TRAP. Coupon is in interest expense; net profit is
+                       already net of it. Anchor 2 clean by construction.
+                       Indian bank AT1 (RBI Basel III / Banking Regulation Act
+                       schedule format) and mainland capital supplementary
+                       bonds (subordinated debt) live here.
+```
+
+**The name of the instrument tells you nothing — its classification tells you everything.** Sweep
+of 2026-07-27: HDFC Bank and ICICI Bank both carry AT1 and **neither** produced the trap, because
+both report it under borrowings. Skipping this gate false-alarms on most of a financials sleeve.
+
+**Where the gate returns EQUITY — equity in form, senior in substance.** Perpetual capital
+securities, AT1 notes and preference shares are presented *within* equity but rank **ahead of**
+ordinary shares for both distributions and liquidation. Two consequences, both live:
+
+```
+1. SHARE COUNT
+   Basic EPS is struck AFTER the senior distribution.
+   Implied Shares = (Profit attributable to owners − senior distribution) ÷ basic EPS
+   Skip the subtraction → share count overstated (3.83% on China Taiping FY25)
+   ALWAYS state resolution: ±(0.5 × 10^−dp)/EPS. A gap below resolution is
+   rounding, not a finding. EPS at 2dp on a ~1.00 base resolves only ~±0.5%.
+
+2. PER-SHARE VALUE METRICS
+   Issuer-published EV/share, NAV/share, BV/share may divide TOTAL equity
+   by ordinary shares — attributing senior capital to ordinary holders.
+   Strike an EX-PERPETUAL version before valuing on it.
+   (China Taiping FY25: EVPS HK$58.297 → HK$53.85 ex-perp, −7.6%)
+```
+
+**Where to look:** statement of changes in equity (the distribution line); equity note (instrument
+carrying value); and check for **subsidiary-level** perpetuals sitting inside non-controlling
+interests — these are easy to miss because they never touch the parent equity note.
+
+**Who carries them:** mainland Chinese insurers and banks (perpetual bonds and capital supplementary
+bonds are routine regulatory capital), Indian banks (AT1), European banks, and utilities/REITs with
+hybrid capital. **Assume present until checked** for any financial.
+
+**Not a share-class problem.** This is orthogonal to Warning Classes A–F. An issuer with one share
+class, one listing and a perfectly clean Anchor 4 can still fail here. The trap is in the **capital
+stack**, not the share register.
+
 ### The Four Reconciliation Anchors
 
 Before any per-share calculation, verify all four (per SKILL.md Step 2.5):
@@ -345,11 +396,12 @@ The reverse test catches **price-basis** errors that the forward test passes: an
 market cap on the *other* listing's price and displaying it beside your quote. Caught live on PICC
 Group (1339.HK) — see SKILL.md Step 2.5. Anchor 2 is the tiebreaker when the two directions disagree.
 
-**Anchor 2: EPS Back-Check** (most reliable)
+**Anchor 2: EPS Back-Check** (most reliable) — ⚠️ deduct senior distributions first (amendment #13)
 ```
-Reported Net Income: $X B
+Reported Net Income (attributable to owners): $X B
+LESS perpetual / AT1 / preference distribution: $S B   ← Warning Class G; often overlooked
 Reported EPS: $Y per share
-Implied Shares = X / Y = Z B
+Implied Shares = (X − S) / Y = Z B
 Gap vs. assumed share count: ±W% — must be ≤ 2%
 ```
 
@@ -482,6 +534,14 @@ Run before finalizing any Buy / Hold / Avoid recommendation:
 
 - [ ] Every verdict-moving number has a Tier 1 or Tier 2 source
 - [ ] **Share count reconciled via all four anchors (per Share-Class Structure Warnings section)** ⚠️ NEW
+- [ ] **Classification gate run: senior instrument is EQUITY or LIABILITY? (Warning Class G) — only
+      equity-classified instruments require the Anchor 2 subtraction** ⚠️ NEW
+- [ ] **Where equity-classified: distribution deducted before Anchor 2, and any issuer-published
+      per-share value metric restated ex-perpetual** ⚠️ NEW
+- [ ] **Anchor 2 reported as "passes at ±X% resolution", never as an unqualified pass** ⚠️ NEW
+- [ ] **Book-value denominator READ FROM A FILING, not derived from a ratio, and its GAAP basis named
+      where the issuer publishes more than one (e.g. 20-F filers: US GAAP vs local)** ⚠️ NEW
+- [ ] **Price vintage stated, and checked for an ex-dividend date passing since the quote (RF-4)** ⚠️ NEW
 - [ ] No pending M&A is embedded in current SOTP (RF-1)
 - [ ] Headline losses/gains decomposed into cash vs. non-cash (RF-3)
 - [ ] Data vintage labeled per line for time-sensitive figures (RF-4)
