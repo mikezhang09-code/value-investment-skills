@@ -303,13 +303,55 @@ does not, the segments are not exhaustive and something is being valued at zero 
 
 ---
 
-## ⚠️ Mandatory Fade Disclosure (financials) — amendment 2026-07-26 · **UNVALIDATED**
+## ⚠️ Mandatory Fade Disclosure (financials) — amendment #11-R, 2026-07-26 · **VALIDATED · BINDING**
 
-> **Status: provisional, single-case derivation.** This rule was written from one deep dive
-> (HDFC Bank, 2026-07-26) and has **not** been validated against a second financial. Apply it, but
-> flag its use in the report. **Scheduled validation: ICICI Bank (IBN)** — same market, same sector,
-> *non*-merged balance sheet, which isolates whether the fade problem is general to financials or
-> specific to a post-merger franchise. Until then, do not extend it beyond financials.
+> **Status: validated on ICICI Bank (IBN), same day.** The scheduled validation ran and **confirmed
+> the rule while proving the original threshold too weak.** IBN — non-merged, CASA 39%, ROE 16%,
+> payout 15.5% — produced a **negative** justified P/B, not merely a fragile one. The problem is
+> **general to financials**, not specific to post-merger franchises; HDB was the *milder* case.
+> Promoted from provisional to binding.
+
+### The binding condition is g ≥ r, not (r − g) < 3pp
+
+The original draft said "demote where (r − g) < 3pp." That understates it. For a bank, g is not free:
+**g = ROE × (1 − payout)**. The method therefore requires **payout > 1 − r/ROE**:
+
+| Bank ROE | Minimum payout for justified P/B to function (r = 12%) |
+|---|---|
+| 14% | 14.3% |
+| **16%** | **25.0%** |
+| 18% | 33.3% |
+| 20% | 40.0% |
+
+High-quality Asian banks retain 80–85% precisely *because* they can redeploy at high returns. They
+**systematically fail** this condition. IBN pays 15.5% against a 25.0% requirement.
+
+**The perverse property — the finding that matters.** Higher ROE and lower payout are the two
+defining features of a great compounder, and **both push g up toward and past r.** The method is
+most reliable on mediocre, high-payout banks and breaks down entirely on exactly the franchises a
+value investor most wants to own. This should have been visible from the algebra before either deep
+dive was run.
+
+### The rule
+
+1. **Justified P/B may not carry primary weight for any bank or insurer where ROE × (1 − payout) ≥ r − 1pp.** For most high-quality Asian banks this is unconditional.
+2. **Where g ≥ r the method is not demoted — it is VOID.** Do not report the output; a negative or explosive fair value is not a data point.
+3. The fade-sensitivity ladder remains mandatory. **Where the no-fade rung is undefined, state it as undefined rather than omitting the row** — its absence is itself the diagnostic.
+4. Primary anchor is **residual income with an explicit, moat-calibrated fade.**
+
+**Materiality:** applying this rule cut base fair value **~33% on HDB and ~17% on IBN**, in both cases
+with negligible FX contribution. It changes verdicts, which raises rather than lowers the burden of
+applying it carefully.
+
+**Comparative evidence:**
+
+| | HDB | IBN |
+|---|---|---|
+| ROE × retention = g | 15.0% × 68.1% = **10.21%** | 16.0% × 84.5% = **13.53%** |
+| (r − g) at r = 12% | **+1.78pp** — fragile | **−1.53pp** — broken |
+| Justified P/B | 2.68× | **−1.62× (negative)** |
+| Fade-ladder spread (defined rungs) | +39% | **+75%** |
+| No-fade bound | ₹1,051 | **does not exist** |
 
 For any bank or insurer valued on **justified P/B** or **residual income**, the terminal assumption —
 how long above-cost-of-capital returns persist before fading — routinely dominates every other input
@@ -340,7 +382,8 @@ in forecast. **Stating that split is more useful to the reader than the point es
 
 **Cross-reference:** `industry-playbooks.md` §F.5 already notes that P/B and EPV are not independent
 (they converge as normalized ROE → r) and must be counted as one method. This amendment is the
-companion constraint on the same family of methods.
+companion constraint on the same family of methods, and **§F.5's method table was corrected on
+2026-07-26 (d)** to remove the now-contradictory "Primary anchor" designation for P/B.
 
 ---
 
@@ -547,6 +590,12 @@ Particularly common share-count errors:
 
 ## Change Log
 
+- **2026-07-26 (c)** — **#11 VALIDATED on ICICI Bank (IBN) → promoted to #11-R, binding.** Threshold
+  rewritten from "(r − g) < 3pp" to **g ≥ r**; where g ≥ r the method is **void**, not demoted. IBN
+  returned a negative justified P/B (−1.62×). Perverse property identified: the method breaks down
+  precisely on high-ROE, low-payout compounders. §F.5 method table corrected in the same commit —
+  P/B demoted from primary anchor to conditional; residual income with explicit fade promoted in its
+  place. Materiality: ~33% FV cut on HDB, ~17% on IBN.
 - **2026-07-26** — **Amendment #11: Mandatory Fade Disclosure (financials) added.** ⚠ **UNVALIDATED —
   single-case derivation from HDFC Bank (HDB) Q1 FY27 refresh.** Requires the fade-sensitivity ladder
   to be printed for any financial valued on justified P/B or residual income, and demotes justified

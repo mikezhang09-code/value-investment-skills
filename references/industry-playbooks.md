@@ -126,7 +126,8 @@ of the compression as transitional and carried a BUY at a fair value ~48% above 
 
 | Method | Insurance | Banking |
 |---|---|---|
-| **P/B calibrated to sustainable ROE** | **Primary anchor.** Justified P/B ≈ (ROE − g) / (r − g) | **Primary anchor.** Same construction |
+| **P/B calibrated to sustainable ROE** | **Conditional — see #11-R.** Justified P/B ≈ (ROE − g)/(r − g) is **VOID where g ≥ r** and may not carry primary weight where ROE × (1 − payout) ≥ r − 1pp | **Conditional — same construction, same constraint.** Most high-quality Asian banks fail the condition unconditionally (IBN: g 13.5% vs r 12% → negative output) |
+| **Residual income with explicit moat-calibrated fade** | **Primary anchor** (replaced P/B, 2026-07-26 (d)) | **Primary anchor.** Fade-sensitivity ladder mandatory per #11-R |
 | **EPV on normalized underwriting profit** | **Floor.** Establishes the no-growth downside per house discipline | **Floor**, on normalized pre-provision profit less normalized credit cost |
 | **SOTP** | **Mandatory for holdcos.** Now defined as Method 6 in `intrinsic-value.md` | Mandatory for holdcos |
 | **Embedded value** | **Life only.** Dense with management assumptions (discount rate, mortality, lapse). Stress-test each; never accept as reported | N/A |
@@ -243,8 +244,18 @@ detector of bad news.** Run it in both directions:
 | Provisions **falling**, credit cost below the bank's own range, profit growth tracking the release | Possible harvesting — reported profit is flattered. Investigate |
 | Provisions **rising**, credit cost rising, and a **discretionary buffer left unreleased through a consensus miss** | **Reporting integrity demonstrated.** A credibility multiplier on every other figure in the release |
 
-**The diagnostic is a ratio, not a direction: compare the size of the consensus miss to the size of
-the unreleased buffer.** A management that could have converted a miss into a beat by releasing a
+**Two branches (refined on IBN, 2026-07-26 (d)) — the original construction assumed a miss:**
+
+| Situation | Test |
+|---|---|
+| **On a MISS** | Did management decline to release a buffer that would have converted it? Compare the size of the miss to the size of the unreleased buffer. *(HDB: 3.0% of the buffer would have sufficed; declined.)* |
+| **On a BEAT** | Was the beat **earned or manufactured**? Test whether PAT growth is matched by **pre-provision / core operating profit growth**, and whether the buffer is intact. *(IBN: PAT +15.95% vs core operating profit +15.6%, ₹13,100cr buffer held → **earned**.)* |
+
+**The miss branch is the stronger signal** — it required management to accept a visible cost. The
+beat branch is confirmatory rather than probative.
+
+**On the miss branch, the diagnostic is a ratio, not a direction: compare the size of the consensus
+miss to the size of the unreleased buffer.** A management that could have converted a miss into a beat by releasing a
 trivial fraction of a discretionary buffer, and did not, has told you something about the reliability
 of the whole release — and the signal is strongest precisely when the incentive to release was
 highest.
@@ -669,6 +680,38 @@ When applying these playbooks to HK/China-listed companies:
 ---
 
 ## Change Log
+
+- **2026-07-26 (d)** — **Amendment #11 validated on ICICI Bank (IBN) and promoted to binding as
+  #11-R.** The scheduled validation ran the same day and **confirmed the rule while proving the
+  original threshold too weak.** IBN — non-merged, CASA 39%, ROE 16.0%, payout 15.5% — produced a
+  **negative** justified P/B (g 13.53% ≥ r 12%), not merely a fragile one. The problem is **general
+  to financials**, not specific to post-merger franchises; HDB was the milder case.
+
+  | Change | Detail |
+  |---|---|
+  | **#11-R** | Binding condition rewritten from "(r − g) < 3pp" to **g ≥ r, i.e. ROE × (1 − payout) ≥ r**. Where g ≥ r the method is **VOID**, not demoted. Primary-weight ban where ROE × (1 − payout) ≥ r − 1pp. No-fade rung must be **stated as undefined** rather than omitted |
+  | **#11-R(b)** | **§F.5 method table corrected** — "P/B calibrated to sustainable ROE" demoted from **Primary anchor** to **Conditional** for both insurance and banking; **residual income with explicit moat-calibrated fade** inserted as the primary anchor. This inconsistency was *created* by #11 on the same day and is fixed in the same commit |
+  | **#9-R** | B-1 positive case given **two branches**. The original construction assumed a miss and was undefined on IBN, which beat. **Miss branch:** did management decline a release that would have converted it? **Beat branch:** was the beat earned or manufactured — test PAT growth against pre-provision/core operating profit growth, buffer intact. Miss branch is probative; beat branch confirmatory |
+
+  **Why the perverse property matters:** higher ROE and lower payout are the two defining features of
+  a great compounder, and **both push g up toward and past r.** Justified P/B is most reliable on
+  mediocre, high-payout banks and breaks down entirely on the franchises a value investor most wants
+  to own. Visible from the algebra before either deep dive — it was not run.
+
+  **Materiality:** #11 cut base fair value **~33% on HDB and ~17% on IBN**, with negligible FX
+  contribution. Not cosmetic.
+
+  **Process note — RF-4 fired twice in one run, both times on my own arithmetic:** (i) 1bn shares =
+  100 crore, not 10 → the A1 market-cap anchor first returned a 90% gap; (ii) 1 crore = 0.01bn, not
+  0.1 → EPV first returned P/B 13.6×. **Both were caught by the gates and neither reached the
+  report.** Absurd-output checking earned its place twice in a single session; the lesson is that
+  crore/billion conversion is the highest-frequency unit trap in Indian filings and should be done
+  once, explicitly, at the top of the working file.
+
+  **Confirmation-bias control used:** the #11 hypothesis was **pre-registered in the report before
+  IBN data was fetched**. The confirming input (payout 15.5%) is a reported fact rather than a
+  modelling choice. Recommend adopting pre-registration as standard practice whenever a run's stated
+  purpose is to validate a prior amendment.
 
 - **2026-07-26 (c)** — **Validated against a third live deep dive** (HDFC Bank, HDB — Q1 FY27 thesis
   refresh). Amendments **#9–12** applied, continuing the #1–8 series from 2026-07-26 (b). The refresh
