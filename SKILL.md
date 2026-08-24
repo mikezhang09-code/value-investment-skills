@@ -62,7 +62,7 @@ When asked to research a company or build a portfolio, follow this process:
 2. DATA COLLECTION         → Fetch filings, reports, financials from primary sources
 2.5 DATA RECONCILIATION    → MANDATORY four-anchor verification (mechanical accuracy)
 3. FINANCIAL ANALYSIS      → 10-year financial deep dive (quantitative)
-3.5 EARNINGS QUALITY GATE  → MANDATORY 8-distortion check (interpretive accuracy) — NEW
+3.5 EARNINGS QUALITY GATE  → MANDATORY 8-distortion check (interpretive accuracy)
 4. MOAT ASSESSMENT         → Competitive advantage quality, durability, and TREND
 5. INDUSTRY ANALYSIS       → Sector-specific metrics and macro sensitivities
 6. INTRINSIC VALUATION     → Multiple methods → triangulated fair value range
@@ -70,7 +70,8 @@ When asked to research a company or build a portfolio, follow this process:
 7. MARGIN OF SAFETY        → Compare price to intrinsic value
 8. RISK & SELL CHECK       → Value trap diagnostic, inflation/derivatives exposure, sell criteria
 9. INVESTMENT DECISION     → Buy / Monitor / Pass with clear rationale + behavioral bias check
-10. REPORT GENERATION      → Professional report + optional Excel model
+10. REPORT GENERATION      → THREE deliverables: Markdown report + HTML dashboard
+                             + bilingual EN/中文 summary (+ optional Excel model)
 ```
 
 **Mental model: Two upstream gates protect the valuation work downstream.**
@@ -114,7 +115,7 @@ Minimum data to collect:
 
 ---
 
-## Step 2.5: Data Reconciliation Gate (MANDATORY) ⚠️ NEW
+## Step 2.5: Data Reconciliation Gate (MANDATORY) ⚠️
 
 Before running ANY per-share calculation, you MUST verify these four anchors. Skipping this step is the single most common source of analytical errors. **One bad upstream number poisons every downstream calculation.**
 
@@ -352,12 +353,12 @@ Build a **10-year financial summary table** with these rows:
 > insurers and banks — gross margin does not exist, regulatory leverage is structural rather than a
 > warning, and "FCF > NI" signals a growing book rather than clean earnings. **Before building the
 > table for any financial, read `references/industry-playbooks.md` §1.2** for the metric
-> substitutions. This applies to the coverage book today (HDFC Bank, ICICI, Berkshire, Waterdrop),
-> not only to future insurers.
+> substitutions. This applies to the coverage book today (HDFC Bank, ICICI, Berkshire, Waterdrop,
+> AIA), not only to future insurers.
 
 ---
 
-## Step 3.5: Earnings Quality Gate (MANDATORY) ⚠️ NEW
+## Step 3.5: Earnings Quality Gate (MANDATORY) ⚠️
 
 Read `references/earnings-quality-and-distortions.md` for the full framework.
 
@@ -529,7 +530,7 @@ Implied upside/downside: XX%
 
 ---
 
-## Step 6.5: Output Plausibility Checks (NEW) ⚠️
+## Step 6.5: Output Plausibility Checks ⚠️
 
 Before reporting valuation conclusions, apply these sanity checks. A surprising result is more often an analytical error than a market inefficiency — especially in heavily-covered large-cap markets.
 
@@ -624,7 +625,7 @@ Read `references/inflation-goodwill-derivatives.md` for macro risk overlays.
 4. **Recency bias** — Am I overweighting the last few quarters?
 5. **Action bias** — Is "do nothing" actually the best decision?
 
-### Self-Analysis Error Check (NEW)
+### Self-Analysis Error Check
 6. **Has any external data point challenged my numbers?** If yes, my first response must be verification, not defense.
 7. **Does my conclusion require the market to be obviously wrong on a heavily-covered stock?** If yes, error probability is high.
 8. **Have I documented the reconciliation anchors in the data trail?** If no, I haven't earned the conclusion.
@@ -653,15 +654,48 @@ Support the recommendation with:
 
 ## Step 10: Report Generation
 
-Read `assets/report-template.md` for the deliverable specification — the ten Markdown sections,
-the dashboard tab structure, and the rules that apply to both — and produce:
+Read `assets/report-template.md` for the deliverable specification — the ten Markdown sections, the
+dashboard tab structure, the bilingual summary spec, and the rules that apply to all three — and
+produce **THREE deliverables, not two**:
 
-**Written Investment Report** (always):
+### Deliverable 1 — Written Investment Report (always)
+`report_<ticker>_<YYYY-MM-DD>.md` · **English**, bilingual EN/ZH headers
 - Professional, investor-grade language
-- Structured per the template
+- Structured per the template (10 sections)
 - Includes all tables from steps 3–6
 - Clear BUY/PASS recommendation with conviction level
 - **MUST include the four reconciliation anchors in the Data Trail section**
+- This is the **audit document** — its job is that every number is traceable
+
+### Deliverable 2 — HTML Dashboard (always, except on reduced scopes)
+`report_<ticker>_<YYYY-MM-DD>.html` · **English**, bilingual EN/ZH headers
+- 12 tabs per `assets/single-stock-report.md`; Dark Luxe per `references/design-system.md`
+- This is the **browsing surface** — charts, tabs, interactivity
+
+### Deliverable 3 — Bilingual Executive Summary (always, EVERY scope) ⚠️ NEW
+`summary_<ticker>_<YYYY-MM-DD>_EN-CN.md` · **Full English + 简体中文, interleaved by block**
+- **Produced AFTER the report, derived FROM it — never authored in parallel**
+- 16 required sections, fixed list — see `assets/report-template.md` "Deliverable 3"
+- 35–50KB target. If it exceeds ~60KB it has stopped being a summary — **cut, do not translate less**
+- Tables are bilingual **within cells**, not duplicated as two tables
+- Simplified Chinese, mainland finance conventions — use the terminology table in the template;
+  do not invent a second rendering for a term already listed
+- This is the **communication document** — what gets forwarded, and what reloads the thesis in six months
+
+> **Why the full report stays English.** Language follows the document's *job*. Nobody reads a
+> reconciliation table bilingually, and a bilingual full report would double every number's surface
+> area *inside one file* — the Xtep-#14 drift failure mode by construction. The summary is short
+> enough that interleaving stays readable, and it is the artifact that actually gets read twice.
+
+### The three anti-drift controls (mandatory)
+
+1. **Derived, never parallel-authored.** If the report changes, regenerate the summary — do not patch it.
+2. **Mechanical figure cross-check before delivery.** Assert every headline figure appears identically
+   in the report and the summary. Report the result.
+3. **One canonical figure block.** Verdict, conviction, base FV, MoS, entry zone, floor and cap come
+   from **the command-center JSON row**, so report, dashboard, summary and command center cannot disagree.
+
+### Optional deliverables
 
 **Excel Financial Model** (if requested):
 - 10-year historical data
@@ -696,7 +730,7 @@ Read these when needed — don't load all at once:
 | `references/sell-discipline-and-traps.md` | Step 8 — sell criteria, value traps, behavioral biases, error recognition |
 | `references/inflation-goodwill-derivatives.md` | Step 8 — inflation/goodwill/derivatives risk |
 | `references/portfolio-construction.md` | Portfolio construction or adding a new name |
-| `assets/report-template.md` | Step 10 — the 10-section report and 12-tab dashboard spec |
+| `assets/report-template.md` | **Step 10 — the THREE deliverables**: the 10-section report, the 12-tab dashboard, and the bilingual EN/中文 summary (16-section spec + terminology table + anti-drift controls) |
 
 ---
 
@@ -717,3 +751,23 @@ Read these when needed — don't load all at once:
     inside equity and rank ahead of it. Deduct their distributions before back-calculating shares, and
     strike an ex-perpetual version of any per-share value metric before valuing on it.
 13. **Per-share is the only share that matters.** Aggregate growth means nothing to the existing shareholder if it's diluted away. Always compute both aggregate and per-share growth.
+14. **Derive, never retype.** Any figure that appears in more than one artifact — report, dashboard,
+    bilingual summary, command center — comes from one source. The Xtep #14 error sat undetected for
+    eleven weeks because a master-table row was retyped instead of derived while the JSON beneath it
+    was correct. Cross-check mechanically before delivering.
+
+---
+
+## Change Log
+
+- **2026-08-23** — **Step 10 restructured: THREE deliverables, not two.** Added **Deliverable 3 — the
+  bilingual EN/简体中文 executive summary** (`summary_<ticker>_<date>_EN-CN.md`), which runs at
+  **every scope** including quick thesis, thesis refresh and earnings reaction. Full spec (16 required
+  sections, interleaved-block layout, 32-pair terminology table, what NOT to carry over) lives in
+  `assets/report-template.md` under "Deliverable 3". Rationale recorded there and summarised at Step 10:
+  **language follows the document's job** — the full report stays English because it is an audit
+  document, and a bilingual full report would double every number's surface area inside one file.
+  Three **anti-drift controls** made mandatory: derived-not-parallel-authored, mechanical figure
+  cross-check before delivery, and one canonical figure block sourced from the command-center JSON row.
+  Added **Key Principle 14 (derive, never retype)**, whose worked example is the Xtep #14 master-table
+  drift found on 2026-08-23. Workflow Overview line 10 and the Reference Files table updated to match.

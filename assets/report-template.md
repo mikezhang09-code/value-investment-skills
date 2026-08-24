@@ -4,6 +4,22 @@ Use this template to produce every investment report. Fill in every section — 
 
 ---
 
+## ⚠️ Deliverables at a glance — THREE per analysis, not two
+
+| # | Deliverable | File | Language | Job it does | Reader |
+|---|---|---|---|---|---|
+| 1 | **Markdown report** | `report_<ticker>_<YYYY-MM-DD>.md` | **English**, bilingual headers | Audit trail + reasoning record. Every number traceable. | The analyst — you now, or a future session doing a refresh |
+| 2 | **HTML dashboard** | `report_<ticker>_<YYYY-MM-DD>.html` | **English**, bilingual headers | Browsing surface. Charts, tabs, interactivity. | Anyone exploring the analysis visually |
+| 3 | **Bilingual summary** | `summary_<ticker>_<YYYY-MM-DD>_EN-CN.md` | **Full EN + 简体中文**, interleaved | Communication + fast reload of the thesis. | Anyone being sent the conclusion; you, six months later |
+
+Plus **Stage 6**: `command-center.md` and `command-center.html` are *revised in place* — same filenames forever, one copy in existence, written back to Project Knowledge. They are not per-analysis artifacts and do not accumulate.
+
+**Delivery convention:** deliver deliverables 1–3 plus `command-center.html` into the conversation. Write both command-center files to Project Knowledge. Do **not** deliver `command-center.md` into the chat — it is a ~280KB record meant to be read by the next session, not by a human in a chat panel.
+
+> **Why three and not a single bilingual report.** Language follows the document's *job*, not applied uniformly. The full report is an audit document — nobody reads a reconciliation table bilingually, and translating it would double the length of exactly the sections where length hurts most and helps least. Worse, a bilingual full report doubles every number's surface area *inside one file*, which is the Xtep-#14 failure mode by construction. The summary is short enough that interleaving stays readable, and it is the artifact that actually gets forwarded and re-read.
+
+---
+
 ```
 ═══════════════════════════════════════════════════════════════
 INVESTMENT RESEARCH REPORT
@@ -29,11 +45,13 @@ Conviction:      [High / Medium / Low]
 [COMPANY] is a [brief business description] with a [wide/narrow] competitive moat based on [moat type]. The business has compounded earnings at [X%] over 10 years with consistently high returns on capital (average ROE: [X%], ROIC: [X%]). At current prices of [PRICE], the stock offers a [X%] margin of safety to our base-case intrinsic value of [VALUE]. We rate the stock [RECOMMENDATION] for long-term value investors.
 
 **Key investment merits (bullet form):**
+
 - [Merit 1]
 - [Merit 2]
 - [Merit 3]
 
 **Key risks:**
+
 - [Risk 1]
 - [Risk 2]
 
@@ -119,6 +137,7 @@ Conviction:      [High / Medium / Low]
 
 ### Moat Stress Test (Munger Inversion)
 *What would have to happen for this moat to be destroyed within 10 years?*
+
 - Scenario 1: [e.g., "A well-funded competitor enters with superior technology..."]
 - Scenario 2: [e.g., "Regulatory change eliminates the pricing advantage..."]
 - Assessment: [Why these scenarios are/aren't likely]
@@ -148,11 +167,13 @@ Conviction:      [High / Medium / Low]
 ### Key Financial Observations
 
 **Strengths:**
+
 - [Observation 1: e.g., "Gross margins have expanded from 40% to 55% over the decade, evidence of growing pricing power"]
 - [Observation 2]
 - [Observation 3]
 
 **Concerns:**
+
 - [Concern 1: e.g., "Debt/Equity has risen from 0.2x to 0.8x due to acquisitions — worth monitoring"]
 - [Concern 2]
 
@@ -252,6 +273,7 @@ Conviction:      [High / Medium / Low]
 
 ### Downside Scenario Analysis
 *If the thesis is wrong and risks materialize:*
+
 - Bear case owner earnings: $[X]
 - Bear case intrinsic value: $[X]
 - Downside from current price: [-X%]
@@ -302,6 +324,7 @@ Conviction:      [High / Medium / Low]
 [1–2 paragraph summary of the full analysis. State the recommendation with conviction and explain what would change your view.]
 
 **Revisit Triggers:**
+
 - Reassess if price falls below $[X] (add opportunity)
 - Reassess if price rises above $[X] (consider trimming)
 - Reassess if [specific business event, e.g., "market share falls below 30%"]
@@ -322,7 +345,6 @@ Conviction:      [High / Medium / Low]
 ---
 
 **DISCLAIMER**: *This report is for informational and educational purposes only. It does not constitute personalized investment advice or a solicitation to buy or sell any security. All investments involve risk, including possible loss of principal. Past performance does not guarantee future results. Investors should conduct their own due diligence and consult a qualified financial advisor before making investment decisions.*
-```
 
 ---
 
@@ -366,30 +388,118 @@ inconsistently across the coverage book.
 
 ---
 
-## Rules That Apply to Both Deliverables
+# Deliverable 3 — Bilingual Executive Summary (EN + 简体中文)
 
-1. **Presentation order: HTML dashboard first, then Markdown report.** Then command-center.md, then
-   command-center.html.
+**Filename:** `summary_<ticker>_<YYYY-MM-DD>_EN-CN.md`
+**Produced:** AFTER the Markdown report is finished. It is **derived from** the report, never authored in parallel with it.
+**Length target:** 35–50KB. If it exceeds ~60KB it has stopped being a summary — cut, do not translate less.
+
+## Purpose
+
+The full report is an **audit document**; this is a **communication document**. It is what gets forwarded, and what gets re-read six months later to reload the thesis quickly. It must stand alone: a reader who has never opened the full report should finish it knowing the verdict, why, what would change it, and what to watch.
+
+## Layout rule — interleaved by block
+
+Each heading, paragraph, callout and bullet appears in **English immediately followed by 中文**. Never a full English document followed by a full Chinese one — that makes cross-checking a translation against its source impossible.
+
+**Tables are bilingual *within cells*** (`Moat 护城河`, `Base fair value 基准内在价值`), not duplicated as two tables. Duplicating tables doubles the length for no added clarity, and side-by-side EN | 中文 columns wrap badly on a phone.
+
+**Translate the argument, not the words.** Where a literal rendering would go flat, translate for force. The Chinese reader should get the same emphasis, not a gloss.
+
+## Required sections — the fixed list
+
+Produce these, in this order. Omit one only if the analysis genuinely has no content for it, and say so.
+
+| # | Section | 中文 | Must contain |
+|---|---|---|---|
+| 1 | Header + verdict box | 标题与结论 | Verdict, conviction, price (+vintage), base FV with bear/bull, MoS, entry zone, aggressive, floor, position cap, next review |
+| 2 | **Anchoring / framing correction** | **锚定偏差修正** | **Mandatory whenever the request arrived with a frame attached** ("crash", "plummeted", "cheap"). State the correction and the chronology table. Skip only if no frame was supplied |
+| 3 | One-sentence thesis | 一句话论点 | The single sentence from §8, both languages, as a blockquote |
+| 4 | What the business is | 业务本质 | 2–4 paragraphs. Plain language. How it actually makes money |
+| 5 | **The decisive finding** | **分析核心** | The one analytical result the verdict turns on, with its comparison table. Name it explicitly |
+| 6 | Headline decomposition | 拆解财报标题 | Check 19 or equivalent — operating vs non-operating split, wherever the headline and the business disagree |
+| 7 | Valuation | 估值 | Method set stated explicitly (including what was NOT used and why) · any gate that fired · **the mandatory fade/sensitivity ladder** · triangulation table · reverse valuation |
+| 8 | **The ±20% verdict-mover** | **决定性敏感性分析** | The sensitivity table that decides the call, and a plain statement of which variable actually matters |
+| 9 | Quality scorecard | 质量评分 | Moat /30 with pillars, EQ /40, franchise test, value trap, 4-framework, quick-kill result, sector flags |
+| 10 | Risk and downside | 风险与下行 | Risk register, Munger inversion one-liner, bear case, floor, and the risk/reward ratio at spot vs at the entry price |
+| 11 | Entry discipline + portfolio | 建仓纪律与组合定位 | Entry/aggressive/trim/cap, sleeve rules, whether the entry has historically been available |
+| 12 | Why this verdict and not the adjacent one | 为何是此结论 | The precedent invoked, and the specific reasons for and against |
+| 13 | Pre-committed watch bar | 预设检验标准 | Downgrade triggers, upgrade triggers, metrics table with warning levels |
+| 14 | Data discipline | 数据纪律 | Four anchors, classification gate, RF hits, plausibility Test 4 (consensus divergence) |
+| 15 | Key figures | 关键数据 | The period's headline table + segment table |
+| 16 | Legend + sources + disclaimer | 图例、来源与免责声明 | ▲ / ▲▲ meanings, acronym glosses, data vintage, bilingual disclaimer |
+
+**What NOT to carry over:** the 10-year financial table, the full data trail, the complete RF-1→RF-7 scan narrative, the pre-verdict checklist, per-method arithmetic. Those are audit content and belong only in the full report.
+
+## Chinese conventions — 简体, mainland finance usage
+
+Use Simplified throughout. Match the coverage book, which is 简体. Gloss each acronym once in the legend, then use it freely.
+
+| EN | 中文 | EN | 中文 |
+|---|---|---|---|
+| Embedded value (EV) | 内含价值 | Value of new business (VONB/NBV) | 新业务价值 |
+| Contractual service margin (CSM) | 合同服务边际 | Margin of safety (MoS) | 安全边际 |
+| Intrinsic / base fair value | 内在价值 / 基准内在价值 | Earnings power value (EPV) | 盈利能力价值 |
+| Operating profit after tax (OPAT) | 营运利润 | Operating ROE | 营运净资产收益率 |
+| Operating ROEV | 内含价值营运回报率 | Free surplus generation | 自由盈余生成 |
+| Moat | 护城河 | Franchise | 特许经营 |
+| Value trap | 价值陷阱 | Earnings quality | 盈利质量 |
+| Persistency | 保单继续率 | Solvency ratio | 偿付能力充足率 |
+| Agency channel | 代理人渠道 | Bancassurance | 银保渠道 |
+| Discount rate | 折现率 | Risk discount rate | 风险贴现率 |
+| Fade | 衰减 | Appraisal value | 评估价值 |
+| Watchlist / Accumulate / Pass | 观察名单 / 逐步买入 / 放弃 | Conviction | 信心度 |
+| Position cap | 仓位上限 | Entry zone | 建仓区间 |
+| Sum-of-the-parts (SOTP) | 分部估值 | Owner earnings | 所有者收益 |
+| Combined ratio | 综合成本率 | Net interest margin (NIM) | 净息差 |
+| Book value per share | 每股账面价值 | Free cash flow | 自由现金流 |
+| Cum-dividend / ex-dividend | 含息 / 除息 | Basis point | 基点 |
+
+Extend this table whenever a new sector enters the book; do not invent a second rendering for a term already listed.
+
+## Anti-drift controls — all three are mandatory
+
+The summary is a fourth place a number can be wrong. These are what stop it becoming one.
+
+1. **Derived, never parallel-authored.** Write it from the finished report, at the end. If the report changes, regenerate the summary — do not patch it.
+2. **Mechanical figure cross-check before delivery.** Extract every headline figure (verdict, conviction, price, base FV, bear, bull, MoS, entry, aggressive, floor, cap, and the 8–12 numbers the thesis turns on) and assert each appears identically in the full report. Takes seconds; it is the control that actually works. Report the result.
+3. **One canonical figure block.** Verdict, conviction, base FV, MoS, entry zone, floor and cap come from **the command-center JSON row** — so the report, the dashboard, the command center and the summary cannot disagree. This is rule 3 below, extended to a fourth artifact.
+
+---
+
+## Rules That Apply to All Three Deliverables
+
+1. **Presentation order: HTML dashboard first, then the Markdown report, then the bilingual summary.**
+   Then command-center.md, then command-center.html.
 2. **Never fabricate a number to fill a cell.** An empty cell marked "not disclosed" is correct; an
-   invented one is not. ▲ marks anything approximate, in both files.
-3. **The verdict, conviction, fair value and entry zone must be identical** across report, dashboard
-   and command center. A mismatch is the most common source of downstream drift — check before
-   presenting.
-4. **Bilingual EN/ZH headers in both deliverables.** Chart axis labels may be English-only.
+   invented one is not. ▲ marks anything approximate and ▲▲ anything derived-not-disclosed, in **all
+   three** files.
+3. **The verdict, conviction, fair value and entry zone must be identical** across report, dashboard,
+   bilingual summary and command center. A mismatch is the most common source of downstream drift —
+   check before presenting. *(This is the rule the Xtep #14 error violated for eleven weeks: the JSON
+   was right, the master table was stale, and the dashboard — which reads the JSON — was never wrong.
+   Derive from one source; do not retype.)*
+4. **Bilingual EN/ZH headers in the report and dashboard; full bilingual body in the summary only.**
+   Chart axis labels may be English-only.
 5. **A cross-boundary CAGR is never printed as a number.** Mark it non-meaningful and say why — see
    the accounting-standard transition rule in
    `references/earnings-quality-and-distortions.md`.
+6. **Deliver deliverables 1–3 plus `command-center.html`.** Write both command-center files to
+   Project Knowledge. `command-center.md` is not delivered into the conversation.
 
 ---
 
 ## Scope Variations
 
-| Scope | Markdown | HTML | Stage 6 |
-|---|---|---|---|
-| Full deep dive | All 10 sections | Full 12 tabs | Yes |
-| Quick thesis | §1, 2, 5, 6, 7, 9, 10 | Skip | Yes |
-| Thesis refresh | Refresh structure (what changed / does verdict hold / updated FV / updated entry / what to watch) | Skip | Yes |
-| Earnings reaction | §1 + delta analysis + §6–7 revised + §10 | Skip | Yes |
-| Comparison | Side-by-side across §3, 5, 6, 7, 8 | Optional | Yes, both names |
+| Scope | Markdown report | HTML dashboard | **Bilingual summary** | Stage 6 |
+|---|---|---|---|---|
+| Full deep dive | All 10 sections | Full 12 tabs | **Yes — all 16 sections** | Yes |
+| Quick thesis | §1, 2, 5, 6, 7, 9, 10 | Skip | **Yes — §1–3, 5, 7–8, 10–13, 15–16** | Yes |
+| Thesis refresh | Refresh structure (what changed / does verdict hold / updated FV / updated entry / what to watch) | Skip | **Yes — mirrors the refresh structure** | Yes |
+| Earnings reaction | §1 + delta analysis + §6–7 revised + §10 | Skip | **Yes — §1–3, 6–8, 10, 13, 15** | Yes |
+| Comparison | Side-by-side across §3, 5, 6, 7, 8 | Optional | **Yes — one summary covering both names** | Yes, both names |
+
+**The bilingual summary runs at every scope.** It is the one deliverable that always makes sense: a
+refresh or an earnings reaction is *mostly* conclusion, which is exactly what the summary carries.
 
 Stage 6 runs for every scope that produces or changes a verdict. No exceptions.
