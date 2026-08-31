@@ -8,10 +8,12 @@
 
 Errors fall into three families:
 - **Mechanical errors** (Classes 1-5): Wrong inputs. Catastrophic but visible — they break things obviously.
-- **Interpretive errors** (Classes 6-11): Right inputs, wrong meaning. Subtle but cumulative — they corrupt conclusions silently.
+- **Interpretive errors** (Classes 6-11, 13-14): Right inputs, wrong meaning. Subtle but cumulative — they corrupt conclusions silently.
 - **Omission errors** (Class 12): Inputs never gathered at all. The most dangerous family, because there is nothing to check — an omitted asset produces a fully self-consistent model built on the wrong number, and no reconciliation complains.
 
 Each family needs a separate defense. Mechanical errors are stopped at Step 2.5 (reconciliation gate). Interpretive errors are stopped at Step 3.5 (earnings quality gate). **Omission errors are stopped only by a positive sweep — Check 15 — because they leave no trace to detect.**
+
+**A cross-cutting condition applies to all three: the source tier must be able to carry the conclusion.** Classes 13 and 14 were both produced in a single session by re-rating a position on wire-service earnings-flash data. No gate fires on a *correctly executed* interpretation of an *insufficient* source — the reconciliation passes, the earnings-quality bridge passes, and the answer is still wrong. See "The source-tier ladder" under Process Behaviors.
 
 ---
 
@@ -88,6 +90,8 @@ leg alone can be verdict-relevant. See Check 12.
 
 **Asymmetric trap:** Management highlights one-time costs aggressively but quietly includes one-time gains. The analyst must independently identify both directions.
 
+**The analyst's own asymmetry — and it is the harder one.** A gate built to catch one-time *gains inflating* earnings does not automatically fire on one-time *losses depressing* them. Both are Class 6; only the sign differs. The habit of asking "is this profit too good?" has no reflex counterpart asking "is this profit too bad?" — so a depressed print gets accepted at face value and read as operating deterioration. That is **Class 13**, and it is Class 6 running backwards through the analyst rather than through management.
+
 ---
 
 ### 7. Aggregate Growth Mistaken for Per-Share Growth
@@ -146,6 +150,55 @@ leg alone can be verdict-relevant. See Check 12.
 **Conversion-in-transit tells:** convertible-interest line drops to zero; weighted-average **basic** shares jump while **diluted** barely moves; the diluted-EPS note drops its prior-year convertible add-back (interest + assumed conversion).
 
 **Case study:** Bosideng (3998.HK) H1 FY26 — profit attributable +5.3% but **basic EPS flat** (diluted +1.5%), driven by the US$275M 1% CB due 2024 converting into ~560M shares at HK$3.83 between the comparison periods. One-time; convert interest fell RMB 36.6M → 0; the diluted-EPS note dropped its convert add-back. Overhang now cleared; mild value transfer (converted below ~HK$5 IV). The trap was over-penalizing it as chronic dilution; correct read was a cleared one-off.
+
+---
+
+### 13. Non-Operating Swing Misread as Operating Deterioration
+**Family:** Interpretive — the mirror of Class 6
+**Frequency:** Any issuer carrying large associate stakes, an investment portfolio, or FX translation exposure: Tencent, Berkshire-style holdcos, HK conglomerates, insurers, China internet generally. Rises sharply in quarters where equity markets moved.
+
+**Cost:** The verdict moves on a number that never touched the business. On Tencent Q2 FY26 this produced a one-notch conviction downgrade and a HK$50 fair-value cut, both reversed hours later on reading the primary release.
+
+**The mechanism.** A headline profit line comes in far below consensus. The instinct — correctly trained by Class 6 — is that something in the operations has deteriorated. But the income statement below operating profit contains lines with no operating content at all: share of associates, investment gains/losses, FX translation, fair-value remeasurement. **A large negative swing in any of them can drag reported net profit to flat while operating profit is compounding double digits.**
+
+```
+Tencent 2Q2026, RMB m          2Q2026      2Q2025      Read
+------------------------------------------------------------------
+IFRS operating profit          67,276      60,104      +11.9%  HEALTHY
+Share of associates/JVs        (9,993)      4,473      -14,466 SWING
+Net gains from investments      11,184      2,638      +8,546
+------------------------------------------------------------------
+Profit attributable            56,022      55,628      +0.7%   "MISS"
+
+The "miss" is a RMB14.5bn associate swing. Operating margin was
+stable at 33%. Nothing in the operating business missed anything.
+```
+
+**The specific error made:** the flat bottom line was attributed to "real operating deleverage from AI opex and capex depreciation." That thesis was plausible, internally consistent with the capex story, and completely wrong — the AI spend was in fact *inside* operating profit, which grew 11.9%.
+
+**Prevention — Check 19.** Before any interpretation of a profit surprise in either direction, decompose the bridge from operating profit to attributable profit line by line and state which portion is operating. **Only the operating portion may be used to characterise the business.** The non-operating portion is a Class 6 item and belongs in the normalisation bridge, not in the narrative.
+
+**Why the existing gate did not fire:** Step 3.5 is entered with reported earnings in hand and asks whether they are *overstated*. It has no symmetric prompt for understatement. Check 19 supplies it.
+
+**Case study:** Tencent (0700.HK) Q2 FY26 refresh v2 → v3, 2026-08-12, corrected within the same session.
+
+---
+
+### 14. Signal Inferred From an Absence, Without a Base Rate
+**Family:** Interpretive
+**Frequency:** Any time a narrative is built on what management *did not* do — no dividend, no guidance, no buyback, no disclosure, no comment. Wire-service coverage actively encourages this by reporting non-events as bullet points.
+
+**Cost:** An entire governance thesis constructed on nothing, and — worse — pointed in the wrong direction. The inference is unfalsifiable from the current filing alone, because absence looks identical whether it is a change or a constant.
+
+**The mechanism.** An earnings flash prints "DID NOT DECLARE INTERIM DIVIDEND." Read as a change, it implies management withheld a distribution it would normally make, which supports a story about capital being diverted elsewhere. **But Tencent has never paid an interim dividend** — it declares a single annual dividend each March. The flash was reporting a structural constant as though it were an event.
+
+**And the inference ran backwards.** The conclusion drawn was "management is prioritising AI investment over shareholder distribution." In the same quarter, buybacks were **HKD16.9bn, up 122% quarter-on-quarter** from HKD7.6bn. Distribution had increased sharply. The absence was not merely uninformative; the available evidence pointed the other way and was not sought because the narrative already felt complete.
+
+**Prevention — Check 18.** For any inference of the form "management did not do X," confirm X occurred in **at least two of the prior four comparable periods** before treating the absence as information. If it did not, the absence is a constant, and the correct number of words to spend on it is zero.
+
+**Corollary — an absence never stands alone as evidence.** Where the absence is genuine (X did happen before and has stopped), pair it with the *presence* evidence on the same question before concluding. "No dividend" and "buyback doubled" are the same question — capital returned to shareholders — and only the pair answers it.
+
+**Case study:** Tencent (0700.HK) Q2 FY26 refresh v2, 2026-08-12. Diagnosed and corrected the same session on reading the primary release.
 
 ---
 
@@ -433,7 +486,154 @@ exists in prior filings and can anchor a trend even after the current disclosure
 **Applies to any issuer with a filing history.** Cost is minutes; it dissolved the largest open
 unknown in the book.
 
+### Check 18: Base-Rate Test on Any Absence (20 seconds)
+
+**Trigger:** any sentence in a draft of the form *"management did not …"*, *"no X was declared"*,
+*"the company declined to …"*, *"X was notably missing"*.
+
+```
+Before the absence may carry ANY interpretive weight:
+
+  Did X occur in >= 2 of the prior 4 comparable periods?
+
+  NO  -> The absence is a STRUCTURAL CONSTANT, not an event.
+         Delete the sentence. Do not soften it — delete it.
+
+  YES -> The absence is a genuine change. Proceed, but pair it with the
+         PRESENCE evidence on the same underlying question before
+         concluding anything.
+```
+
+**Why "comparable periods" and not "prior periods":** interim vs annual, H1 vs H2, and pre- vs
+post-policy-change are different populations. Tencent declares one annual dividend each March; every
+interim quarter for its entire listed history shows "no dividend declared." Comparing Q2 to Q1
+rather than Q2 to Q2 manufactures a signal out of a calendar.
+
+**The pairing requirement is not optional.** An absence and its presence-side counterpart answer the
+same question and must be read together:
+
+```
+Tencent 2Q2026 — "capital returned to shareholders"
+
+  ABSENCE side   no interim dividend      -> structural constant, ZERO information
+  PRESENCE side  buyback HKD16.9bn        -> +122% QoQ vs HKD7.6bn in 1Q2026
+  ---------------------------------------------------------------------------
+  Correct read   distribution INCREASED SHARPLY
+
+  Absence alone produced the exact opposite conclusion.
+```
+
+**Cost when skipped:** Tencent v2, 2026-08-12 — a governance thesis ("prioritising AI investment
+over shareholder distribution") built on a non-event, while the contradicting evidence sat two
+bullets away in the same release.
+
+### Check 19: Operating / Non-Operating Decomposition Before Interpreting Any Profit Surprise (2 minutes)
+
+**Trigger:** reported profit surprises consensus by more than ~5% in **either** direction. Run this
+*before* writing a single sentence characterising the business.
+
+```
+Walk the bridge, line by line, and label each line O or N:
+
+  Operating profit .......................... O   <- ONLY this may
+  Net gains/losses from investments ......... N      characterise
+  Share of associates and JVs ............... N      the BUSINESS
+  Interest income / finance costs ........... N
+  FX translation / fair-value remeasurement . N
+  Income tax (check for one-off items) ...... N?
+  ------------------------------------------------
+  Profit attributable to equity holders
+
+State explicitly: "Of the RMB X shortfall, RMB Y is operating and RMB Z is not."
+If Y is small, the business did not miss — the portfolio did.
+```
+
+**The symmetry that Step 3.5 lacks.** Step 3.5 is entered holding reported earnings and asks whether
+they are *overstated*. There is no reflex asking whether they are *understated*. A depressed print
+therefore passes the gate untouched and gets read at face value. Check 19 makes the question
+bidirectional, and it is the same question Class 6 asks of gains.
+
+**Worked example — Tencent 2Q2026:**
+
+```
+IFRS operating profit    67,276  vs  60,104   O   +11.9%   <- the business
+Share of associates      (9,993) vs   4,473   N   -14,466  <- the "miss"
+Investment gains         11,184  vs   2,638   N   +8,546
+----------------------------------------------------------
+Attributable profit      56,022  vs  55,628       +0.7%
+
+Verdict: operating +11.9%, margin stable at 33%. The flat headline is
+entirely a RMB14.5bn associate swing. The business missed nothing.
+```
+
+**Second use — protect the multiple.** Where the non-operating drag recurs, reported EPS stays
+depressed and the headline P/E stays misleading in the *expensive* direction. Note it as a standing
+monitoring item rather than re-deriving the surprise each quarter.
+
 ## Process Behaviors to Reinforce
+
+### The source-tier ladder — a conclusion may not outrank its source
+
+The existing rule says a deep dive needs an annual report. That rule has a floor below it that went
+unwritten until it was breached: **wire-service earnings flashes cannot support a verdict change of
+any size.**
+
+```
+TIER 1  ANNUAL REPORT      20-F / HK annual report / 年报
+        Supports:          full deep dive, initiation, moat & composition work
+        Has:               notes, segment detail, share structure, entity-level cash
+
+TIER 2  QUARTERLY RELEASE  issuer's own press release + condensed statements
+        Supports:          thesis refresh, earnings reaction, verdict CHANGE
+        Has:               full income statement, balance sheet, MD&A, footnote
+                           definitions, management commentary
+        Lacks:             notes, composition, related-party detail
+
+TIER 3  WIRE FLASH         First Squawk / Futubull / CNBC / MarketScreener
+        Supports:          PRICE REFRESH and a dated "headline logged" note
+        MUST NOT SUPPORT:  conviction, fair value, entry zone, cap, verdict
+        Has:               headline aggregates, usually accurate
+        Lacks:             YoY BASES, the operating/non-operating split, footnote
+                           scope definitions, everything that decides whether a
+                           miss is core or noise
+```
+
+**The rule:** when a result has printed but the issuer's own release has not been read, record the
+price, log the headline, and mark the entry **PENDING-PRIMARY**. No conviction, fair-value,
+entry-zone or cap field may move. `PENDING-PRIMARY` is a legitimate terminal state for a session —
+it is *more* informative than a number derived from a source that cannot carry it.
+
+**Why flashes fail in a specific, predictable way.** They are not inaccurate; every headline
+aggregate in the Tencent flash was right. They are *incomplete along exactly the dimensions that
+determine meaning*:
+
+| Flash gives | Flash omits | What the omission caused |
+|---|---|---|
+| Segment revenue level | The prior-year base for that segment | Domestic games read as +11%; actual **+17%** |
+| Attributable net profit | The operating / non-operating split | A 14.5bn associate swing read as operating deleverage (Class 13) |
+| "No interim dividend" | Whether one was ever paid | A governance thesis built on a non-event (Class 14) |
+| Capex level | Cash-flow context and prepayment split | FCF assumed "lower"; actual **negative**, but **+37.6bn ex-prepayments** |
+| — | The issuer's own footnote definitions | Scope of "New AI Products" (Xiaowei added) unknown |
+
+**Cost when ignored, measured:** Tencent 2026-08-12. A refresh built on Tier 3 cut conviction
+8.5 → 7.5, fair value HK$700 → 650 and the cap 10% → 8%. The Tier 2 release, read four hours later,
+re-rated in the *opposite* direction on two of three drivers (conviction → 8.0, FV → HK$670,
+cap → 9%) and corrected three factual errors. **Three of the five items the refresh itself flagged
+as "pending verification" resolved favourably — including the single most important one, the ex-AI
+disclosure, which was not merely preserved but accelerating (+17% → +19%).**
+
+**The uncomfortable part.** The v2 refresh was internally rigorous. It ran the sell-trigger tests,
+scored them honestly, documented the partial trigger, cut conviction rather than rationalising, and
+listed its own open items. Every gate in this file passed. **A correctly executed analysis of an
+insufficient source produces a confident wrong answer with no error signal anywhere** — which is
+precisely the Class 12 property (silence) reappearing at the level of sourcing rather than at the
+level of a balance-sheet line.
+
+**Corollary — a same-session correction is a success, not an embarrassment.** The verification step
+exists to do this. What must not happen is the correction never occurring because the deliverable
+already read as finished. Where a re-rate has been published on Tier 3 and Tier 2 later contradicts
+it, **supersede in place**: one dated entry carrying the correction inside it, not two dated entries
+contradicting each other.
 
 ### Quarterly filings cannot support a deep dive — they have no notes
 
@@ -482,6 +682,7 @@ is already sitting in the book.
 
 
 ### Pre-Analysis
+- [ ] **Declare the source tier before starting (annual / quarterly / wire flash) and state what it can and cannot support**
 - [ ] State share count explicitly at top of analysis
 - [ ] Document source for share count (annual report, EPS back-check, etc.)
 - [ ] Identify share-class structure (single-class, dual-class, dual-listed, ADR)
@@ -491,11 +692,17 @@ is already sitting in the book.
 - [ ] Run all four reconciliation anchors before any per-share calculation
 - [ ] Use reported per-share metrics (EPS, BV/share, DPS) as ground truth
 - [ ] Document each major valuation input with source
+- [ ] **Check 19 — split any profit surprise into operating vs non-operating before characterising the business**
+- [ ] **Check 18 — base-rate any "management did not do X" claim before it carries weight**
 
 ### Post-Analysis
 - [ ] Apply 4 plausibility checks before publishing
+- [ ] **Run Step 10.5 Deliverable Gate — manifest built from scope table, every artifact verified on disk**
+- [ ] **Bilingual summary produced (mandatory at every scope, derived from the finished report)**
+- [ ] **Stage 6 command-center.md + command-center.html updated and cross-validated**
 - [ ] Cross-check against analyst consensus — explain divergence
 - [ ] Include reconciliation table in "Sources & Data Trail"
+- [ ] **Confirm no verdict/conviction/FV/cap field moved on Tier 3 (wire-flash) data — else mark PENDING-PRIMARY**
 
 ### When Challenged
 - [ ] First response: "Let me verify" (NOT defensive elaboration)
@@ -542,6 +749,16 @@ Unlike mechanical errors (which fail loudly via reconciliation), interpretive er
 **Trigger:** Operating profit 800-1000 range; reported NI 200-1800 range
 **Diagnosis:** Investment portfolio mark-to-market dominating reported NI
 **Response:** Separate operating from investing. Likely needs SOTP valuation (Class 3).
+
+### Pattern: "Profit missed badly but operating profit grew double digits"
+**Trigger:** Attributable net profit flat or down versus a consensus miss of 5%+, while operating profit is up 10%+ and operating margin is stable
+**Diagnosis:** The miss lives below operating profit — associates, investment marks, FX, or a tax one-off. **Class 13.** The business did not miss; the portfolio did.
+**Response:** Run Check 19 and state the operating/non-operating split in currency before writing any sentence about the business. Tencent 2Q2026: attributable profit +0.7% against operating profit **+11.9%** with margin stable at 33%, the entire gap being a **RMB14.5bn** swing in share of associates (−9,993 vs +4,473). Then ask the standing question: if the non-operating drag recurs, reported EPS stays depressed and the headline P/E stays misleading in the expensive direction — flag it as a monitoring item rather than re-deriving it each quarter.
+
+### Pattern: "Management didn't do X this quarter"
+**Trigger:** A draft sentence built on a non-event — no dividend, no guidance, no buyback, no comment, a disclosure "notably absent"
+**Diagnosis:** Possibly **Class 14**. Absence is indistinguishable from constancy without a base rate, and wire coverage reports structural constants as though they were events.
+**Response:** Run Check 18 — did X occur in ≥2 of the prior 4 **comparable** periods? If no, delete the sentence entirely. If yes, pair it with the presence-side evidence on the same question before concluding. Tencent 2Q2026: "no interim dividend" is a constant (annual dividend only, every March), and the presence side — buybacks **+122% QoQ to HKD16.9bn** — pointed the opposite way to the conclusion drawn from the absence.
 
 ### Pattern: "Growth came almost entirely from acquisitions"
 **Trigger:** 5-year revenue CAGR 12%, but acquisitions contributed 9% of that
@@ -639,6 +856,8 @@ If all three agree, you're safe. If they disagree, dig deeper.
 | Date | Lesson Added | Trigger |
 |------|--------------|---------|
 | 2026-05-18 | Share count reconciliation (BYD case) | User caught wrong market cap on BYD deep dive |
+| 2026-08-31 | Deliverable omission (Class 6) + Step 10.5 Deliverable Gate | User caught 4 consecutive rounds missing the bilingual summary and Stage 6 |
+| 2026-08-31 | Trigger specification (Class 7) | June "OCF rebound = BUY" trigger fired against a valuation that did not support BUY |
 | 2026-05-23 | Interpretive error framework (8 distortion classes) | User identified gap: one-time items, dilution, investment portfolios not systematically addressed |
 | 2026-07-27 | Check 12 — price vintage + ex-dividend leg | China Taiping: price 6.5 weeks stale AND cum-dividend; the HK$1.23 ex-div step alone moved MoS 15.0% → 20.0% |
 | 2026-07-27 | Check 13 — record-keeping assertion (header == data == table) | Command-centre header read 46 against 49 live entries; cross-file equality passed and caught nothing, because both checked artifacts agreed with each other |
@@ -653,6 +872,12 @@ If all three agree, you're safe. If they disagree, dig deeper.
 | 2026-08-11 | **A guessed discount is not a conservative substitute for reading the filing** | TME v2 caught the v1 omission but, still working from quarterlies, invented "opaque Tencent-affiliated private holdings" and applied a 20% haircut. All four grounds were false — the holdings are Spotify/UMG/WMG, exchange-listed, liquid, held 100% offshore. The guess carried the same weight as research and happened to be wrong in the favourable direction, which is simply the other way to be wrong |
 | 2026-08-11 | **Quarterly filings cannot support a deep dive — they have no notes** | TME v1 and v2 were both built on quarterly releases. One 20-F read in v3 closed **twelve** open items at once: portfolio composition, entity-level cash, withholding, share-class structure, VIE quantification, book value (P/B 1.27×, never computed before), three-year audited trajectory, goodwill baseline. A deep-dive label now requires ≥1 annual report in the source trail |
 | 2026-08-11 | **Pattern — acquisition closed mid-quarter, growth still looks weak** | IFRS 3 consolidates **prospectively**, so the base is never inflated and the contribution is purely additive. Build the bridge in absolute currency and count days consolidated: TME Q2 FY26 had 44 of 91 days (48%), and social entertainment (−RMB260mn) ate more than half of Ximalaya's +RMB407mn. Pre-commit the first full quarter as the validation quarter |
+| 2026-08-12 | **The source-tier ladder — a conclusion may not outrank its source; Tier 3 (wire flash) cannot move any verdict field** | Tencent Q2 FY26. A refresh built on earnings-flash aggregates cut conviction 8.5→7.5, FV HK$700→650 and cap 10%→8%. The issuer's own release, read four hours later, re-rated in the **opposite** direction on two of three drivers (→8.0 / HK$670 / 9%) and corrected three factual errors. Flashes are not inaccurate — they are incomplete along exactly the dimensions that decide meaning: **segment YoY bases, the operating/non-operating split, and footnote scope definitions.** New terminal state **PENDING-PRIMARY**: refresh the price, log the headline, move nothing else. **The uncomfortable part is that every existing gate passed** — a correctly executed analysis of an insufficient source produces a confident wrong answer with no error signal anywhere |
+| 2026-08-12 | **Error Class 13 — non-operating swing misread as operating deterioration (the Class 6 mirror)** | Tencent 2Q2026 attributable profit +0.7% versus operating profit **+11.9%** with margin stable at 33%; the entire gap was a **RMB14.5bn** swing in share of associates (−9,993 vs +4,473). It was attributed to "real operating deleverage from AI opex" — plausible, internally consistent, and wrong, since the AI spend sits *inside* the operating profit that grew 11.9%. Step 3.5 asks only whether earnings are **overstated**; it has no symmetric prompt for understatement, so a depressed print passes untouched |
+| 2026-08-12 | **Check 19 — operating/non-operating decomposition before interpreting any profit surprise** | Supplies the missing symmetry. Walk the bridge from operating profit to attributable profit, label every line O or N, and state "of the RMB X shortfall, RMB Y is operating and RMB Z is not" **before** writing any sentence about the business. Runs on surprises in **either** direction, at a ~5% threshold |
+| 2026-08-12 | **Error Class 14 — signal inferred from an absence, without a base rate** | Tencent 2Q2026 "did not declare interim dividend" was read as capital being diverted from shareholders to AI. **Tencent has never paid an interim dividend** — one annual dividend each March; the flash reported a structural constant as an event. The inference also ran **backwards**: buybacks that quarter were **HKD16.9bn, +122% QoQ**, so distribution had increased sharply. Absence is indistinguishable from constancy without a base rate |
+| 2026-08-12 | **Check 18 — base-rate test on any absence, plus mandatory pairing with the presence side** | For any "management did not do X": did X occur in ≥2 of the prior 4 **comparable** periods? If no, the absence is a constant — delete the sentence rather than soften it. If yes, pair it with the presence-side evidence on the same underlying question. "No dividend" and "buyback doubled" answer the same question and only the pair answers it. Note *comparable*: Tencent's every interim quarter shows no dividend, so a Q2-vs-Q1 comparison manufactures a signal out of a calendar |
+| 2026-08-12 | **Supersede in place when a Tier 3 re-rate is later contradicted** | Where a verdict moved on flash data and the primary release reverses it, the record must carry **one dated entry with the correction inside it**, not two dated entries contradicting each other. A same-session correction is the verification step working, not an embarrassment — the failure mode to avoid is the correction never happening because the deliverable already read as finished |
 
 ### Pattern: "Net income rose but basic EPS is flat (or basic and diluted EPS diverge)"
 **Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves

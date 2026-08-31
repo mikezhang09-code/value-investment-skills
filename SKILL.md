@@ -57,6 +57,7 @@ Before any deep analysis, run this 8-question gate. Two "No" answers require str
 When asked to research a company or build a portfolio, follow this process:
 
 ```
+0. LOAD + VERIFY CONTEXT   → ls the skill directory; confirm report-template.md read
 0. QUICK-KILL SCREENER     → 8-question gate (must pass before proceeding)
 1. IDENTIFY & SCOPE        → Clarify company, ticker, market, and research depth
 2. DATA COLLECTION         → Fetch filings, reports, financials from primary sources
@@ -82,6 +83,18 @@ If either gate fails, no amount of valuation sophistication downstream will resc
 
 For portfolio construction requests, run steps 1–7 for each candidate, then apply
 `references/portfolio-construction.md` to build the final portfolio.
+
+---
+
+## Step 0: Load & Verify Context (do this with a directory listing, not from memory)
+
+Run an actual `ls` of the skill directory and confirm every file is accounted for before reporting
+what was loaded. **`report-template.md` must be opened before producing any deliverable** — it defines
+the three-deliverable set, the 16-section bilingual summary spec, the presentation order and the
+▲/▲▲ conventions. A Stage 0 report written from memory is how the BYD Aug-2026 omission happened:
+the file listing the three deliverables had not synced yet, and nothing later forced a re-read.
+
+If files sync mid-session, re-run the listing and re-read anything new.
 
 ---
 
@@ -711,6 +724,54 @@ produce **THREE deliverables, not two**:
 - Suggested position size as % of portfolio
 - How this fits with existing holdings
 - Portfolio-level metrics after addition
+
+---
+
+---
+
+## Step 10.5: Deliverable Gate (MANDATORY — run before declaring the task complete)
+
+Step 2.5 guards inputs. Step 6.5 guards output values. **Neither checks whether the work was actually
+delivered.** A correct analysis, incompletely delivered, passes every other gate silently. This gate
+is the only thing that catches it.
+
+### Build the manifest from the scope, then verify each item on disk
+
+| Scope | Markdown report | HTML dashboard | Bilingual summary | Stage 6 command center |
+|---|---|---|---|---|
+| Full deep dive | Required | Required | **Required** | **Required** |
+| Quick thesis | Required | Skip | **Required** | **Required** |
+| Thesis refresh | Required | Skip | **Required** | **Required** |
+| Earnings reaction | Required | Skip | **Required** | **Required** |
+| Comparison | Required | Optional | **Required** | **Required (both names)** |
+
+**The bilingual summary is required at EVERY scope. Stage 6 runs at EVERY scope that creates or
+changes a verdict.** "Skip the HTML" never means "skip artifacts" — that generalization is the
+recorded failure mode (see process-lessons.md Class 6).
+
+### The check itself
+
+```
+For each artifact in the manifest:
+  [ ] file exists on disk at the expected filename
+  [ ] copied to the outputs directory
+  [ ] included in present_files
+Report the manifest and the pass/fail result explicitly. Do not declare the task
+complete on the strength of having presented *something*.
+```
+
+### Canonical figure cross-check (runs with the gate)
+
+Verdict, conviction, base FV, MoS, entry zone, floor and cap must be **identical** across report,
+dashboard, bilingual summary and command-center JSON. Extract them mechanically and assert equality —
+do not eyeball it. Derive all four artifacts from one source; never retype.
+
+### Trigger specification rule
+
+Any pre-committed tripwire written into a report must state **both** the operational condition and the
+valuation condition. An operational trigger removes a risk; it does not create value. Writing
+"metric X recovers = upgrade to BUY" without the accompanying MoS condition guarantees a conflict at
+the next review (see process-lessons.md Class 7).
 
 ---
 
