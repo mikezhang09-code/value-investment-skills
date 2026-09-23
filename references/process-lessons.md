@@ -883,3 +883,10 @@ If all three agree, you're safe. If they disagree, dig deeper.
 **Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves
 **Diagnosis:** A convertible (bond or preferred) likely converted — shares crossing from *potential* (diluted-only) to *actual* (basic). Not chronic dilution; not an earnings miss.
 **Response:** Confirm via the convert-interest line (→ 0) and the diluted-EPS note (add-back dropped). Anchor on diluted per-share growth; assess conversion price vs IV for value transfer; mark the overhang cleared going forward.
+
+### 2026-09-23 — TCOM #29 Q2 FY26 earnings reaction: two corrections to the 2026-06-03 initiation
+| Error | Class | Root cause | Gate | Impact | Fix |
+|---|---|---|---|---|---|
+| June model used USD/RMB 7.12 (30-Sep-2025 Fed rate), stale on 3-Jun-2026 (actual ≈6.8) | Mechanical — currency/scale (Class 2) | FX carried forward from the most recent *fetched* exhibit rather than re-quoted at analysis date | Step 2.5 currency self-consistency | June FV understated ~$1–3; no verdict change | Re-quote FX at analysis date; state the rate's own date beside it |
+| June prose: "Q1 FY26 reported May 18, roughly in-line" — Q1 actually printed 24-Jun-2026 (+17%, EPS miss, Q2 guided 3–8%, −18% intraday) | Sourcing — Tier-3 calendar listing written as a reported result | Event date not checked for staleness/existence; ▲ flag present but prose asserted the fact | RF-4 (event dates) + source-tier ladder | No valuation impact; misstated the information set | An earnings result may only be cited from the issuer release or a filing; calendar/preview pages = expectation, never outcome |
+**Positive control exercised:** re-derived FV rose on bad news ($58→$63 raw). Treated as a flag, bridged step-by-step: FX +2.85, buyback +2.70, business −7.20, method +4.01. Adopted $57 with EPV retained at 15%; constant-FX/method business FV ≈$53.5 disclosed. Rule reinforced: *a methodology change must not be first applied on the same print as a business deterioration without a like-for-like number beside it.*
