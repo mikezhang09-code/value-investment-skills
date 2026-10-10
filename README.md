@@ -6,21 +6,22 @@ A Claude Code skill for deep fundamental research and value investing analysis, 
 
 When installed, this skill gives Claude the ability to:
 
-- Research any publicly listed company as a seasoned fundamental analyst
-- **Quick-Kill screen** stocks with an 8-question pass/fail gate before deep analysis
-- **Enforce a 4-Anchor Reconciliation Gate** (market cap, EPS back-check, per-share metrics, share-class structure) before any per-share valuation to completely eliminate calculation/input errors (e.g. H+A float underreporting, ADR ratio confusion)
-- Perform 10-year financial deep dives (revenue, margins, ROE, ROIC, FCF, etc.)
-- Assess competitive moats using Morningstar-style classification **with trend analysis** (widening/stable/narrowing)
-- **Apply industry-specific playbooks** for insurance, banking, consumer, media, energy, railroads, and technology
-- Calculate intrinsic value using multiple methods (DCF, EPV, Graham Formula, DDM)
-- **Apply Output Plausibility Checks** ("Too Good to Be True" check for mega-caps, peer multiple comparison, reverse DCF growth validation, analyst consensus divergence)
-- Apply margin of safety analysis and deliver a clear BUY / PASS / SELL recommendation
-- **Run sell discipline checks** — 4 explicit criteria for hold/sell decisions
-- **Identify value traps** using a 5-type diagnostic framework
-- **Assess inflation, goodwill, and derivatives risk** with structured scorecards
-- **Detect behavioral biases** in your own analysis with a 5-point self-check and an **error recognition protocol**
-- Generate professional investor-grade research reports (Word, PDF, and interactive HTML) with a mandatory audited data trail
-- Screen for undervalued businesses across **5 markets**: US, Hong Kong, China A-shares, Singapore, and India
+- Research any publicly listed company as a seasoned fundamental analyst, across **5 markets**: US, Hong Kong, China A-shares, Singapore, and India
+- **Route by scope** — full deep dive, quick thesis, thesis refresh, earnings reaction, or comparison — each running a defined set of steps, with the data gates never skipped
+- **Quick-Kill screen** stocks with an 8-question pass/fail gate (integrity is an automatic veto) before deep analysis
+- **Verify the live price** (timestamp, freshness, 52-week range vs prices on file, move check, two sources) before it enters any calculation
+- **Enforce a 4-Anchor Reconciliation Gate** (market cap, EPS back-check, per-share metrics, share-class structure) before any per-share valuation — catches H+A float underreporting, ADR ratio confusion, and perpetual/AT1 capital miscounted as equity
+- Perform 10-year financial deep dives (revenue, margins, ROE, ROIC, FCF, etc.) and record a **Data gaps** list — an empty debt, share-count or tax field blocks valuation
+- **Run an Earnings Quality Gate** — 8 distortion classes (one-offs, dilution, investment income, SBC and net buybacks, related-party transactions, off-balance-sheet items, acquired growth) normalized before valuation
+- **Bridge any surprising quarter** from operating profit through one-offs, non-operating items and tax, so only the operational part moves the thesis
+- Assess competitive moats **with trend analysis** (widening/stable/narrowing), and test technology disruption **per segment** with the Deflation Sign Test
+- **Apply industry playbooks** — full sector overrides for financials (insurance and banking), plus guidance for consumer, media, energy, railroads and technology
+- Calculate intrinsic value with multiple methods (owner-earnings DCF, EPV, Graham Formula, DDM, NCAV, SOTP) and **probability-weighted disruption scenarios** via a reproducible script (`scripts/scenario_dcf.py`)
+- **Apply Output Plausibility Checks** ("too good to be true", peer multiples, reverse DCF, analyst consensus divergence)
+- Deliver a clear **BUY / ACCUMULATE / MONITOR / PASS / SELL / AVOID** verdict with conviction, margin of safety and tripwires that state both an operational and a valuation condition
+- **Run sell discipline and value-trap checks** — 4 sell criteria, a 5-type value-trap diagnostic, inflation/goodwill/derivatives scorecards, and a behavioral-bias self-check
+- **Learn from its own mistakes** — `process-lessons.md` records 15 error classes and 20 sanity checks, each derived from a real analysis error
+- Produce **three deliverables** per analysis — a Markdown research report, an interactive HTML dashboard, and a bilingual EN/简体中文 executive summary — all derived from one canonical figure block and checked by a final Deliverable Gate
 
 ## Markets Covered
 
@@ -40,10 +41,12 @@ value-investment-skills/
 │                                               #   behavioral bias checks; includes mandatory Step 2.5
 │                                               #   Reconciliation Gate and Step 6.5 Plausibility Checks
 ├── assets/
-│   └── report-template.md                      # Professional Word/PDF investment report template
-│                                               #   (10 sections: exec summary → business overview →
-│                                               #   management → moat → financials → valuation →
-│                                               #   risk → thesis → portfolio recommendation → conclusion)
+│   └── report-template.md                      # Spec for the THREE deliverables: 10-section Markdown
+│                                               #   report (exec summary → business → management → moat →
+│                                               #   financials + profit bridge → valuation + scenarios +
+│                                               #   plausibility → risk → thesis → portfolio → conclusion,
+│                                               #   plus data trail and data gaps); HTML dashboard tabs;
+│                                               #   16-section bilingual EN/中文 summary; scope variations
 ├── references/
 │   ├── data-sources.md                         # Filing URLs and search strategies for all 5 markets;
 │   │                                           #   data quality hierarchy; verdict-moving number rules;
@@ -66,7 +69,9 @@ value-investment-skills/
 │   │                                           #   Munger mental models + inversion + too-hard pile;
 │   │                                           #   Fisher 15-point checklist + scuttlebutt method;
 │   │                                           #   combined 4-framework scoring (/10)
-│   ├── industry-playbooks.md                   # Sector-specific analysis: insurance (float economics,
+│   ├── industry-playbooks.md                   # Sector-specific analysis; §F financials overrides the
+│   │                                           #   generic workflow (metrics, valuation, distortion
+│   │                                           #   classes); insurance (float economics,
 │   │                                           #   combined ratio), banking (NIM, NPL, CET1), consumer
 │   │                                           #   brands (pricing power, See's Candies case), media
 │   │                                           #   (moat destruction case study), energy & utilities,
@@ -109,7 +114,7 @@ value-investment-skills/
 │                                               #   Mermaid architecture diagram (not loaded by the skill)
 └── web-report/                                 # Interactive HTML web report generation skill
     ├── SKILL.md                                # Skill definition — triggers, workflow, quality
-    │                                           #   checklist (25 items); bilingual EN/ZH glossary
+    │                                           #   checklist; bilingual EN/ZH glossary
     │                                           #   (40+ financial terms); 3 aesthetic themes
     └── references/
         ├── design-system.md                    # Complete CSS design system: 3 themes (Dark Terminal,
@@ -170,7 +175,19 @@ git clone https://github.com/mikezhang09-code/value-investment-skills.git \
    cp -r value-investment-skills/* ~/.claude/skills/value-investing/
    ```
 
-Claude Code auto-discovers skills placed in `~/.claude/skills/`.
+### Option 4 — Symlink (for contributors editing the skill)
+
+Keep the repo wherever you develop it and link it in, so every saved change takes effect immediately:
+
+```bash
+git clone https://github.com/mikezhang09-code/value-investment-skills.git ~/Documents/GitHub/value-investment-skills
+ln -s ~/Documents/GitHub/value-investment-skills ~/.claude/skills/value-investing
+```
+
+Claude reads whatever is checked out, so keep `main` checked out when you are not mid-edit.
+
+Claude Code auto-discovers skills placed in `~/.claude/skills/`. The scenario script needs only
+Python 3 (standard library).
 
 ## Usage
 
@@ -183,6 +200,9 @@ Once installed, the skill activates automatically when you ask Claude anything i
 "Build me a concentrated value portfolio"
 "Screen Hong Kong stocks for net-nets"
 "Analyze Berkshire Hathaway — full deep dive"
+"Is Tencent still worth holding after this quarter?"   # thesis refresh
+"Why did Intuit's profit fall in Q4?"                  # earnings reaction
+"Compare ICICI Bank and HDFC Bank"                     # comparison
 ```
 
 Claude will follow a 10-step research process:
@@ -240,7 +260,7 @@ This skill is grounded in time-tested value investing principles:
 ## Keeping Up to Date
 
 ```bash
-cd ~/.claude/skills/value-investing
+cd ~/.claude/skills/value-investing   # with Option 4, this is your repo; pulling updates both
 git pull
 ```
 
