@@ -183,6 +183,18 @@ Conviction:      [High / Medium / Low]
 - Non-recurring charges pattern: [e.g., "Company has taken restructuring charges in 3 of last 5 years — treat as recurring"]
 - Earnings quality rating: [High / Medium / Low]
 
+### Quarterly Profit Bridge *(required when the bridge was triggered — see `references/quarterly-profit-bridge.md`)*
+
+| Driver | Δ NI ($M) | O / N | Recurring? |
+|---|---|---|---|
+| Organic operating profit | | O | |
+| One-offs this quarter / prior-year quarter | | N | |
+| Non-operating (associates, investment marks, FX, interest) | | N | |
+| Tax (rate change / discrete item) | | N | |
+| **Reported Δ NI** | | | |
+
+Conclusion: "Of the [X]-point gap, [Y] points are non-recurring; [Z] points are operational, from [segment]."
+
 ---
 
 ## Section 6: Intrinsic Value Calculation
@@ -249,6 +261,27 @@ Conviction:      [High / Medium / Low]
 - Optimistic: $[X] — [Margin of Safety: X%]
 
 **Current Price: $[X]**
+
+### Disruption Scenarios *(required when Step 4 flagged a revenue-line threat — see `references/disruption-scenarios.md`)*
+
+| Scenario | Probability | g1 / g2 / tg | Value/share | MoS | Tripwire (operational AND valuation) |
+|---|---|---|---|---|---|
+| Disruption | | | | | |
+| Bear | | | | | |
+| Base | | | | | |
+| Bull | | | | | |
+| **Weighted** | 100% | | | | |
+
+Reverse-DCF implied growth: [X%] · EPV floor: $[X] · Source: `scenario_dcf.py` output, [date]
+
+### Plausibility Tests (Step 6.5)
+
+| Test | Result | Pass / Flag |
+|---|---|---|
+| Too good to be true | | |
+| Peer multiples | | |
+| Reverse DCF | | |
+| Consensus divergence (consensus dated [ ]) | | |
 
 ---
 
@@ -341,6 +374,14 @@ Conviction:      [High / Medium / Low]
 | Company IR | Earnings Presentation | Q4 2024 | Management commentary |
 | Macrotrends | Historical financials | — | 10-year ratio data |
 | [Other] | | | |
+
+**Fiscal-year convention:** [e.g., FY ends 31 July]
+
+### Data Gaps
+
+| Field | Why missing | Resolution (re-sourced from / estimated on / left blank) |
+|---|---|---|
+| | | |
 
 ---
 

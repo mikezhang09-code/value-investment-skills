@@ -597,6 +597,11 @@ Any report reaching verdict stage should include a minimal audit trail for the t
 
 Purpose: any report can be re-audited six months later to know exactly what went in and where it came from.
 
+**Data gaps.** Alongside the trail, list every field that could not be filled and what was done about
+it (re-sourced from which filing / estimated on what basis / left blank). An empty debt, share-count or
+tax field blocks valuation until re-sourced — a page that returns no debt figure has not told you the
+company has no debt.
+
 **Mandatory rows for share-class structure (added May 2026):** Any company with dual-class, dual-listing, or recent dilution must include explicit share-count row in the Data Trail with the reconciliation source noted (EPS back-check is the most reliable).
 
 ---
@@ -633,3 +638,6 @@ Run before finalizing any Buy / Hold / Avoid recommendation:
 - [ ] Currency and share-class conversions verified (RF-5, RF-6, RF-7)
 - [ ] Data trail table present for top inputs (including share-count row for multi-class stocks)
 - [ ] Estimates flagged with basis and sensitivity tested if verdict-moving
+- [ ] **"Data gaps" list present; no empty debt, share-count or tax field reached the valuation**
+      (an empty field is re-sourced from the filing, never assumed zero or "cash ≈ debt")
+- [ ] **Fiscal-year convention stated; consensus and price targets carry their dates**

@@ -84,6 +84,23 @@ If either gate fails, no amount of valuation sophistication downstream will resc
 For portfolio construction requests, run steps 1–7 for each candidate, then apply
 `references/portfolio-construction.md` to build the final portfolio.
 
+### Scope routing — decide which steps run before doing any work
+
+Classify the request in Step 1, then run exactly the steps in its row. The deliverables for each
+scope are fixed by the Step 10.5 manifest.
+
+| Request looks like | Scope | Steps that run |
+|---|---|---|
+| "Analyze X" / "is X a buy" | Full deep dive | 0 → 10.5, all |
+| "Quick take on X" | Quick thesis | 0, QK, 1, 2, 2.5, 3, 3.5, 4 (brief), 6, 6.5, 7, 8, 9, 10, 10.5 |
+| "Is X still worth holding" | Thesis refresh | 0, 2 (new filings + price), 2.5, 3.5, **Q-bridge**, 6, 6.5, 7, 8 (sell check), 9, 10, 10.5 |
+| "Why did X's profit fall/jump" / results day | Earnings reaction | 0, 2, 2.5, **Q-bridge**, 3.5, 6 (refresh), 6.5, 7, 9, 10, 10.5 |
+| Several tickers | Comparison | quick thesis or deep dive per name, then `web-report/references/multi-stock-report.md` |
+
+**Never skipped at any scope:** the live-price gate (P1–P5), Step 2.5, Step 6.5 and Step 10.5. A
+reduced scope reduces the *analysis*; it never reduces the gates. **Q-bridge** =
+`references/quarterly-profit-bridge.md`.
+
 ---
 
 ## Step 0: Load & Verify Context (do this with a directory listing, not from memory)
@@ -124,8 +141,21 @@ Minimum data to collect:
 - Last 10 years of annual reports (or all available if < 10 years public)
 - Most recent quarterly/interim filing
 - Any major news: acquisitions, management changes, regulatory issues (last 2 years)
+- **At least 8 quarters** of the income statement through to net income (revenue, operating
+  profit, non-operating lines, pretax, tax, NI, diluted EPS) — the quarterly profit bridge needs them
+- **The last two earnings-call transcripts** — management's explanation of one-offs, tax and guidance
+- Total debt, cash and net debt from the balance sheet, plus analyst consensus and price targets
+  **with their dates** (Step 6.5 Test 4)
 - Current share price and market cap — **run the Live Price Verification Gate (P1–P5) in
   `references/data-sources.md` before the price enters any calculation** ⚠️ NEW (Oct 2026)
+
+**State the fiscal-year convention in the report header** (e.g., "FY ends 31 July") — fiscal and
+calendar years diverge for many names, and a quarter label without it is ambiguous.
+
+**Record every field you could not fill in a "Data gaps" list** carried into the report. **An empty
+debt, share-count, or tax field blocks valuation until re-sourced** from the filing. Never assume
+"cash ≈ debt" or "debt = 0" because a data page left the field blank — a missing debt figure once
+inflated intrinsic value by ~10%.
 
 ### Live price — the input with no anchor until now
 
@@ -475,6 +505,14 @@ If 3+ distortion classes show material issues:
 | Recently IPO'd / SPAC merged | Class 2 (forward dilution, warrants), 5 (founder shares) |
 | Cyclicals near peak (semis, autos, materials) | Class 1 (peak-cycle earnings inflated), 4 (channel stuffing) |
 
+### Quarterly Profit Bridge (when a recent quarter looks surprising)
+
+Run `references/quarterly-profit-bridge.md` when reported profit beats or misses consensus by >~5%,
+**or** when any of the last four quarters' net-profit growth diverges from revenue growth by >10pp
+or turns negative while revenue grows. Bridge through **pretax income first** — a prior-year tax
+benefit can turn a +47% pretax quarter into a −5% net income headline (Intuit Q4 FY26). Only the
+operational component of the gap may move the moat trend, growth assumptions or verdict.
+
 ### Stop Conditions
 
 If the earnings quality composite is < 16 OR Class 6 (RPTs) shows material value leakage:
@@ -510,6 +548,11 @@ Apply Munger's inversion: *What would have to be true for this business to fail 
 
 **Franchise vs. Commodity Test** (Buffett's 1991 three-part standard):
 A true franchise business meets ALL three: (1) product/service is needed or desired, (2) customers perceive no close substitute, (3) not subject to price regulation.
+
+**Disruption scenarios** (when a technology, regulation or free alternative could change the revenue
+line of any segment): run the Deflation Sign Test from `references/moat-analysis.md` **per segment**,
+then build the four probability-weighted scenarios in `references/disruption-scenarios.md`. They feed
+Step 6 as explicit scenarios — not as a quietly lowered growth rate.
 
 ---
 
@@ -549,6 +592,15 @@ Use **at least two** of these methods and triangulate:
 sustainable ROE as the primary anchor, EPV as floor, DDM or SOTP alongside, and **no Graham Formula,
 no NCAV**. See `references/industry-playbooks.md` §1.5. Where the standard set is not used, say so
 explicitly in the report.
+
+**Discount rate: 10% unless defended.** Any other rate needs a one-line reason in the report
+(see `references/intrinsic-value.md` Step 3). An undefended 9.5% once lifted base IV ~9%. Use the same
+rate across scenarios — uncertainty belongs in the probabilities and cash flows, not in r.
+
+**Run the arithmetic through `scripts/scenario_dcf.py`** for the owner-earnings DCF: scenario values,
+probability-weighted IV, reverse DCF, EPV and the sensitivity grid in one reproducible JSON. It refuses
+to run with a missing net-debt figure and flags an undefended discount rate. Its output is the source
+for the canonical figure block (Key Principle 14).
 
 Present as a range:
 ```
@@ -804,6 +856,9 @@ Read these when needed — don't load all at once:
 | `references/earnings-quality-and-distortions.md` | Step 3.5 — distortion checks (one-time items, dilution, investment portfolios, RPTs, etc.) |
 | `references/frameworks.md` | Steps 3–6 — applying investment checklists; includes per-share scorecard |
 | `references/moat-analysis.md` | Step 4 — competitive analysis |
+| `references/disruption-scenarios.md` | Step 4 → 6 — when a technology/regulation could hit a segment's revenue line; per-segment Deflation Sign Test and four probability-weighted scenarios |
+| `references/quarterly-profit-bridge.md` | Step 3.5, thesis refresh and earnings reaction — when a quarter's profit diverges from revenue or surprises consensus |
+| `scripts/scenario_dcf.py` | Step 6 — reproducible scenario DCF, weighted IV, reverse DCF, EPV, sensitivity grid |
 | `references/industry-playbooks.md` | **Step 1 (check sector index), then Steps 0/3/5/6** — sector-specific metric substitutions, valuation method overrides, and sector distortion classes. Financials (insurance + banking) written; other sectors use the generic workflow |
 | `references/intrinsic-value.md` | Step 6 — valuation calculations; includes output plausibility checks |
 | `references/sell-discipline-and-traps.md` | Step 8 — sell criteria, value traps, behavioral biases, error recognition |
@@ -841,6 +896,20 @@ Read these when needed — don't load all at once:
 ---
 
 ## Change Log
+
+- **2026-10-10** — **Scope routing table, quarterly profit bridge, disruption scenarios and a
+  scenario-DCF script**, adapted from the `value-investing-plus` fork after review. Scope routing
+  (Workflow Overview) states which steps each scope runs and that the four gates never skip. Step 2
+  now requires 8 quarters, two call transcripts, dated consensus, the fiscal-year convention and a
+  "Data gaps" list, and **an empty debt/share/tax field blocks valuation**. Step 3.5 gains the
+  quarterly profit bridge (`references/quarterly-profit-bridge.md`), widening Check 19's trigger to
+  include revenue/profit divergence; Intuit Q4 FY26 added as a Class 13 sub-case. Step 4 links the
+  per-segment Deflation Sign Test to `references/disruption-scenarios.md`. Step 6 adds the 10%
+  default-discount-rate rule and `scripts/scenario_dcf.py` (fixed versus the fork: reverse DCF no
+  longer saturates silently, EPV follows `intrinsic-value.md`, grid centre equals Base). Net-buyback
+  rule added to `earnings-quality-and-distortions.md` Class 5. Not adopted: the fork's
+  report-in-user-language rule (conflicts with the 2026-08-23 decision) and its environment-specific
+  `finance_*` tool map.
 
 - **2026-10-09** — **Live Price Verification Gate (P1–P5) added to Step 2** and Key Principle 15.
   Full spec in `references/data-sources.md` (new section + RF-8 + pre-verdict checklist item);

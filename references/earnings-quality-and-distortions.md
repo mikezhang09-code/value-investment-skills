@@ -334,6 +334,20 @@ Many tech companies (especially US, increasingly China ADRs and HK tech) report 
 | 10-20% | Very high — often loss-making growth tech |
 | >20% | Extreme — usually pre-profit tech; question whether "earnings" exist at all |
 
+### Buybacks That Only Offset SBC Are Not Capital Return
+
+Gross buyback dollars overstate what shareholders received when the repurchases merely absorb RSU
+vesting. Measure capital return by the **net change in diluted share count**, not the buyback line:
+
+```
+Net buyback yield = (diluted shares, start − diluted shares, end) ÷ diluted shares, start
+SBC-offset spend  = buyback $ spent while the share count did not fall
+```
+
+If the share count is flat while the company spent $X on buybacks, that $X was an SBC cost paid in
+cash — deduct it from owner earnings (or, equivalently, treat SBC as cash) and do not credit it in the
+capital allocation scorecard.
+
 For Chinese ADRs (PDD, BIDU, NTES, JD) and HK tech (Meituan, Kuaishou), SBC routinely 5-15% of revenue. Companies and bullish analysts always present non-GAAP; the analyst must always cross-check GAAP.
 
 ---

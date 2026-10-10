@@ -47,9 +47,16 @@ value-investment-skills/
 ├── references/
 │   ├── data-sources.md                         # Filing URLs and search strategies for all 5 markets;
 │   │                                           #   data quality hierarchy; verdict-moving number rules;
-│   │                                           #   red-flag patterns from past analyses (RF-1 to RF-7);
-│   │                                           #   data trail audit template; estimation discipline;
-│   │                                           #   share-class warnings and 4 reconciliation anchors
+│   │                                           #   red-flag patterns from past analyses (RF-1 to RF-8);
+│   │                                           #   data trail + data gaps; estimation discipline;
+│   │                                           #   share-class warnings and 4 reconciliation anchors;
+│   │                                           #   live price verification gate (P1–P5)
+│   ├── disruption-scenarios.md                 # Per-segment Deflation Sign Test → four probability-
+│   │                                           #   weighted scenarios (Disruption/Bear/Base/Bull) with
+│   │                                           #   evidence rules and dual-condition tripwires
+│   ├── earnings-quality-and-distortions.md     # Step 3.5 gate: 8 distortion classes (one-offs, dilution,
+│   │                                           #   investment income, SBC + net buybacks, RPTs, off-BS,
+│   │                                           #   acquired growth); normalized-earnings bridge
 │   ├── financial-analysis.md                   # 10-year financial summary table; income statement,
 │   │                                           #   balance sheet, and cash flow analysis; return metrics
 │   │                                           #   (ROE, ROIC, ROA); earnings quality assessment;
@@ -82,16 +89,24 @@ value-investment-skills/
 │   ├── portfolio-construction.md               # Building a concentrated 10–20 stock portfolio;
 │   │                                           #   position sizing; geographic & sector diversification;
 │   │                                           #   rebalancing rules
-│   ├── process-lessons.md                      # Self-improvement reference for analytical errors;
-│   │                                           #   Top 5 error classes (share counts, currency/scale, etc.);
-│   │                                           #   Top 5 sanity checks; Share-Class Trap Cheat Sheet;
-│   │                                           #   BYD May 2026 case study
+│   ├── process-lessons.md                      # Self-improvement reference for analytical errors:
+│   │                                           #   15 error classes (mechanical / interpretive / omission)
+│   │                                           #   and 20 sanity checks, each derived from a real case
+│   │                                           #   (BYD, Tencent, China Taiping, GWM, Intuit, ...)
+│   ├── quarterly-profit-bridge.md              # Operating vs tax / one-off / non-operating / seasonal
+│   │                                           #   decomposition of a quarter's profit change
 │   └── sell-discipline-and-traps.md            # 4 sell criteria (overvaluation, moat destruction,
 │                                               #   integrity, better opportunity); 5-type value trap
 │                                               #   diagnostic; institutional imperative; 5 behavioral
 │                                               #   bias self-checks; monitoring framework with quarterly
 │                                               #   review checklist and sell trigger signals; error
 │                                               #   recognition protocol and speed guidelines
+├── scripts/
+│   └── scenario_dcf.py                         # Reproducible scenario owner-earnings DCF: weighted IV,
+│                                               #   reverse DCF, EPV, sensitivity grid; stops on missing
+│                                               #   net debt, warns on an undefended discount rate
+├── *_bilingual.md, value_investing_skill_*.md  # EN/中文 records of rule amendments and sweeps, and a
+│                                               #   Mermaid architecture diagram (not loaded by the skill)
 └── web-report/                                 # Interactive HTML web report generation skill
     ├── SKILL.md                                # Skill definition — triggers, workflow, quality
     │                                           #   checklist (25 items); bilingual EN/ZH glossary
@@ -177,14 +192,18 @@ Claude will follow a 10-step research process:
 2. **Data Collection** — fetch filings from primary sources (SEC, HKEx, SGX, etc.)
 2.5. **Reconciliation Gate** — mandatory 4-anchor check (market cap, EPS back-check, per-share metrics, share-class structure) to prevent calculation and scale errors
 3. **Financial Analysis** — 10-year quantitative deep dive
-4. **Moat Assessment** — competitive advantage quality, durability, and **trend** (widening/stable/narrowing)
+3.5. **Earnings Quality Gate** — 8-distortion check, plus a quarterly profit bridge when a quarter's profit diverges from revenue or surprises consensus
+4. **Moat Assessment** — competitive advantage quality, durability, and **trend** (widening/stable/narrowing); per-segment disruption scenarios where technology threatens a revenue line
 5. **Industry Analysis** — sector-specific metrics and macro sensitivities
-6. **Intrinsic Valuation** — multiple methods triangulated into a fair value range
+6. **Intrinsic Valuation** — multiple methods triangulated into a fair value range; probability-weighted scenarios via `scripts/scenario_dcf.py`
 6.5. **Output Plausibility Checks** — four sanity checks ("Too Good to Be True", peer multiples, reverse DCF, analyst consensus divergence) before publishing
 7. **Margin of Safety** — compare current price to intrinsic value
 8. **Risk & Sell Check** — value trap diagnostic, inflation scorecard, sell criteria, and behavioral bias/analytical self-checks
 9. **Investment Decision** — BUY / ACCUMULATE / MONITOR / PASS / SELL / AVOID
-10. **Report Generation** — professional report (including mandatory reconciliation anchors in data trail) + optional Excel model
+10. **Report Generation** — three deliverables: Markdown report, HTML dashboard, bilingual EN/中文 summary (+ optional Excel model)
+10.5. **Deliverable Gate** — every file in the scope's manifest exists and the canonical figures match across them
+
+Reduced scopes (quick thesis, thesis refresh, earnings reaction, comparison) run a defined subset of these steps — see the scope routing table in `SKILL.md`. The live-price gate and Steps 2.5, 6.5 and 10.5 run at every scope.
 
 ## Web Report Skill
 

@@ -68,6 +68,10 @@ Common discount rates:
 Default to 10% for most analyses — it matches Buffett's historical practice.
 ```
 
+**Any rate other than 10% needs a one-line reason in the report** (e.g., "8.5%: regulated utility,
+inflation-linked tariff"). An undefended 9.5% once lifted base IV by ~9% with no change in the business.
+Apply one rate across all scenarios; never lower it in a bull case to lift value.
+
 ### Step 4: Calculate Present Value
 
 ```
@@ -97,6 +101,18 @@ Always present results as a range:
 | High case (g+2%) | | | |
 
 The range of these outcomes is your intrinsic value range.
+
+### Step 6: Probability-Weighted Scenarios (when outcomes are genuinely bimodal)
+
+Where a disruption, regulatory or binary risk makes one base case misleading, value four explicit
+scenarios (Disruption / Bear / Base / Bull) with probabilities summing to 100%, each justified in one
+line — see `references/disruption-scenarios.md`. Only growth and terminal assumptions differ between
+scenarios; owner earnings, share count, net debt and the discount rate are the same.
+
+Run `scripts/scenario_dcf.py` for the arithmetic. It computes the per-scenario values, the
+probability-weighted IV, a reverse DCF (Base terminal growth and step-down held fixed), EPV as
+defined in Method 2 below (when its `epv` inputs are supplied), and a sensitivity grid whose centre equals Base. It stops on a missing
+net-debt figure and warns on an undefended discount rate. Report its warnings; do not suppress them.
 
 ---
 

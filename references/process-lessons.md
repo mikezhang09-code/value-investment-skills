@@ -182,6 +182,12 @@ stable at 33%. Nothing in the operating business missed anything.
 
 **Case study:** Tencent (0700.HK) Q2 FY26 refresh v2 → v3, 2026-08-12, corrected within the same session.
 
+**Sub-case — the tax line (Intuit Q4 FY26).** Net income −4.7% while pretax income rose ~47.5%: the
+prior-year quarter carried a −$15M discrete tax benefit against +$177M of tax this year, on top of a
+~$300M restructuring charge. Nothing operational deteriorated. Tax sits below operating profit and
+swings the headline just as an associate does — **bridge through pretax income before reading net
+income**. Full procedure: `references/quarterly-profit-bridge.md`.
+
 ---
 
 ### 14. Signal Inferred From an Absence, Without a Base Rate
@@ -572,8 +578,11 @@ bullets away in the same release.
 
 ### Check 19: Operating / Non-Operating Decomposition Before Interpreting Any Profit Surprise (2 minutes)
 
-**Trigger:** reported profit surprises consensus by more than ~5% in **either** direction. Run this
-*before* writing a single sentence characterising the business.
+**Trigger:** reported profit surprises consensus by more than ~5% in **either** direction, **or**
+any of the last four quarters shows net-profit growth more than 10pp away from revenue growth (or
+negative while revenue grows). Run this *before* writing a single sentence characterising the
+business. The full bridge — one-offs, tax, seasonality, definition changes and the driver table —
+is in `references/quarterly-profit-bridge.md`; the O/N labelling below is its step 2.
 
 ```
 Walk the bridge, line by line, and label each line O or N:
