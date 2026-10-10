@@ -202,6 +202,49 @@ stable at 33%. Nothing in the operating business missed anything.
 
 ---
 
+
+### 15. Stale Quote Accepted as the Live Price
+**Family:** Mechanical — and the only mechanical input with no reconciliation gate until now
+**Frequency:** Any session that fetches a price from a Tier 3 quote page. Rises sharply for names
+with no Google Finance listing, after long weekends/holidays, and on names that are falling fast
+(the stale number is always *higher* than the truth, flattering MoS-to-floor in the wrong direction).
+
+**Cost:** Every price-relative output is wrong at once — MoS, upside, reverse DCF, the
+price-versus-floor statement, which entry zone and tripwire has fired. Fair value is untouched, so the
+model *looks* healthy.
+
+**The mechanism.** The share count is reconciled through four anchors because a wrong count is
+expensive. The price is equally expensive and arrives last, from the least reliable tier, after the
+analysis is mentally finished — so it gets the least scrutiny of any input. A cached page renders a
+current-date template around old data, and the header is what gets read.
+
+**The specific error made (GWM 2333.HK, 2026-10-08):**
+
+```
+Quoted:   HK$8.64  "Closed·10/07"   (Investing.com)
+Truth:    HK$7.115  7-Oct close      (user-supplied, corroborated)
+Error:    +21%
+
+Signals on the SAME page and in the SAME record, all ignored:
+  • page FAQ: "As of Jul 12, 2026"            → P1 timestamp conflict
+  • page 52-wk low HK$8.23                    → P3: file already held HK$7.58 (11-Sep)
+  • company Sep buybacks ~HK$7.40             → P4: a +14% "rise" against own buyback prices
+  • conflict noticed, written as "▲ single-source", USED ANYWAY
+```
+
+**The uncomfortable part — same shape as Class 13/14.** The refresh ran Check 19, the reverse DCF,
+the ±20% band, and flagged its own price as single-source. Every gate passed. The ±20% band even
+contained the true price — but it tests *verdict* robustness, and the errors that mattered were
+statements of position against fixed levels (the EPV floor), which no band protects.
+
+**Prevention — Check 20.** Before any live price enters a calculation, run P1–P5 (data-sources.md
+"Live Price Verification Gate"). **A source that fails a check is rejected, not flagged.**
+
+**Case study:** Great Wall Motor (2333.HK) H1 FY26 thesis refresh, 2026-10-08 → corrected 2026-10-09
+on Mike's challenge. FV and floor unchanged; MoS 30% → 42%; "at the floor" → "15% below it";
+reverse DCF −0.1% → −3.0%.
+
+---
 ### OMISSION ERROR CLASSES (data never gathered)
 
 ### 12. Balance-Sheet Value Omitted Because It Never Touches Operating Profit
@@ -570,6 +613,30 @@ entirely a RMB14.5bn associate swing. The business missed nothing.
 depressed and the headline P/E stays misleading in the *expensive* direction. Note it as a standing
 monitoring item rather than re-deriving the surprise each quarter.
 
+
+### Check 20: Live-Price Verification Gate (60 seconds)
+
+**Trigger:** every live price, every scope — deep dive, refresh, price refresh, comparison.
+
+```
+P1 TIMESTAMP   Read the date from the quote data, not the page header.
+               Any date conflict on the page → reject the source.
+P2 FRESHNESS   Within 1 trading day of analysis date, or labelled as older vintage.
+P3 RANGE       Source's 52-wk low ≤ every price on file (last 52 wks) ≤ its 52-wk high.
+               Prices on file = command-center pxNow/pxAnalysis, prior reports,
+               company buyback/placement prices. Violation → page is stale → reject.
+P4 MOVE        |move vs last price on file| > 10% → second source within ±2%
+               or a dated event that explains it.
+P5 SOURCES     Two independent sources within ±2%; else ▲ single-source — and only
+               if the one source passed P1–P4.
+```
+
+**A flag is not a fix.** "▲ single-source" is for a source that *passed* every check and simply
+lacks a twin — never for one that failed a check. The GWM quote failed P1 and P3 and was flagged
+instead of rejected; the flag was accurate and changed nothing.
+
+**When the user gives a price:** adopt it, verify, correct downstream. Do not defend the aggregator.
+
 ## Process Behaviors to Reinforce
 
 ### The source-tier ladder — a conclusion may not outrank its source
@@ -682,6 +749,7 @@ is already sitting in the book.
 
 
 ### Pre-Analysis
+- [ ] **Check 20 — live price passed P1–P5 before entering any calculation; Data Trail row records the checks**
 - [ ] **Declare the source tier before starting (annual / quarterly / wire flash) and state what it can and cannot support**
 - [ ] State share count explicitly at top of analysis
 - [ ] Document source for share count (annual report, EPS back-check, etc.)
@@ -878,6 +946,7 @@ If all three agree, you're safe. If they disagree, dig deeper.
 | 2026-08-12 | **Error Class 14 — signal inferred from an absence, without a base rate** | Tencent 2Q2026 "did not declare interim dividend" was read as capital being diverted from shareholders to AI. **Tencent has never paid an interim dividend** — one annual dividend each March; the flash reported a structural constant as an event. The inference also ran **backwards**: buybacks that quarter were **HKD16.9bn, +122% QoQ**, so distribution had increased sharply. Absence is indistinguishable from constancy without a base rate |
 | 2026-08-12 | **Check 18 — base-rate test on any absence, plus mandatory pairing with the presence side** | For any "management did not do X": did X occur in ≥2 of the prior 4 **comparable** periods? If no, the absence is a constant — delete the sentence rather than soften it. If yes, pair it with the presence-side evidence on the same underlying question. "No dividend" and "buyback doubled" answer the same question and only the pair answers it. Note *comparable*: Tencent's every interim quarter shows no dividend, so a Q2-vs-Q1 comparison manufactures a signal out of a calendar |
 | 2026-08-12 | **Supersede in place when a Tier 3 re-rate is later contradicted** | Where a verdict moved on flash data and the primary release reverses it, the record must carry **one dated entry with the correction inside it**, not two dated entries contradicting each other. A same-session correction is the verification step working, not an embarrassment — the failure mode to avoid is the correction never happening because the deliverable already read as finished |
+| 2026-10-09 | **Error Class 15 — stale quote accepted as the live price; Check 20 — live-price verification gate (P1–P5)** | GWM 2333.HK refresh used HK$8.64 from a cached Investing.com page (header 'Closed·10/07', FAQ 'As of Jul 12', 52-wk low HK$8.23) against a true 7-Oct close of **HK$7.115** (+21%). The file already held HK$7.58 (11-Sep) and the company had bought back at ~HK$7.40 — two checks against data in hand would have rejected the quote. The conflict was noticed and flagged ▲ but not acted on. MoS 30%→42%, 'at the floor'→'15% below', reverse DCF −0.1%→−3.0%. **The ±20% band contained the truth and still did not help** — it protects the verdict, not statements of position against fixed levels. Caught by Mike, not by any gate |
 
 ### Pattern: "Net income rose but basic EPS is flat (or basic and diluted EPS diverge)"
 **Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves

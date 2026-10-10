@@ -124,7 +124,25 @@ Minimum data to collect:
 - Last 10 years of annual reports (or all available if < 10 years public)
 - Most recent quarterly/interim filing
 - Any major news: acquisitions, management changes, regulatory issues (last 2 years)
-- Current share price and market cap
+- Current share price and market cap — **run the Live Price Verification Gate (P1–P5) in
+  `references/data-sources.md` before the price enters any calculation** ⚠️ NEW (Oct 2026)
+
+### Live price — the input with no anchor until now
+
+```
+P1 TIMESTAMP  date read from the quote data, not the page header; any conflict → reject
+P2 FRESHNESS  ≤1 trading day old, or labelled as an older vintage
+P3 RANGE      source's 52-wk low ≤ every price on file (command center, prior reports,
+              buyback prices) ≤ its 52-wk high; violation = stale page → reject
+P4 MOVE       >10% vs last price on file → second source within ±2% or a dated event
+P5 SOURCES    two independent sources within ±2%; else ▲ single-source, and only if P1–P4 passed
+```
+
+**A flag is not a fix** — a source that fails a check is rejected, not marked ▲ and used. The
+±20% band protects the verdict, not statements like "price is below the EPV floor". A price the
+user supplies outranks an aggregator. *Case: GWM 2333.HK, 2026-10-08 — HK$8.64 from a stale
+Investing.com snapshot vs a true HK$7.115; its 52-wk low (HK$8.23) sat above a price already on
+file (HK$7.58).* See process-lessons.md Class 15 / Check 20.
 
 ---
 
@@ -816,11 +834,20 @@ Read these when needed — don't load all at once:
     bilingual summary, command center — comes from one source. The Xtep #14 error sat undetected for
     eleven weeks because a master-table row was retyped instead of derived while the JSON beneath it
     was correct. Cross-check mechanically before delivering.
+15. **The price is an input, not a lookup.** Verify it against the prices already on file before
+    using it (P1–P5). A stale quote corrupts every price-relative conclusion while leaving fair
+    value — and therefore the model's apparent health — untouched.
 
 ---
 
 ## Change Log
 
+- **2026-10-09** — **Live Price Verification Gate (P1–P5) added to Step 2** and Key Principle 15.
+  Full spec in `references/data-sources.md` (new section + RF-8 + pre-verdict checklist item);
+  error class and check in `process-lessons.md` (Class 15, Check 20). Derivation: the GWM
+  (2333.HK) H1 FY26 refresh used a stale cached quote (HK$8.64 vs true HK$7.115) whose page
+  carried two internal signs of staleness, both noticed and neither acted on. Until now the share
+  count had four anchors and the price had none.
 - **2026-08-23** — **Step 10 restructured: THREE deliverables, not two.** Added **Deliverable 3 — the
   bilingual EN/简体中文 executive summary** (`summary_<ticker>_<date>_EN-CN.md`), which runs at
   **every scope** including quick thesis, thesis refresh and earnings reaction. Full spec (16 required

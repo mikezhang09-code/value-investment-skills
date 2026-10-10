@@ -468,6 +468,80 @@ Non-verdict-movers (Tier 3 aggregator acceptable):
 
 ---
 
+## Live Price Verification Gate ⚠️ NEW (October 2026)
+
+**A live price is a verdict-moving input like any other.** Margin of safety, reverse DCF, the
+price-versus-floor comparison and the entry-zone trigger all hang off one number, and it is the one
+number in the analysis that is fetched last, from a Tier 3 page, under the least scrutiny. The share
+count gets four anchors; until this section, the price got none.
+
+*Derivation — Great Wall Motor (2333.HK), 2026-10-08.* An Investing.com page displayed **HK$8.64**
+under a header reading "Closed·10/07". The true 7-Oct close was **HK$7.115**. The page was a stale
+cached snapshot: its own FAQ read "As of Jul 12, 2026", and it showed a **52-week low of HK$8.23**
+while the command center already held an **11-Sep close of HK$7.58** and the company's own September
+buyback disclosures averaged **~HK$7.40**. The date conflict was noticed, written up as
+"single-source ▲" — and the quote was used anyway. Every downstream price-relative statement was
+wrong: MoS 30% (true 42%), "price sits on the EPV floor" (true: 15% *below* it), reverse DCF −0.1%
+(true −3.0%). Caught by Mike the next day, not by any gate.
+
+### The five checks — run on every live price before it enters any calculation
+
+```
+P1  TIMESTAMP     The quote's own date/time, read from the data itself (quote line, chart
+                  tooltip, "as of" field) — not from a page header or template label.
+                  Any internal date conflict on the page (header vs FAQ vs meta)
+                  → REJECT THE SOURCE. Do not flag-and-use.
+
+P2  FRESHNESS     Quote date within 1 trading day of the analysis date, or explicitly
+                  labelled as an older vintage (Check 12 handles the ex-dividend leg).
+
+P3  RANGE         The source's 52-week LOW must be ≤ every price already on file for this
+    COHERENCE     name within the trailing 52 weeks (command-center pxNow / pxAnalysis,
+                  prior reports, company buyback or placement prices); its 52-week HIGH
+                  must be ≥ every such price.
+                  A 52-wk low ABOVE a price you already hold is proof the page is stale
+                  → REJECT THE SOURCE.
+
+P4  MOVE CHECK    Compute the move vs the LAST PRICE ON FILE.
+                  |move| > 10%  → requires a second independent source within ±2%,
+                                  or a dated event that explains it (results day, etc.).
+                  Direction sanity: if the company has been BUYING BACK below the quote
+                  since the last price on file, a rise needs a source.
+
+P5  TWO SOURCES   Two independent sources agreeing within ±2%, at least one passing P1
+                  with an explicit timestamp. Where only one source survives P1–P4, the
+                  price may be used with ▲ single-source — but a source that FAILED any
+                  of P1–P4 may not be used at all. A flag is not a fix.
+```
+
+**User-supplied prices outrank aggregators.** Mike follows his names daily. When he gives a price,
+adopt it, verify it, and correct downstream — do not defend the aggregator figure (Key Principle 10).
+
+**The ±20% sensitivity band does not cure a bad quote.** On GWM the band around HK$8.64
+(HK$6.91–10.37) did contain the true price, and the *verdict* survived — but the band tests verdict
+robustness only. **Statements of position relative to a fixed level** (above/below the EPV floor,
+inside/outside the entry zone, which tripwire has fired) are not protected by it and flipped.
+
+### Recording format (Data Trail row, mandatory)
+
+```
+| Price (2333.HK) | HK$7.115 | Source A (timestamp) + Source B / user-supplied | 2026-10-07 close |
+|                 |          | P1 ✓ P2 ✓ P3 ✓ (52-wk low ≤ 7.58 on file) P4 ✓ P5 ✓      |                  |
+```
+
+### Source behaviour observed (HK names, 2026)
+
+| Source | Observed failure | Use |
+|---|---|---|
+| Investing.com | Serves cached snapshots; header date can disagree with on-page data | P1 check mandatory; never sole source |
+| Google Finance | No listing for some H-shares (2333:HKG not found) | Absence ≠ error; use another source |
+| Sina HK quote page | Placeholder / mixed-vintage fields on the same page (e.g. 昨收 122.45 beside 最新价 11.28) | Reject when internal fields conflict |
+| Futu (futunn.com) | 403 rate-limits to automated fetch | Retry later or use alternative |
+| StockAnalysis | Can lag by weeks, but **labels its own timestamp honestly** | Passes P1; check P2 |
+| Company buyback / placement disclosures (HKEX) | Not a quote, but a Tier 1 traded price with a date | Use as a P3/P4 anchor |
+
+---
+
 ## Red-Flag Patterns from Past Analyses — 历史教训
 
 Specific mistake classes that have surfaced in real work. Check for each explicitly on any SOTP, DCF, or verdict-stage analysis.
@@ -498,6 +572,15 @@ Match the share count to the period of the earnings figure. For companies with a
 For HK-listed Chinese companies (and other dual-class structures), HK-focused data sources sometimes report H-share float as "total shares outstanding." This understates true total by 2x–10x.
 *Case: BYD May 2026 — initially used 3.04B shares vs. actual 9.085B (H + A combined). 3x error. Caught only when user provided market cap. Required full report rewrite. See Share-Class Structure Warnings section above for the full reconciliation protocol.*
 *Reproduction test on Ping An: Google Finance shows "shares outstanding 7.45B" — this is H-share only. True total: ~18.2B (H + A). EPS back-check (NI ÷ EPS) confirmed.*
+
+### RF-8. Stale cached quote accepted as live ⚠️ NEW (October 2026)
+A Tier 3 quote page served an old snapshot under a current-date header. Signals present and ignored:
+the page's own FAQ date disagreed with its header; its 52-week low sat above a price already on file;
+the "rise" ran opposite to the company's own buyback prices. Run the **Live Price Verification
+Gate** (P1–P5) on every live price.
+*Case: Great Wall Motor (2333.HK) refresh, 2026-10-08 — HK$8.64 used vs true HK$7.115 (+21%). MoS,
+reverse DCF and the price-vs-floor statement were all wrong; caught by the user the next day.*
+
 
 ---
 
@@ -542,6 +625,8 @@ Run before finalizing any Buy / Hold / Avoid recommendation:
 - [ ] **Book-value denominator READ FROM A FILING, not derived from a ratio, and its GAAP basis named
       where the issuer publishes more than one (e.g. 20-F filers: US GAAP vs local)** ⚠️ NEW
 - [ ] **Price vintage stated, and checked for an ex-dividend date passing since the quote (RF-4)** ⚠️ NEW
+- [ ] **Live price passed P1–P5 (timestamp, freshness, 52-wk range vs prices on file, >10% move
+      second-sourced, two sources) and recorded in the Data Trail with check marks (RF-8)** ⚠️ NEW
 - [ ] No pending M&A is embedded in current SOTP (RF-1)
 - [ ] Headline losses/gains decomposed into cash vs. non-cash (RF-3)
 - [ ] Data vintage labeled per line for time-sensitive figures (RF-4)
