@@ -16,7 +16,8 @@ input.json example (millions, except price and per-share values):
   "net_debt": 1136,                # REQUIRED; negative = net cash. Never assume 0.
   "diluted_shares": 277,           # reconciled total from Step 2.5
   "price": 306.96,                 # must have passed P1-P5
-  "discount_rate": 0.10,           # 10% default; any other value needs discount_rate_reason
+  "currency": "USD",               # currency the cash flows are earned in; sets the table rate
+  "discount_rate": 0.10,           # optional; defaults to the table rate; any other value needs discount_rate_reason
   "discount_rate_reason": "",
   "epv": {                         # optional; EPV per intrinsic-value.md Method 2
     "after_tax_operating_earnings": 5900,
@@ -36,13 +37,20 @@ A scenario may set "r" only together with "r_reason" -- do not lower r to lift t
 Reverse DCF holds the Base scenario's terminal growth and g1->g2 step-down fixed and
 solves for the g1 that prices the stock. Years 6-10 growth is floored at terminal growth
 (or at g1, when g1 itself is below terminal growth) so the implied path never dips below
-the terminal rate and then recovers; "g2_floored" in the output says when the floor bound. The sensitivity grid shifts Base g1 and g2
+the terminal rate and then recovers; "g2_floored" in the output says when the floor bound. "implied_return_pct" is the discount rate at which the Base cash flows equal the price:
+the annual return the current price offers if the Base case happens. Report it beside
+the discount rate in every deliverable. The sensitivity grid shifts Base g1 and g2
 together, so its centre cell equals the Base scenario value.
 """
 import json
 import sys
 
 DEFAULT_R = 0.10
+# Currency rate table, references/intrinsic-value.md Method 1 Step 3. Yields of 2026-10-09.
+# rate = 10% USD hurdle + (local 10y yield - US 10y yield), rounded to 0.5pt, floor 8%.
+RATE_TABLE_DATE = "2026-10-09"
+RATE_TABLE = {"USD": (0.10, 0.030), "HKD": (0.09, 0.020), "RMB": (0.08, 0.010), "CNY": (0.08, 0.010),
+              "INR": (0.12, 0.050), "JPY": (0.08, 0.010), "SGD": (0.08, 0.010), "TWD": (0.08, 0.010)}  # (rate, max terminal growth)
 
 
 def per_share_value(oe, g1, g2, tg, r, net_debt, shares):
@@ -80,6 +88,22 @@ def reverse_dcf(oe, price, r, net_debt, shares, tg, step, lo=-0.30, hi=0.60):
     return (lo + hi) / 2
 
 
+def implied_return(oe, price, net_debt, shares, g1, g2, tg, lo=None, hi=0.60):
+    """Discount rate at which the Base cash flows are worth exactly the price (an IRR).
+    Needs no discount-rate choice. None if no solution between tg and 60%."""
+    lo = tg + 0.002 if lo is None else lo
+    f = lambda r: per_share_value(oe, g1, g2, tg, r, net_debt, shares) - price
+    if f(lo) < 0 or f(hi) > 0:
+        return None
+    for _ in range(100):
+        mid = (lo + hi) / 2
+        if f(mid) > 0:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
 def main(path):
     with open(path) as fh:
         cfg = json.load(fh)
@@ -93,10 +117,19 @@ def main(path):
     if sh <= 0 or price <= 0:
         sys.exit("STOP: diluted_shares and price must be positive.")
 
-    r = cfg.get("discount_rate", DEFAULT_R)
-    if abs(r - DEFAULT_R) > 1e-9 and not cfg.get("discount_rate_reason"):
-        warnings.append(f"discount_rate {r:.2%} differs from the 10% default with no "
-                        f"discount_rate_reason stated")
+    ccy = cfg.get("currency", "USD").upper()
+    if ccy not in RATE_TABLE:
+        sys.exit(f"STOP: currency '{ccy}' is not in the rate table {sorted(RATE_TABLE)}; "
+                 f"add it to intrinsic-value.md Step 3 and RATE_TABLE first.")
+    table_r, max_tg = RATE_TABLE[ccy]
+    r = cfg.get("discount_rate", table_r)
+    if abs(r - table_r) > 1e-9 and not cfg.get("discount_rate_reason"):
+        warnings.append(f"discount_rate {r:.2%} differs from the {ccy} table rate {table_r:.1%} "
+                        f"with no discount_rate_reason stated")
+    for s_ in cfg["scenarios"]:
+        if s_["tg"] > max_tg + 1e-9:
+            warnings.append(f"scenario '{s_['name']}' terminal growth {s_['tg']:.1%} exceeds the "
+                            f"{ccy} cap of {max_tg:.1%}")
 
     scen = cfg["scenarios"]
     total_p = sum(s["p"] for s in scen)
@@ -106,7 +139,7 @@ def main(path):
     if len(set(names)) != len(names):
         sys.exit("STOP: scenario names must be unique")
 
-    out = {"ticker": cfg.get("ticker"), "price": price, "discount_rate": r, "scenarios": []}
+    out = {"ticker": cfg.get("ticker"), "price": price, "currency": ccy, "discount_rate": r, "scenarios": []}
     weighted = 0.0
     for s in scen:
         sr = s.get("r", r)
@@ -144,6 +177,12 @@ def main(path):
     if g_rev is None:
         warnings.append("reverse DCF has no solution in g1 between -30% and +60%; "
                         "the price implies growth outside that range -- check inputs")
+
+    ir = implied_return(oe, price, nd, sh, base["g1"], base["g2"], base["tg"])
+    out["implied_return_pct"] = None if ir is None else round(ir * 100, 2)
+    out["discount_rate_basis"] = cfg.get("discount_rate_basis") or (f"{ccy} hurdle, rate table {RATE_TABLE_DATE}" if abs(r - table_r) < 1e-9 else cfg.get("discount_rate_reason", ""))
+    if ir is None:
+        warnings.append("implied return has no solution between terminal growth and 60%")
 
     grid = {}
     for dr in (r - 0.02, r - 0.01, r, r + 0.01, r + 0.02):

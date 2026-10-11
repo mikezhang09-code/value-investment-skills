@@ -76,6 +76,7 @@ defines the section structure, data requirements, and Chart.js visualizations fo
 - Key bull points (3)
 - Key bear points (3)
 - KPI stat cards (4–6): Current Price, Intrinsic Value (base), MoS%, Graham Score, Buffett Score, Moat Rating
+- **Discount rate card (mandatory, even at the 10% default):** rate, basis, terminal growth — and beside it the **implied return at the current price** from `scenario_dcf.py`. Repeat the rate in the hero line
 
 ### Layout
 
@@ -461,7 +462,7 @@ company.financialObservations = {
 - Owner Earnings DCF: Bear / Base / Bull cases
 - Reverse DCF (implied growth rate at current price)
 - **Disruption scenarios table** (required when Step 4 flagged a revenue-line threat) — Disruption / Bear / Base / Bull with probability, g1/g2/tg, value per share, MoS and tripwire, plus the probability-weighted value; figures copied from `scenario_dcf.py` output, never retyped. Lives in this tab — do not add a tab
-- **Discount rate and its one-line reason** if it is not 10%
+- **Discount rate, basis and terminal growth — always shown**, plus the one-line reason if the rate is not 10%, and the implied return at the current price
 - Sensitivity table (discount rate × growth rate matrix)
 - Intrinsic value range visualization
 

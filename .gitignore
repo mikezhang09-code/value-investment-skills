@@ -8,3 +8,6 @@ command-center.html
 report_*.md
 report_*.html
 research-note-*.md
+# Python bytecode
+__pycache__/
+*.py[cod]

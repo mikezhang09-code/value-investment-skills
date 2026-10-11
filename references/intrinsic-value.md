@@ -54,23 +54,62 @@ Be conservative. Buffett says to be skeptical of high growth assumptions.
 
 **Rule**: For most businesses, assume mid-term growth = 50–70% of recent history. If a company grew at 20%, assume 10–12% going forward.
 
-### Step 3: Choose Discount Rate
+### Step 3: Choose Discount Rate — one hurdle, translated by currency (adopted 2026-10-11)
 
-The discount rate represents the required return. Buffett typically uses the 10-year US Treasury yield + a risk premium.
+The discount rate is **the investor's required return**, not a measure of how risky the business is.
+Risk is already counted in the scenario probabilities, the margin-of-safety tiers, the conviction caps
+and the position caps; raising the rate for a weaker business counts it again. So the rate does **not**
+vary by business quality. It varies only by the **currency the cash flows are earned in**, because a
+nominal 10% is a different real hurdle in renminbi than in rupees.
+
+**Rule.** The hurdle is **10% in US dollars**. For another currency:
 
 ```
-Common discount rates:
-  Very safe business (utility, consumer staple): 8–9%
-  Good business with some risk: 10%
-  Cyclical or moderate-risk business: 11–12%
-  Higher-risk or international: 12–15%
+r(currency) = 10% + (local 10-year government yield − US 10-year Treasury yield)
+              rounded to the nearest 0.5 point, with a FLOOR of 8%
 
-Default to 10% for most analyses — it matches Buffett's historical practice.
+terminal growth ≤ r − 7 points, and never above the local 10-year yield
 ```
 
-**Any rate other than 10% needs a one-line reason in the report** (e.g., "8.5%: regulated utility,
-inflation-linked tariff"). An undefended 9.5% once lifted base IV by ~9% with no change in the business.
-Apply one rate across all scenarios; never lower it in a bull case to lift value.
+**Rate table — yields of 9 Oct 2026. Review every January, or when a yield moves more than 1 point.**
+
+| Cash-flow currency | 10-yr yield | Formula result | **Rate used** | Max terminal growth |
+|---|---|---|---|---|
+| USD | 5.24% | 10.0% | **10.0%** | 3.0% |
+| HKD (Hong Kong-earning businesses) | 4.13% ▲ | 8.9% | **9.0%** | 2.0% |
+| RMB / CNY | 1.69% | 6.5% | **8.0%** (floor) | 1.0% |
+| INR | 7.29% ▲ | 12.1% | **12.0%** | 5.0% |
+| JPY | 3.09% | 7.8% | **8.0%** | 1.0% |
+| SGD | 2.45% ▲ | 7.2% | **8.0%** (floor) | 1.0% |
+| TWD | not fetched ▲ | below floor for any yield under 3.2% | **8.0%** (floor) | 1.0% |
+
+Sources: Trading Economics and FXMacroData, 9 Oct 2026; ▲ = single source.
+
+**How to apply it**
+1. **Currency means where the cash is earned, not where the share is listed.** An HK-listed or
+   ADR-listed company reporting in RMB uses the RMB rate; value it in RMB and convert the result at spot.
+2. **No per-stock adjustment.** The table is the only defence for a rate. "Safer business" or "riskier
+   business" is not a reason. Country and governance risks (VIE structures, trapped cash, withholding)
+   stay in the cash flows and haircuts — see `process-lessons.md` Checks 15–16.
+3. **The floor is deliberate.** The formula gives 6.5% for RMB. An equity discount rate that low rests
+   on interest-rate parity actually holding for a foreign holder; the 8% floor declines to rely on that.
+4. **Financials are unchanged.** Banks and insurers keep their cost-of-equity rates as validated
+   (`industry-playbooks.md` §F.5, #11-R). This table governs owner-earnings DCFs.
+5. **Transition.** Existing command-center rows keep their fair values until their next refresh. The
+   first refresh under this table prints fair value at the old rate and at the table rate side by side.
+   **A fair value that rises only because the rate changed does not raise the entry zone.**
+6. Apply one rate across all scenarios; never lower it in a bull case to lift value.
+7. A mixed-currency business uses the currency of the majority of owner earnings, stated in the report.
+
+*Why not "safe business 8–9%, risky business 12–15%"?* That older ladder is withdrawn. It let the rate
+absorb a judgment already made elsewhere, and it was the easiest input to tune toward a wanted answer
+(an undefended 9.5% once lifted base IV by ~9% with no change in the business).
+
+**State the rate even when it is the default.** The verdict box of every deliverable carries the
+discount rate, its basis (e.g. "10%, USD hurdle, rate table 9 Oct 2026") and terminal growth, with the **implied return at the
+current price** beside it — the discount rate at which the Base cash flows equal today's price
+(`implied_return_pct` in `scripts/scenario_dcf.py`). The implied return needs no rate assumption, so
+it lets a reader judge the price without arguing about 9% versus 10%.
 
 ### Step 4: Calculate Present Value
 
@@ -641,6 +680,15 @@ Particularly common share-count errors:
 ---
 
 ## Change Log
+
+- **2026-10-11 (c)** — **Method 1 Step 3 rewritten: currency-based discount-rate table adopted.** One
+  hurdle (10% in USD) translated to other currencies by the 10-year government-yield differential,
+  rounded to 0.5, floored at 8%; terminal growth capped at r − 7 points and at the local yield. The
+  quality-based ladder (8–9% safe … 12–15% risky) is withdrawn. Financials unchanged. **Not validated
+  by a retrospective sweep:** the per-name models are not on file, so fair values are not restated;
+  each name moves at its next refresh with old-rate and table-rate values shown side by side, and
+  entry zones do not rise on a rate change alone. Expected direction: RMB-earning non-financials move
+  from 10% to 8% (fair values up); USD names unchanged; HKD-earning names 10% → 9%.
 
 - **2026-07-27** — **Amendment #14: a Method 6 holding-company discount now requires a named
   enforcing mechanism.** **BINDING on adoption** — the rule is a *restraint*, not a number: it demands

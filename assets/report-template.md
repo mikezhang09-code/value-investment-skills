@@ -31,6 +31,8 @@ RECOMMENDATION:  [BUY / ACCUMULATE / WATCHLIST / HOLD / PASS / AVOID]
 Current Price:   [CURRENCY + PRICE]
 Intrinsic Value: [CURRENCY + RANGE] (Conservative: X | Base: X | Optimistic: X)
 Margin of Safety: [X%] (at base case intrinsic value)
+Discount Rate:   [X%] ([currency] hurdle, rate table [date] — or the one-line reason if it differs) · Terminal growth [X%]
+Implied Return:  [X%] a year at the current price if the Base case happens (scenario_dcf.py)
 Target Horizon:  5–10 years
 Risk Rating:     [Low / Medium / High]
 Conviction:      [High / Medium / Low]
@@ -453,7 +455,7 @@ Produce these, in this order. Omit one only if the analysis genuinely has no con
 
 | # | Section | 中文 | Must contain |
 |---|---|---|---|
-| 1 | Header + verdict box | 标题与结论 | Verdict, conviction, price (+vintage), base FV with bear/bull, MoS, entry zone, aggressive, floor, position cap, next review |
+| 1 | Header + verdict box | 标题与结论 | Verdict, conviction, price (+vintage), base FV with bear/bull, MoS, **discount rate + basis + terminal growth, implied return at price**, entry zone, aggressive, floor, position cap, next review |
 | 2 | **Anchoring / framing correction** | **锚定偏差修正** | **Mandatory whenever the request arrived with a frame attached** ("crash", "plummeted", "cheap"). State the correction and the chronology table. Skip only if no frame was supplied |
 | 3 | One-sentence thesis | 一句话论点 | The single sentence from §8, both languages, as a blockquote |
 | 4 | What the business is | 业务本质 | 2–4 paragraphs. Plain language. How it actually makes money |
@@ -488,6 +490,7 @@ Use Simplified throughout. Match the coverage book, which is 简体. Gloss each 
 | Persistency | 保单继续率 | Solvency ratio | 偿付能力充足率 |
 | Agency channel | 代理人渠道 | Bancassurance | 银保渠道 |
 | Discount rate | 折现率 | Risk discount rate | 风险贴现率 |
+| Implied return (at price) | 隐含回报率 | Terminal growth | 永续增长率 |
 | Fade | 衰减 | Appraisal value | 评估价值 |
 | Watchlist / Accumulate / Pass | 观察名单 / 逐步买入 / 放弃 | Conviction | 信心度 |
 | Position cap | 仓位上限 | Entry zone | 建仓区间 |
@@ -503,7 +506,7 @@ Extend this table whenever a new sector enters the book; do not invent a second 
 The summary is a fourth place a number can be wrong. These are what stop it becoming one.
 
 1. **Derived, never parallel-authored.** Write it from the finished report, at the end. If the report changes, regenerate the summary — do not patch it.
-2. **Mechanical figure cross-check before delivery.** Extract every headline figure (verdict, conviction, price, base FV, bear, bull, MoS, entry, aggressive, floor, cap, and the 8–12 numbers the thesis turns on) and assert each appears identically in the full report. Takes seconds; it is the control that actually works. Report the result.
+2. **Mechanical figure cross-check before delivery.** Extract every headline figure (verdict, conviction, price, base FV, bear, bull, MoS, discount rate, implied return, entry, aggressive, floor, cap, and the 8–12 numbers the thesis turns on) and assert each appears identically in the full report. Takes seconds; it is the control that actually works. Report the result.
 3. **One canonical figure block.** Verdict, conviction, base FV, MoS, entry zone, floor and cap come from **the command-center JSON row** — so the report, the dashboard, the command center and the summary cannot disagree. This is rule 3 below, extended to a fourth artifact.
 
 ---

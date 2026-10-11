@@ -580,7 +580,7 @@ Read `references/intrinsic-value.md` for calculation methods.
 
 Use **at least two** of these methods and triangulate:
 
-1. **Owner Earnings DCF** (Buffett's preferred): conservative growth, 10% discount rate
+1. **Owner Earnings DCF** (Buffett's preferred): conservative growth, discount rate from the currency table (10% USD)
 2. **Earnings Power Value (EPV)**: no-growth baseline, normalized earnings
 3. **Graham Formula**: for simpler businesses with predictable earnings
 4. **Dividend Discount Model**: for mature dividend-paying companies
@@ -595,8 +595,14 @@ See `references/industry-playbooks.md` §F.5 and the Mandatory Fade Disclosure i
 `references/intrinsic-value.md`. Where the standard set is not used, say so
 explicitly in the report.
 
-**Discount rate: 10% unless defended.** Any other rate needs a one-line reason in the report
-(see `references/intrinsic-value.md` Step 3). An undefended 9.5% once lifted base IV ~9%. Use the same
+**Discount rate: from the currency table, and ALWAYS stated.** The hurdle is 10% in USD, translated
+to the currency the cash flows are earned in (`references/intrinsic-value.md` Method 1 Step 3: HKD 9%,
+RMB 8%, INR 12%, JPY 8%, SGD 8%, TWD 8% as of 9 Oct 2026). It does not vary by business quality; the table is
+the only defence for a rate. Every deliverable shows the rate, its
+basis and the terminal growth rate in the verdict box, even when the rate is the 10% default, with the
+**implied return at the current price** beside it (`implied_return_pct` from `scenario_dcf.py`: the
+return the price offers if the Base case happens). Any rate that differs from the table needs a one-line
+reason, and financials keep their validated cost-of-equity rates. An undefended 9.5% once lifted base IV ~9%. Use the same
 rate across scenarios — uncertainty belongs in the probabilities and cash flows, not in r.
 
 **Run the arithmetic through `scripts/scenario_dcf.py`** for the owner-earnings DCF: scenario values,
@@ -839,8 +845,9 @@ complete on the strength of having presented *something*.
 
 ### Canonical figure cross-check (runs with the gate)
 
-Verdict, conviction, base FV, MoS, entry zone, floor and cap must be **identical** across report,
-dashboard, bilingual summary and command-center JSON. Extract them mechanically and assert equality —
+Verdict, conviction, base FV, MoS, entry zone, floor, cap, **discount rate and implied return** must
+be **identical** across report, dashboard, bilingual summary and command-center JSON (`dr`,
+`drBasis`, `impRet` fields). Extract them mechanically and assert equality —
 do not eyeball it. Derive all four artifacts from one source; never retype.
 
 ### Trigger specification rule
@@ -903,6 +910,21 @@ Read these when needed — don't load all at once:
 ---
 
 ## Change Log
+
+- **2026-10-11 (c)** — **Currency-based discount-rate table adopted** (Step 6; full rule and table in
+  `references/intrinsic-value.md` Method 1 Step 3). One 10% USD hurdle translated by government-yield
+  differential, 8% floor, terminal-growth cap; no per-stock or quality-based adjustment; financials
+  unchanged. `scenario_dcf.py` takes a `currency` field and warns when the rate differs from the table.
+  Existing fair values are not restated; each name moves at its next refresh.
+
+- **2026-10-11 (b)** — **Discount-rate disclosure made mandatory.** The rate, its basis, terminal growth
+  and the implied return at the current price now appear in the verdict box of all three deliverables
+  and in the command-center row (`dr`, `drBasis`, `impRet`), even at the 10% default.
+  `scenario_dcf.py` gains `implied_return_pct`. Derivation: the Zoom (#28) v2 deep dive cut fair value
+  $95 → $79 and $8.42 of that was the move from an unstated ~9%-equivalent multiple to the 10% rule —
+  invisible without opening the valuation section; the command center had no record of which rate any
+  name used. Disclosure only: no valuation rule changed. A currency-based rate table is under
+  consideration and is NOT adopted.
 
 - **2026-10-11** — **Consistency cleanup after the project-knowledge review.** (1) Step 6 financials
   note aligned with #11-R: residual income with explicit fade is the primary anchor, not P/B.
