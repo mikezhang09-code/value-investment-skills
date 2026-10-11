@@ -283,7 +283,7 @@ While you don't need to formally calculate the M-Score, be alert to:
 - Use Price/Book instead of P/E as primary valuation
 - Focus on Net Interest Margin, Loan Loss Provisions, Capital Ratios (Tier 1)
 - Insurance: Combined Ratio (< 100% = profitable underwriting) — **always decompose into expense
-  ratio and loss ratio; never report the headline alone** (§F.3)
+  ratio and loss ratio; never report the headline alone** (§Insurance, "Additional Metrics")
 - Don't use debt metrics the same way — leverage is inherent to banking
 - **Delete gross margin, the D/E red flag, and FCF-quality logic entirely** — they do not exist or
   actively mislead for financials (§F.2)

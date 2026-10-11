@@ -413,7 +413,7 @@ Build a **10-year financial summary table** with these rows:
 > ⚠️ **Financials carve-out.** The margin rows and the debt and cash-flow flags above are wrong for
 > insurers and banks — gross margin does not exist, regulatory leverage is structural rather than a
 > warning, and "FCF > NI" signals a growing book rather than clean earnings. **Before building the
-> table for any financial, read `references/industry-playbooks.md` §1.2** for the metric
+> table for any financial, read `references/industry-playbooks.md` §F.2** for the metric
 > substitutions. This applies to the coverage book today (HDFC Bank, ICICI, Berkshire, Waterdrop,
 > AIA), not only to future insurers.
 
@@ -588,9 +588,11 @@ Use **at least two** of these methods and triangulate:
 6. **Sum-of-the-Parts (SOTP)**: mandatory for holdcos and conglomerates, and for any business whose
    segments would command materially different standalone multiples
 
-⚠️ **Method selection is not universal.** Financials use a different set — P/B calibrated to
-sustainable ROE as the primary anchor, EPV as floor, DDM or SOTP alongside, and **no Graham Formula,
-no NCAV**. See `references/industry-playbooks.md` §1.5. Where the standard set is not used, say so
+⚠️ **Method selection is not universal.** Financials use a different set — **residual income with an
+explicit, moat-calibrated fade as the primary anchor** (justified P/B is conditional and VOID where
+g ≥ r — amendment #11-R), EPV as floor, DDM or SOTP alongside, and **no Graham Formula, no NCAV**.
+See `references/industry-playbooks.md` §F.5 and the Mandatory Fade Disclosure in
+`references/intrinsic-value.md`. Where the standard set is not used, say so
 explicitly in the report.
 
 **Discount rate: 10% unless defended.** Any other rate needs a one-line reason in the report
@@ -721,10 +723,15 @@ Deliver a clear, unambiguous recommendation:
 
 **BUY** — Strong business, undervalued, meaningful margin of safety
 **ACCUMULATE** — Strong business, approaching fair value, add on weakness
-**MONITOR** — Good business but fully valued; revisit if price falls
+**WATCHLIST** — Good business but no adequate margin of safety yet; pre-committed entry zone set
+**HOLD** — Already owned: keep, do not add at this price (not an entry recommendation)
 **PASS** — Business quality insufficient or no margin of safety
-**SELL** — Sell criteria triggered (overvalued, moat destroyed, integrity issue, or better opportunity)
 **AVOID** — Structural decline, excessive debt, or integrity concerns
+
+These six are the **only** values the command-center `verdict` field takes — use them verbatim in the
+report, dashboard, summary and JSON row, and avoid new hybrids (`HOLD/ACCUM`-style labels). **SELL** is
+an *action* on a held position when Step 8 sell criteria trigger; record it in the note and move the
+verdict to PASS or AVOID. ("MONITOR" in older reports = WATCHLIST.)
 
 Support the recommendation with:
 1. The single most important reason to own this business
@@ -896,6 +903,17 @@ Read these when needed — don't load all at once:
 ---
 
 ## Change Log
+
+- **2026-10-11** — **Consistency cleanup after the project-knowledge review.** (1) Step 6 financials
+  note aligned with #11-R: residual income with explicit fade is the primary anchor, not P/B.
+  (2) Dead `industry-playbooks.md` references §1.2 / §1.5 / §1.8 corrected to §F.2 / §F.5 / §F.8 across
+  SKILL.md, `intrinsic-value.md`, `moat-analysis.md` and the research note; §F.3/§F.4 references
+  resolved. (3) Step 9 verdict vocabulary aligned with the command center: BUY / ACCUMULATE /
+  WATCHLIST / HOLD / PASS / AVOID, SELL as an action. (4) `single-stock-report.md` pre-verdict
+  checklist brought up to the current `data-sources.md` list; slots added for the quarterly bridge,
+  disruption scenarios and data gaps. (5) `scenario_dcf.py` reverse DCF no longer lets years 6–10
+  growth fall below terminal growth. (6) Line endings normalised in `frameworks.md` and
+  `moat-analysis.md`. No analytical rule changed.
 
 - **2026-10-10** — **Scope routing table, quarterly profit bridge, disruption scenarios and a
   scenario-DCF script**, adapted from the `value-investing-plus` fork after review. Scope routing

@@ -295,7 +295,7 @@ not.
 
 All three tests plus the counter must pass before a deflation argument counts as moat evidence. Even
 then it is **qualitative evidence only** until it appears in the financial series — see
-`industry-playbooks.md` §1.8 for the general form of that discipline (track the line the effect
+`industry-playbooks.md` §F.8 for the general form of that discipline (track the line the effect
 should hit *first* against the line it should hit *later*; movement in the first line alone proves
 nothing). A deflation argument does not enter the valuation and is not a verdict-moving input under
 the ±20% rule until the series confirms it.

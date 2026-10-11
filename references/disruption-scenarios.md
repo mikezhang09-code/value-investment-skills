@@ -50,7 +50,7 @@ For each scenario, one observable signal that moves probability toward it, stati
 operational and a valuation condition (Step 10.5 trigger specification rule):
 
 > "TurboTax customer count falls YoY in the next tax season **AND** price > disruption-weighted IV →
-> cut to MONITOR."
+> cut to WATCHLIST."
 
 ## 5. Compute and report
 

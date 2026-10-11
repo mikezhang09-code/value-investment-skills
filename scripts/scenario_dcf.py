@@ -34,7 +34,9 @@ g1 = years 1-5 growth, g2 = years 6-10 growth, tg = terminal growth, p = probabi
 A scenario may set "r" only together with "r_reason" -- do not lower r to lift the bull case.
 
 Reverse DCF holds the Base scenario's terminal growth and g1->g2 step-down fixed and
-solves for the g1 that prices the stock. The sensitivity grid shifts Base g1 and g2
+solves for the g1 that prices the stock. Years 6-10 growth is floored at terminal growth
+(or at g1, when g1 itself is below terminal growth) so the implied path never dips below
+the terminal rate and then recovers; "g2_floored" in the output says when the floor bound. The sensitivity grid shifts Base g1 and g2
 together, so its centre cell equals the Base scenario value.
 """
 import json
@@ -59,9 +61,14 @@ def mos_pct(value, price):
     return None if value <= 0 else round((1 - price / value) * 100, 1)
 
 
+def implied_g2(g1, step, tg):
+    # Step-down from g1, but never below terminal growth unless g1 itself is below it.
+    return max(g1 + step, min(g1, tg))
+
+
 def reverse_dcf(oe, price, r, net_debt, shares, tg, step, lo=-0.30, hi=0.60):
-    """Solve g1 (with g2 = g1 + step) so that value == price. None if outside [lo, hi]."""
-    f = lambda g: per_share_value(oe, g, g + step, tg, r, net_debt, shares) - price
+    """Solve g1 (with g2 = implied_g2(g1)) so that value == price. None if outside [lo, hi]."""
+    f = lambda g: per_share_value(oe, g, implied_g2(g, step, tg), tg, r, net_debt, shares) - price
     if f(lo) > 0 or f(hi) < 0:
         return None
     for _ in range(100):
@@ -130,7 +137,8 @@ def main(path):
     g_rev = reverse_dcf(oe, price, r, nd, sh, base["tg"], step)
     out["reverse_dcf"] = {
         "implied_g1_pct": None if g_rev is None else round(g_rev * 100, 2),
-        "implied_g2_pct": None if g_rev is None else round((g_rev + step) * 100, 2),
+        "implied_g2_pct": None if g_rev is None else round(implied_g2(g_rev, step, base["tg"]) * 100, 2),
+        "g2_floored": None if g_rev is None else implied_g2(g_rev, step, base["tg"]) > g_rev + step + 1e-12,
         "held_fixed": {"tg": base["tg"], "g2_minus_g1": round(step, 4), "r": r},
     }
     if g_rev is None:

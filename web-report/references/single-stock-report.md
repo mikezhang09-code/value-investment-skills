@@ -340,6 +340,7 @@ company.management = {
 - Combined score summary
 - Historical financial charts (5-10 year)
 - **Qualitative observations narrative** (NEW — required) — Strengths, Concerns, Earnings Quality assessment
+- **Quarterly profit bridge table** (required when the bridge was triggered — `references/quarterly-profit-bridge.md`) — driver, Δ NI, O/N label, recurring?, and the one-sentence conclusion splitting non-recurring from operational points
 
 ### Charts Required
 
@@ -459,6 +460,8 @@ company.financialObservations = {
 - EPV (Earnings Power Value)
 - Owner Earnings DCF: Bear / Base / Bull cases
 - Reverse DCF (implied growth rate at current price)
+- **Disruption scenarios table** (required when Step 4 flagged a revenue-line threat) — Disruption / Bear / Base / Bull with probability, g1/g2/tg, value per share, MoS and tripwire, plus the probability-weighted value; figures copied from `scenario_dcf.py` output, never retyped. Lives in this tab — do not add a tab
+- **Discount rate and its one-line reason** if it is not 10%
 - Sensitivity table (discount rate × growth rate matrix)
 - Intrinsic value range visualization
 
@@ -810,7 +813,9 @@ Maps directly to:
 - **Data Trail table** — top 5–10 verdict-moving inputs with full source lineage
 - **General sources** — filings, IR materials, aggregators used
 - **Pre-Verdict Checklist status** — explicit confirmation each box was ticked
-- **Data vintage notice** — when data was retrieved and as-of date
+- **Data vintage notice** — when data was retrieved and as-of date, plus the **fiscal-year convention** (e.g. "FY ends 31 July")
+- **Data gaps table** — field, why missing, resolution (re-sourced / estimated on what basis / left blank)
+- **Share-count reconciliation and live-price rows** in the Data Trail (four anchors; P1–P5 check marks)
 
 ### Layout Pattern
 
@@ -898,12 +903,18 @@ Maps directly to:
     </p>
     <div class="checklist">
       <div class="check-item"><span class="pass">✓</span> Every verdict-moving number has a Tier 1 or Tier 2 source</div>
+      <div class="check-item"><span class="pass">✓</span> Share count reconciled via all four anchors; Anchor 2 stated as "passes at ±X% resolution" <span class="text-dim">(Step 2.5, RF-6, RF-7)</span></div>
+      <div class="check-item"><span class="pass">✓</span> Senior-instrument classification gate run (equity / liability / none) <span class="text-dim">(Warning Class G)</span></div>
+      <div class="check-item"><span class="pass">✓</span> Book-value denominator read from a filing, GAAP basis named <span class="text-dim">(Check 14)</span></div>
+      <div class="check-item"><span class="pass">✓</span> Live price passed P1–P5; vintage and ex-dividend leg checked <span class="text-dim">(RF-8, Check 12)</span></div>
       <div class="check-item"><span class="pass">✓</span> No pending M&A is embedded in current SOTP <span class="text-dim">(RF-1)</span></div>
+      <div class="check-item"><span class="pass">✓</span> Stakes and cross-holdings verified from the latest annual report <span class="text-dim">(RF-2)</span></div>
       <div class="check-item"><span class="pass">✓</span> Headline losses/gains decomposed into cash vs. non-cash <span class="text-dim">(RF-3)</span></div>
       <div class="check-item"><span class="pass">✓</span> Data vintage labeled per line for time-sensitive figures <span class="text-dim">(RF-4)</span></div>
-      <div class="check-item"><span class="pass">✓</span> Currency and share-class conversions verified <span class="text-dim">(RF-5, RF-6)</span></div>
-      <div class="check-item"><span class="pass">✓</span> Data trail table present for top inputs</div>
+      <div class="check-item"><span class="pass">✓</span> Currency and share-class conversions verified <span class="text-dim">(RF-5)</span></div>
+      <div class="check-item"><span class="pass">✓</span> Data trail table present; "Data gaps" list present and no empty debt, share-count or tax field reached the valuation</div>
       <div class="check-item"><span class="pass">✓</span> Estimates flagged with basis and sensitivity tested if verdict-moving</div>
+      <!-- Mark a failed or not-applicable item honestly (⚠ / n/a) — never render an unchecked item as ✓ -->
     </div>
   </div>
 
@@ -929,11 +940,16 @@ company.sources = {
   ],
   preVerdictChecklist: {
     tier1Verified: true,
+    fourAnchorsReconciled: true,       // Anchor 2 reported with its ±% resolution
+    seniorInstrumentGate: 'none',      // 'equity' | 'liability' | 'none'
+    bookValueReadFromFiling: true,
+    livePriceP1toP5: true,             // plus vintage / ex-dividend leg
     noPendingMAinSOTP: true,
+    stakesVerified: true,
     cashVsNonCashDecomposed: true,
     vintageLabeled: true,
     currencyVerified: true,
-    dataTrailPresent: true,
+    dataTrailAndGapsPresent: true,
     estimatesFlagged: true
   },
   vintage: {
@@ -978,7 +994,10 @@ company.sources = {
 16. **Financial Strengths / Concerns dual callout** (NEW — in tab-financials)
 17. **Downside Scenario card** (NEW — 3 stat cards + commentary, in tab-risk)
 18. **Data Trail table** (NEW — 5–10 row verdict-moving inputs, in tab-sources)
-19. **Pre-Verdict Checklist** (NEW — 7-item, in tab-sources)
+19. **Pre-Verdict Checklist** (12-item, mirrors `references/data-sources.md`, in tab-sources)
+20. **Data Gaps table** (in tab-sources)
+21. **Quarterly Profit Bridge table** (when triggered, in tab-financials)
+22. **Disruption Scenarios table** (when triggered, in tab-valuation)
 
 Optional extras: Sensitivity heatmap (rendered as HTML table), scenario bar chart,
 cash flow waterfall, dividend history, segment growth rates.
@@ -1185,11 +1204,16 @@ const company = {
     ],
     preVerdictChecklist: {
       tier1Verified: true,
+      fourAnchorsReconciled: true,       // Anchor 2 reported with its ±% resolution
+      seniorInstrumentGate: 'none',      // 'equity' | 'liability' | 'none'
+      bookValueReadFromFiling: true,
+      livePriceP1toP5: true,             // plus vintage / ex-dividend leg
       noPendingMAinSOTP: true,
+      stakesVerified: true,
       cashVsNonCashDecomposed: true,
       vintageLabeled: true,
       currencyVerified: true,
-      dataTrailPresent: true,
+      dataTrailAndGapsPresent: true,
       estimatesFlagged: true
     },
     vintage: {
@@ -1226,7 +1250,7 @@ For HK/China cross-listing: show both HKD and CNY where relevant, with exchange 
 This template enforces the analytical scaffolding from:
 
 - **`value-investing/SKILL.md`** — 10-step workflow (steps 1–10 map to tab structure)
-- **`value-investing/references/data-sources.md`** — Source hierarchy, ±20% verdict-moving rule, RF-1 through RF-6 red flags, Data Trail format, Pre-Verdict Checklist (rendered in tab-sources)
+- **`value-investing/references/data-sources.md`** — Source hierarchy, ±20% verdict-moving rule, RF-1 through RF-8 red flags, Live Price Verification Gate (P1–P5), Data Trail format, Pre-Verdict Checklist (rendered in tab-sources)
 - **`value-investing/references/sell-discipline-and-traps.md`** — Sell criteria check, value trap diagnostic (rendered in tab-risk)
 - **`value-investing/references/inflation-goodwill-derivatives.md`** — Inflation scorecard (rendered in tab-risk)
 - **`value-investing/references/industry-playbooks.md`** — Industry KPI cards (rendered in tab-industry)

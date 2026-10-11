@@ -116,11 +116,10 @@ delivered in full — while NIM fell to a **record-low 3.26%**. The May-2026 ana
 of the compression as transitional and carried a BUY at a fair value ~48% above the refreshed number.
 **This rule is the direct output of that error.**
 
-> **Numbering note (2026-07-26).** The 2026-07-26 (b) change log entries reference "§F.3" for the
-> float-cost and life new-business amendments, but **no §F.3 or §F.4 header exists in this file** —
-> the sections run §F.2 → §F.5, and that content sits inside §F.2. This rule is therefore placed in
-> §F.2 with the rest of the metric substitutions. Either create §F.3/§F.4 headers or correct the
-> dangling references on next touch; do not add more of them.
+> **Numbering note (resolved 2026-10-11).** There is **no §F.3 or §F.4** — the cross-cutting rules
+> run §F.2 → §F.5 by design. The float-cost table and the life new-business (onerous-contract)
+> requirement that older change-log entries called "§F.3" live in **§Insurance → "Additional
+> Metrics"** below; the references have been corrected to say so.
 
 ## §F.5 Step 6 — Valuation Adaptations
 
@@ -145,15 +144,16 @@ of the compression as transitional and carried a BUY at a fair value ~48% above 
 > method for the purpose of the probability weighting, then reach for a genuinely independent third —
 > DDM, SOTP, or a peer multiple cross-check.
 
-This means a financial will usually triangulate on **P/B-on-sustainable-ROE + EPV + DDM or SOTP**,
+This means a financial will usually triangulate on **residual income with explicit fade + EPV + DDM
+or SOTP** (justified P/B only where it clears the #11-R condition, and then counted with EPV as one method),
 not on the DCF-led combination used elsewhere. State the method set explicitly in the report — a
 reader who sees no DCF should be told why, not left to assume it was skipped.
 
-> ⚠️ **Fade disclosure is mandatory (amendment 2026-07-26, UNVALIDATED).** Justified P/B and
-> residual income are both dominated by the terminal fade assumption. The full rule — print the
-> fade-sensitivity ladder, and demote justified P/B to corroborative where **(r − g) < 3pp** — is in
-> `intrinsic-value.md`. Note that for a healthy bank the narrow-spread condition is the *normal*
-> case, not an edge case, since sustainable g = ROE × (1 − payout). Pending validation on ICICI (IBN).
+> ⚠️ **Fade disclosure is mandatory (amendment #11-R, validated on IBN 2026-07-26 — BINDING).**
+> Justified P/B and residual income are both dominated by the terminal fade assumption. The full
+> rule is in `intrinsic-value.md`: print the fade-sensitivity ladder; justified P/B is **VOID where
+> g ≥ r** and may not carry primary weight where ROE × (1 − payout) ≥ r − 1pp. For a healthy bank the
+> narrow-spread condition is the *normal* case, since sustainable g = ROE × (1 − payout).
 
 ## §F.6 Step 6.5 — One Conditioning Note
 
@@ -703,6 +703,11 @@ When applying these playbooks to HK/China-listed companies:
 
 ## Change Log
 
+- **2026-10-11** — **Housekeeping, no rule change.** §F.5 fade note updated from the superseded
+  "UNVALIDATED / (r − g) < 3pp" wording to the binding #11-R condition; the "usually triangulate
+  on" sentence aligned with the corrected method table; §F.3/§F.4 dangling references resolved (the
+  content lives in §Insurance "Additional Metrics").
+
 - **2026-07-27** — **Amendment #15: §F.8 outcome set extended to UNRUNNABLE.** **BINDING on adoption**
   — the amendment adds a third bucket to an outcome set, and a category meaning *"we do not know"*
   cannot produce a worse answer than forcing the case into PASSED or FAILED. Derivation: Taiping
@@ -796,13 +801,13 @@ When applying these playbooks to HK/China-listed companies:
 
   | # | Amendment | File |
   |---|---|---|
-  | 1 | Float cost promoted from prose to a **mandatory metrics table** in §F.3 | this file |
+  | 1 | Float cost promoted from prose to a **mandatory metrics table** in §Insurance "Additional Metrics" (then labelled §F.3) | this file |
   | 2 | **Book-value quality caveat** added to §F.2 — BVPS is itself mark-to-market for equity-heavy insurers, so P/B struck at a market high re-imports the cyclicality that normalizing the numerator removed | this file |
   | 3 | §F.7 **I-1 given a positive-case diagnostic** — a *rising* reserve ratio is strengthening and acts as a credibility multiplier on every other underwriting number, not merely the absence of harvesting | this file |
   | 4 | §F.5 notes that **P/B and EPV are not independent** (they converge as normalized ROE → r); count them as one method in the probability weighting | this file |
   | 5 | **Step 2.5 Anchor 1 must run in reverse** (market cap ÷ share count → implied price, matched to the listing under analysis) — catches dual-listing *price-basis* errors that the forward test passes | `SKILL.md`, `data-sources.md` |
   | 6 | **Duplicate-exposure test** added to SOTP Method 6 — above ~80% stake concentration, holdco-vs-subsidiary replaces holdco-vs-NAV as the deciding comparison | `intrinsic-value.md` |
-  | 7 | §F.3 requires **PV of loss-making (onerous) new contracts** and channel mix for life — NBV growth alone actively misled (sector's fastest NBV belonged to its worst new business) | this file |
+  | 7 | §Insurance "Additional Metrics" (then labelled §F.3) requires **PV of loss-making (onerous) new contracts** and channel mix for life — NBV growth alone actively misled (sector's fastest NBV belonged to its worst new business) | this file |
   | 8 | **Parent + listed subsidiary = one exposure** for concentration caps; combined cap is the subsidiary's, never the sum | `intrinsic-value.md`, `SKILL.md` |
 
   Two open questions **resolved**: the pre-2023 insurance series is unusable (comparable window is

@@ -451,8 +451,10 @@ After running at least two methods, compare results:
 | **Weighted Average** | | | |
 
 **Method selection is not universal.** Financials (insurers, banks) use a different method set —
-P/B calibrated to sustainable ROE as the primary anchor, EPV as floor, DDM or SOTP alongside, and
-**no Graham Formula and no NCAV**. See `industry-playbooks.md` §1.5 before valuing any financial.
+**residual income with an explicit, moat-calibrated fade as the primary anchor** (justified P/B is
+conditional and VOID where g ≥ r — see the Mandatory Fade Disclosure above), EPV as floor, DDM or
+SOTP alongside, and **no Graham Formula and no NCAV**. See `industry-playbooks.md` §F.5 before
+valuing any financial.
 Where the standard DCF-led set is not used, say so explicitly in the report rather than leaving the
 reader to assume it was skipped.
 

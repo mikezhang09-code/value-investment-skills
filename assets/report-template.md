@@ -27,7 +27,7 @@ INVESTMENT RESEARCH REPORT
 Date: [DATE]   Analyst: Value Investing Research
 ═══════════════════════════════════════════════════════════════
 
-RECOMMENDATION:  [BUY / ACCUMULATE / MONITOR / PASS / AVOID]
+RECOMMENDATION:  [BUY / ACCUMULATE / WATCHLIST / HOLD / PASS / AVOID]
 Current Price:   [CURRENCY + PRICE]
 Intrinsic Value: [CURRENCY + RANGE] (Conservative: X | Base: X | Optimistic: X)
 Margin of Safety: [X%] (at base case intrinsic value)
@@ -470,7 +470,7 @@ Produce these, in this order. Omit one only if the analysis genuinely has no con
 | 15 | Key figures | 关键数据 | The period's headline table + segment table |
 | 16 | Legend + sources + disclaimer | 图例、来源与免责声明 | ▲ / ▲▲ meanings, acronym glosses, data vintage, bilingual disclaimer |
 
-**What NOT to carry over:** the 10-year financial table, the full data trail, the complete RF-1→RF-7 scan narrative, the pre-verdict checklist, per-method arithmetic. Those are audit content and belong only in the full report.
+**What NOT to carry over:** the 10-year financial table, the full data trail, the complete RF-1→RF-8 scan narrative, the pre-verdict checklist, per-method arithmetic. Those are audit content and belong only in the full report.
 
 ## Chinese conventions — 简体, mainland finance usage
 
