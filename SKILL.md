@@ -597,9 +597,10 @@ explicitly in the report.
 
 **Discount rate: from the currency table, and ALWAYS stated.** The hurdle is 10% in USD, translated
 to the currency the cash flows are earned in (`references/intrinsic-value.md` Method 1 Step 3: HKD 9%,
-RMB 8%, INR 12%, JPY 8%, SGD 8%, TWD 8% as of 9 Oct 2026). It does not vary by business quality; the table is
-the only defence for a rate. Every deliverable shows the rate, its
-basis and the terminal growth rate in the verdict box, even when the rate is the 10% default, with the
+RMB 8%, INR 12%, JPY 8%, SGD 8%, TWD 8% as of 9 Oct 2026). The currency rate is the rate for the steadiest business;
+**Step 3b adds 0 to +2 points for business risk** (operating-profit variability, moat, leverage,
+cyclical flag), read from data before the valuation. No other adjustment is allowed. Every deliverable
+shows the rate and its build-up, the terminal growth rate and the industry-beta cross-check in the verdict box, even when the rate is the 10% default, with the
 **implied return at the current price** beside it (`implied_return_pct` from `scenario_dcf.py`: the
 return the price offers if the Base case happens). Any rate that differs from the table needs a one-line
 reason, and financials keep their validated cost-of-equity rates. An undefended 9.5% once lifted base IV ~9%. Use the same
@@ -675,6 +676,10 @@ Graham's principle: **never buy without a margin of safety**.
 |----------|------------------------------|---------------|-----------------|
 | Conservative | | | |
 | Base | | | |
+
+**Required margin of safety: 25% for every going concern, 40%+ for turnarounds and distressed cases**
+(plus 10–15 points if the earnings-quality gate fails). Business risk is priced in the discount rate,
+so the requirement no longer varies by moat — see `references/intrinsic-value.md`.
 
 Guidelines:
 - **Excellent opportunity**: > 40% margin of safety (buy aggressively)
@@ -910,6 +915,13 @@ Read these when needed — don't load all at once:
 ---
 
 ## Change Log
+
+- **2026-10-13** — **Business-risk adjustment added to the discount rate; required margin of safety
+  unified at 25%** (40%+ turnarounds/distressed). Rate = currency base + 0 to +2 points from
+  operating-profit variability, moat, leverage and a cyclical flag (`intrinsic-value.md` Step 3b).
+  Industry beta is a printed cross-check; stock beta is reference only. `scenario_dcf.py` takes a
+  `risk` block and computes the build-up. Validated on a seven-name sweep; each name moves at its next
+  refresh and no entry zone rises on a rate change alone.
 
 - **2026-10-11 (c)** — **Currency-based discount-rate table adopted** (Step 6; full rule and table in
   `references/intrinsic-value.md` Method 1 Step 3). One 10% USD hurdle translated by government-yield

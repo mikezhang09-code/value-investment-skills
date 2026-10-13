@@ -31,7 +31,8 @@ RECOMMENDATION:  [BUY / ACCUMULATE / WATCHLIST / HOLD / PASS / AVOID]
 Current Price:   [CURRENCY + PRICE]
 Intrinsic Value: [CURRENCY + RANGE] (Conservative: X | Base: X | Optimistic: X)
 Margin of Safety: [X%] (at base case intrinsic value)
-Discount Rate:   [X%] ([currency] hurdle, rate table [date] — or the one-line reason if it differs) · Terminal growth [X%]
+Discount Rate:   [X%] = [currency] base [X%] + business risk [+X] (variability · moat · leverage · cyclical) · Terminal growth [X%]
+Rate check:      industry beta [X] → [X%]; reason if the gap exceeds 1 point
 Implied Return:  [X%] a year at the current price if the Base case happens (scenario_dcf.py)
 Target Horizon:  5–10 years
 Risk Rating:     [Low / Medium / High]
@@ -217,7 +218,7 @@ Conclusion: "Of the [X]-point gap, [Y] points are non-recurring; [Z] points are 
 - Years 6–10: [X%] (haircut from recent growth)
 - Terminal growth: [X%]
 
-**Discount Rate:** [X%] ([justification: e.g., "high-quality, predictable business"])
+**Discount Rate:** [X%] (currency base + Step 3b business-risk build-up; see `references/intrinsic-value.md`)
 
 | Year | Owner Earnings | Discount Factor | PV |
 |------|---------------|-----------------|-----|

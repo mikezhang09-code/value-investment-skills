@@ -16,7 +16,9 @@ input.json example (millions, except price and per-share values):
   "net_debt": 1136,                # REQUIRED; negative = net cash. Never assume 0.
   "diluted_shares": 277,           # reconciled total from Step 2.5
   "price": 306.96,                 # must have passed P1-P5
-  "currency": "USD",               # currency the cash flows are earned in; sets the table rate
+  "currency": "USD",               # currency the cash flows are earned in; sets the base rate
+  "risk": {"op_profit_declines": 1, "operating_loss_year": false, "moat": "narrow",
+           "net_debt_ebitda": 0.0, "cyclical": false, "industry_beta": 1.28, "window": "FY22-FY26"},
   "discount_rate": 0.10,           # optional; defaults to the table rate; any other value needs discount_rate_reason
   "discount_rate_reason": "",
   "epv": {                         # optional; EPV per intrinsic-value.md Method 2
@@ -104,6 +106,19 @@ def implied_return(oe, price, net_debt, shares, g1, g2, tg, lo=None, hi=0.60):
     return (lo + hi) / 2
 
 
+def risk_adjustment(risk):
+    """Step 3b: one-directional business-risk addition, 0 to +2.0 points. Returns (decimal, parts)."""
+    downs = int(risk.get("op_profit_declines", 0))
+    var = 2.0 if risk.get("operating_loss_year") or downs >= 4 else {0: 0.0, 1: 0.5, 2: 1.0, 3: 1.5}[downs]
+    moat = {"wide": 0.0, "narrow": 0.5, "none": 1.0}[risk.get("moat", "narrow")]
+    nd = float(risk.get("net_debt_ebitda", 0.0))
+    lev = 0.0 if nd <= 1 else (0.5 if nd <= 2.5 else 1.0)
+    cyc = 1.0 if risk.get("cyclical") else 0.0
+    total = min(2.0, var + moat + lev + cyc)
+    return total / 100, {"variability": var, "moat": moat, "leverage": lev, "cyclical": cyc,
+                         "total_pts": total, "window": risk.get("window", "not stated")}
+
+
 def main(path):
     with open(path) as fh:
         cfg = json.load(fh)
@@ -121,11 +136,24 @@ def main(path):
     if ccy not in RATE_TABLE:
         sys.exit(f"STOP: currency '{ccy}' is not in the rate table {sorted(RATE_TABLE)}; "
                  f"add it to intrinsic-value.md Step 3 and RATE_TABLE first.")
-    table_r, max_tg = RATE_TABLE[ccy]
+    base_r, max_tg = RATE_TABLE[ccy]
+    risk = cfg.get("risk")
+    if risk is None:
+        warnings.append("no 'risk' block: rate is the currency base only (Step 3b not applied)")
+        adj, parts = 0.0, {}
+    else:
+        adj, parts = risk_adjustment(risk)
+    table_r = base_r + adj
     r = cfg.get("discount_rate", table_r)
     if abs(r - table_r) > 1e-9 and not cfg.get("discount_rate_reason"):
-        warnings.append(f"discount_rate {r:.2%} differs from the {ccy} table rate {table_r:.1%} "
-                        f"with no discount_rate_reason stated")
+        warnings.append(f"discount_rate {r:.2%} differs from the rule rate {table_r:.2%} "
+                        f"({ccy} base {base_r:.1%} + risk {adj*100:+.1f}) with no discount_rate_reason stated")
+    beta_check = None
+    if risk and risk.get("industry_beta") is not None:
+        beta_check = base_r + (risk["industry_beta"] - 1) * 0.05
+        if abs(beta_check - r) > 0.01 + 1e-9:
+            warnings.append(f"rate {r:.2%} differs from the industry-beta check {beta_check:.2%} by more "
+                            f"than 1 point: explain in the report")
     for s_ in cfg["scenarios"]:
         if s_["tg"] > max_tg + 1e-9:
             warnings.append(f"scenario '{s_['name']}' terminal growth {s_['tg']:.1%} exceeds the "
@@ -139,7 +167,9 @@ def main(path):
     if len(set(names)) != len(names):
         sys.exit("STOP: scenario names must be unique")
 
-    out = {"ticker": cfg.get("ticker"), "price": price, "currency": ccy, "discount_rate": r, "scenarios": []}
+    out = {"ticker": cfg.get("ticker"), "price": price, "currency": ccy, "discount_rate": r,
+           "rate_build": {"currency_base": base_r, "risk": parts},
+           "industry_beta_check": None if beta_check is None else round(beta_check, 4), "scenarios": []}
     weighted = 0.0
     for s in scen:
         sr = s.get("r", r)
@@ -180,7 +210,7 @@ def main(path):
 
     ir = implied_return(oe, price, nd, sh, base["g1"], base["g2"], base["tg"])
     out["implied_return_pct"] = None if ir is None else round(ir * 100, 2)
-    out["discount_rate_basis"] = cfg.get("discount_rate_basis") or (f"{ccy} hurdle, rate table {RATE_TABLE_DATE}" if abs(r - table_r) < 1e-9 else cfg.get("discount_rate_reason", ""))
+    out["discount_rate_basis"] = cfg.get("discount_rate_basis") or (f"{ccy} base {base_r:.1%} + risk {adj*100:.1f} (table {RATE_TABLE_DATE})" if abs(r - table_r) < 1e-9 else cfg.get("discount_rate_reason", ""))
     if ir is None:
         warnings.append("implied return has no solution between terminal growth and 60%")
 

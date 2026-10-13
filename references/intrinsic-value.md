@@ -56,11 +56,11 @@ Be conservative. Buffett says to be skeptical of high growth assumptions.
 
 ### Step 3: Choose Discount Rate — one hurdle, translated by currency (adopted 2026-10-11)
 
-The discount rate is **the investor's required return**, not a measure of how risky the business is.
-Risk is already counted in the scenario probabilities, the margin-of-safety tiers, the conviction caps
-and the position caps; raising the rate for a weaker business counts it again. So the rate does **not**
-vary by business quality. It varies only by the **currency the cash flows are earned in**, because a
-nominal 10% is a different real hurdle in renminbi than in rupees.
+The discount rate is built in two layers. **Step 3** sets the base: the investor's required return,
+translated into the **currency the cash flows are earned in**, because a nominal 10% is a different real
+hurdle in renminbi than in rupees. **Step 3b** adds a fixed, one-directional allowance for the
+business's own risk. Because business risk now sits in the rate, the required margin of safety is a
+single 25% for all going concerns (see "Margin of Safety Calculation") — risk is charged once.
 
 **Rule.** The hurdle is **10% in US dollars**. For another currency:
 
@@ -88,8 +88,8 @@ Sources: Trading Economics and FXMacroData, 9 Oct 2026; ▲ = single source.
 **How to apply it**
 1. **Currency means where the cash is earned, not where the share is listed.** An HK-listed or
    ADR-listed company reporting in RMB uses the RMB rate; value it in RMB and convert the result at spot.
-2. **No per-stock adjustment.** The table is the only defence for a rate. "Safer business" or "riskier
-   business" is not a reason. Country and governance risks (VIE structures, trapped cash, withholding)
+2. **The only per-stock adjustment is Step 3b below** — a fixed, one-directional business-risk
+   addition read from data. Free judgment ("safer business", "riskier business") is not a reason. Country and governance risks (VIE structures, trapped cash, withholding)
    stay in the cash flows and haircuts — see `process-lessons.md` Checks 15–16.
 3. **The floor is deliberate.** The formula gives 6.5% for RMB. An equity discount rate that low rests
    on interest-rate parity actually holding for a foreign holder; the 8% floor declines to rely on that.
@@ -101,12 +101,53 @@ Sources: Trading Economics and FXMacroData, 9 Oct 2026; ▲ = single source.
 6. Apply one rate across all scenarios; never lower it in a bull case to lift value.
 7. A mixed-currency business uses the currency of the majority of owner earnings, stated in the report.
 
-*Why not "safe business 8–9%, risky business 12–15%"?* That older ladder is withdrawn. It let the rate
-absorb a judgment already made elsewhere, and it was the easiest input to tune toward a wanted answer
-(an undefended 9.5% once lifted base IV by ~9% with no change in the business).
+*Why not "safe business 8–9%, risky business 12–15%"?* That older ladder is withdrawn. It was the
+easiest input to tune toward a wanted answer (an undefended 9.5% once lifted base IV by ~9% with no
+change in the business). Business risk now enters through Step 3b, mechanically.
+
+### Step 3b: Business-risk adjustment (adopted 2026-10-13)
+
+The currency rate above is the rate for the **steadiest possible business** in that currency. A
+business's own risk can only **add** to it — never subtract. Every factor is read from data or from a
+score set before the valuation, so the adjustment cannot be tuned toward an answer.
+
+```
+rate = currency base rate (Step 3)  +  business-risk adjustment (0 to +2.0 points)
+
+Earnings variability   years in the window with OPERATING PROFIT down >15% YoY
+                       0 → 0 · 1 → +0.5 · 2 → +1.0 · 3 → +1.5 · 4+ or any operating-loss year → +2.0
+Moat (scorecard /30)   wide (≥24) → 0 · narrow (18–23) → +0.5 · none (<18) → +1.0
+Leverage               net debt / EBITDA: ≤1× (or net cash) → 0 · 1–2.5× → +0.5 · >2.5× → +1.0
+Cyclical / capital-heavy (autos, semiconductors, batteries, materials, shipping, airlines) → +1.0
+Total capped at +2.0.
+```
+
+**Rules of use**
+1. **Window:** the last 10 fiscal years where available; state the window used. Operating profit, not
+   net income (investment marks distort it) and not FCF (working-capital timing distorts it — Moutai's
+   FCF fell 48% in FY22 on advance receipts while operating profit rose 18%).
+2. **Terminal-growth cap does not rise with the rate.** It stays at the currency table's cap, so a
+   riskier business never earns a higher terminal growth rate.
+3. **Industry-beta cross-check, printed beside the rate, never used to set it:**
+   `check = currency base + (industry levered beta − 1) × 5%` (Damodaran industry tables). If the rate
+   and the check differ by more than 1 point, the report says why in one line.
+4. **Stock-level beta is shown for reference only.** It measures share-price co-movement, not business
+   risk, and is unreliable for China-exposed names (5-year betas of 0.34 for Moutai and 0.47 for CATL
+   would imply rates below 6%).
+5. **Financials are unchanged** — validated cost-of-equity rates (`industry-playbooks.md` §F.5).
+6. **Transition:** as in Step 3 — each name moves at its next refresh, old and new fair values side by
+   side; a fair value that rises only because the rate changed does not raise the entry zone.
+
+**Validation (2026-10-13 sweep, seven names).** A first draft that also allowed −1.5 points for
+quality lowered the rate for six of seven names and raised it for none — the book is weighted toward
+quality, so a two-sided scale works in one direction. The adopted one-sided version gave: Zoom 11.0%,
+ServiceNow 10.0%, Tencent 8.0%, Moutai 8.0%, CATL 9.0%, Great Wall 10.0%, TSMC 9.5%, within about one
+point of the independent industry-beta check for five of the seven. The cyclical factor was added after
+CATL scored as the lowest-risk business on a five-year earnings window. Full record:
+`references/discount-rate-draft_2026-10-13.md` (in Project Knowledge: `claude/discount-rate-draft_2026-10-13.md`).
 
 **State the rate even when it is the default.** The verdict box of every deliverable carries the
-discount rate, its basis (e.g. "10%, USD hurdle, rate table 9 Oct 2026") and terminal growth, with the **implied return at the
+discount rate and its build-up (e.g. "11.0% = USD base 10.0% + risk 1.0: variability +0.5, narrow moat +0.5"), terminal growth and the industry-beta check, with the **implied return at the
 current price** beside it — the discount rate at which the Base cash flows equal today's price
 (`implied_return_pct` in `scripts/scenario_dcf.py`). The implied return needs no rate assumption, so
 it lets a reader judge the price without arguing about 9% versus 10%.
@@ -521,14 +562,16 @@ Positive = stock is undervalued (discount to intrinsic value)
 Negative = stock is overvalued (premium to intrinsic value)
 ```
 
-**Required margin of safety guidelines:**
+**Required margin of safety (changed 2026-10-13):**
 
-| Business Quality | Required Margin of Safety | Rationale |
-|-----------------|--------------------------|-----------|
-| Wide moat, highly predictable | 20–25% | High certainty, lower required discount |
-| Narrow moat, good visibility | 30–35% | Moderate uncertainty in projections |
-| Cyclical or less predictable | 40–50% | Higher uncertainty warrants bigger cushion |
-| Turnaround or distressed | 50%+ | Very high uncertainty; Graham's deep value zone |
+| Situation | Required margin of safety | Rationale |
+|-----------|--------------------------|-----------|
+| All going concerns | **25%** | Business risk is now priced in the discount rate (Step 3b); a tiered requirement would charge it twice |
+| Turnaround or distressed | **40%+** | Outcomes the cash-flow model cannot represent |
+| Earnings-quality gate failed (3+ distortion classes) | **+10–15 points** on the above | Unchanged — model-input uncertainty, not business risk |
+
+*Replaces the moat-tiered table (wide 20–25%, narrow 30–35%, cyclical 40–50%).* Existing entry zones
+stand until each name's next refresh.
 
 Graham's classic line: *"The margin of safety is the secret of sound investing."*
 
@@ -680,6 +723,14 @@ Particularly common share-count errors:
 ---
 
 ## Change Log
+
+- **2026-10-13** — **Step 3b business-risk adjustment adopted; margin of safety unified at 25%.** The
+  rate is now currency base + a one-directional addition (0 to +2) from operating-profit variability,
+  moat, leverage and a cyclical flag; industry beta printed as a cross-check; stock beta reference
+  only. Validated on a seven-name sweep in which a two-sided draft failed (6 of 7 rates lowered, 0
+  raised). The margin-of-safety tiers collapse to 25% (40%+ turnaround/distressed) so risk is not
+  charged twice. Effect: cyclicals and narrow-moat names get higher rates but a smaller required MoS;
+  wide-moat steady names keep the base rate and need 25% instead of 20–25%. Each name moves at its next refresh.
 
 - **2026-10-11 (c)** — **Method 1 Step 3 rewritten: currency-based discount-rate table adopted.** One
   hurdle (10% in USD) translated to other currencies by the 10-year government-yield differential,
