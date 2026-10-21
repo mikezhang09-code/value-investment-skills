@@ -259,7 +259,7 @@ cash or stakes figure in prose.
 
 **Cost:** Moves fair value by more than any operating assumption, with the operating model untouched.
 On TCOM #29 it produced a 21% fair-value fall ($57.00 → $44.74) in which the operating business moved
-by $0.04B. The record passed the gate clean (`gateOk: true`).
+by $0.04B. Nothing flagged it.
 
 **The mechanism — two failures that compound.**
 
@@ -272,9 +272,9 @@ by $0.04B. The record passed the gate clean (`gateOk: true`).
 
 2. ASSERTED ADD-BACK        Each valuation method states its non-operating add-on
                             in prose ("net cash RMB X", "listed stakes RMB Y after
-                            20% haircut"). Nothing recomputes X or Y from the canon,
-                            and nothing checks that two parts of the same proposal
-                            agree with each other.
+                            20% haircut"). Nothing recomputes X or Y from the
+                            balance sheet, and nothing checks that two parts of the
+                            same analysis agree with each other.
 ```
 
 **The specific errors made (TCOM, 31-Dec-2025 balance sheet, RMB B):**
@@ -289,9 +289,9 @@ Less: total debt (19.335 + 11.430)        (30.765)     (30.765)    (30.765)
 Net cash                                   36.385        9.083      68.392
 Issuer's own published liquidity: RMB105.8B (incl. restricted) — reproduced only by "Correct"
 
-Oct-19 run, same proposal:  stakes in DCF/EPV basis = RMB17.92B after 20% haircut (~$3.2B gross)
-                            stakes in duplicateExposureTest      = ~$1.70B gross
-                            → two figures for one asset; gate passed
+Oct-19 run, same analysis:  stakes in the DCF/EPV basis = RMB17.92B after 20% haircut (~$3.2B gross)
+                            stakes in its exposure test    = ~$1.70B gross
+                            → two figures for one asset, unflagged
 ```
 
 The October record should have read roughly **$52–58**, not $44.74 — a $7–13/share understatement on
@@ -304,12 +304,15 @@ reversed the conclusion. **A diagnosis that names one run "the correction" must 
 figures from primary components** — agreement with Tier 1 XBRL is not agreement with the balance sheet
 when the XBRL concept is narrower than the economic quantity.
 
-**Second finding — the September record did not match the September report.** The report used pro-forma
-net cash RMB68.9B and 659.4M diluted shares; the record carried RMB36.38B and 632.33M with the same
-non-operating *total*. The record was transcribed from the report, not generated from a canon. A
-back-filled record must be marked as such, or it will later be diffed as though it were a computed run.
+**Second finding — the comparison's "September run" did not match the September report.** The
+command-center row and report use pro-forma net cash RMB68.9B and 659.4M diluted shares; the comparison
+carried RMB36.38B and 632.33M with the same non-operating *total*, so it was a re-derivation, not the
+record. **Provenance:** the 2026-10-19 run, its $44.74 figure and the comparison came from a pipeline
+outside this project. None of them is in the command center, whose TCOM row is still the 2026-09-23
+$57. Before diffing two runs, confirm both exist in the record.
 
-**Prevention — Check 21**, enforced in `method_rules.py` (see `nonop_reconciliation.py`).
+**Prevention — Check 21.** R1, R2 and R4 are enforced in `scripts/scenario_dcf.py` via its `treasury`
+block; the rest are manual.
 
 **Case study:** Trip.com (TCOM / 9961.HK) #29, runs 2026-09-23 and 2026-10-19; diagnosed 2026-10-21 on
 Mike's challenge to an automated comparison.
@@ -710,10 +713,12 @@ instead of rejected; the flag was accurate and changed nothing.
 
 **When the user gives a price:** adopt it, verify, correct downstream. Do not defend the aggregator.
 
-### Check 21: Non-Operating Asset Reconciliation (2 minutes, machine-enforced)
+### Check 21: Non-Operating Asset Reconciliation (2 minutes, partly script-enforced)
 
 **Trigger:** every valuation that adds net cash, investments or listed stakes to an operating value.
-Enforced as a hard gate in `method_rules.py`; a red gate blocks `deliver.py`.
+`scripts/scenario_dcf.py` enforces R1, R2 and R4 when given a `treasury` block (it stops on a missing
+line, a >5% miss against the issuer's figure, or a typed `net_debt` that disagrees). R3 and R5–R7
+are manual checks.
 
 ```
 R1 COMPONENTS    Net cash = cash + short-term investments + term deposits /
@@ -723,12 +728,12 @@ R1 COMPONENTS    Net cash = cash + short-term investments + term deposits /
 R2 HEADLINE      Where the issuer publishes a liquidity figure ("cash, cash
                  equivalents, restricted cash, short-term investments and HTM…"),
                  the computed gross cash-like total must be within ±5% — or the
-                 reconciling items are listed. Unreconciled → gate red.
+                 reconciling items are listed. Unreconciled → stop.
 R3 SINGLE SOURCE Every method's non-operating add-back is READ from the one
                  computed figure. A number stated in a method basis that differs
-                 from the canon by >1% → gate red.
-R4 SELF-AGREE    Any quantity computed twice in one proposal (e.g. stakes in the
-                 method basis vs the duplicate-exposure test) must agree within 1%.
+                 from that figure by >1% → stop and reconcile.
+R4 SELF-AGREE    Any quantity computed twice in one analysis (e.g. stakes in the
+                 method basis vs an exposure test) must agree within 1%.
 R5 STAKES        Listed stakes priced holding by holding: shares held × quote ×
                  FX, each dated (quote ≤ 5 trading days old). Unlisted holdings
                  get an explicit treatment (zero, or book less haircut) with a reason.
@@ -738,8 +743,8 @@ R6 DATE ALIGN    Cash, debt and share count share one balance-sheet date — the
                  Share count = period-end outstanding (+ dilution), never a
                  weighted average.
 R7 MOVE REVIEW   |ΔFV| > 15% while |Δoperating value| < 5% → the non-operating
-                 bridge must be printed component by component before the gate
-                 can pass.
+                 bridge must be printed component by component before the
+                 verdict is published.
 ```
 
 **Why R2 is the decisive check.** The TCOM issuer headline (RMB105.8B) was in every release. One
@@ -747,7 +752,7 @@ comparison against it would have rejected both the September (RMB67.2B gross) an
 (RMB39.8B gross) figures. A self-consistent model can't detect a missing line; an external total can.
 
 **Why R3 and R4 are not optional.** Check 13 established that prose drifts and data does not. A method
-basis is prose. If a number can be typed into it, it must be recomputed from the canon before it counts.
+basis is prose. If a number can be typed into it, it must be recomputed from the balance sheet before it counts.
 
 ## Process Behaviors to Reinforce
 
@@ -1060,7 +1065,7 @@ If all three agree, you're safe. If they disagree, dig deeper.
 | 2026-08-12 | **Check 18 — base-rate test on any absence, plus mandatory pairing with the presence side** | For any "management did not do X": did X occur in ≥2 of the prior 4 **comparable** periods? If no, the absence is a constant — delete the sentence rather than soften it. If yes, pair it with the presence-side evidence on the same underlying question. "No dividend" and "buyback doubled" answer the same question and only the pair answers it. Note *comparable*: Tencent's every interim quarter shows no dividend, so a Q2-vs-Q1 comparison manufactures a signal out of a calendar |
 | 2026-08-12 | **Supersede in place when a Tier 3 re-rate is later contradicted** | Where a verdict moved on flash data and the primary release reverses it, the record must carry **one dated entry with the correction inside it**, not two dated entries contradicting each other. A same-session correction is the verification step working, not an embarrassment — the failure mode to avoid is the correction never happening because the deliverable already read as finished |
 | 2026-10-09 | **Error Class 15 — stale quote accepted as the live price; Check 20 — live-price verification gate (P1–P5)** | GWM 2333.HK refresh used HK$8.64 from a cached Investing.com page (header 'Closed·10/07', FAQ 'As of Jul 12', 52-wk low HK$8.23) against a true 7-Oct close of **HK$7.115** (+21%). The file already held HK$7.58 (11-Sep) and the company had bought back at ~HK$7.40 — two checks against data in hand would have rejected the quote. The conflict was noticed and flagged ▲ but not acted on. MoS 30%→42%, 'at the floor'→'15% below', reverse DCF −0.1%→−3.0%. **The ±20% band contained the truth and still did not help** — it protects the verdict, not statements of position against fixed levels. Caught by Mike, not by any gate |
-| 2026-10-21 | **Error Class 16 — non-operating asset asserted, not computed; Check 21 — non-operating reconciliation (R1–R7), enforced in method_rules.py** | TCOM #29 FV fell $57.00 → $44.74 (−21%) with the operating business unchanged ($25.24B → $25.20B). Oct-19 net cash RMB9.08B was cash-and-equivalents less debt — RMB59.3B of short-term investments and HTM deposits omitted (one XBRL tag). Sep-23's RMB36.38B omitted the RMB32.0B short-term investments. Correct: RMB68.39B; issuer headline RMB105.8B reproduces it. Oct-19 also carried two stakes figures (~$3.2B vs ~$1.70B) in one proposal with `gateOk: true`. Corrected Oct-19 FV ≈ $52–58. **The automated comparison repeated the error** — it trusted the single-tag figure and blamed the older run for not deducting debt, which it had. Caught by Mike's challenge |
+| 2026-10-21 | **Error Class 16 — non-operating asset asserted, not computed; Check 21 — non-operating reconciliation (R1–R7); `scenario_dcf.py` gains a `treasury` block enforcing R1/R2/R4** | A TCOM #29 valuation run outside this project (2026-10-19) printed $44.74 vs the recorded $57.00 with the operating value unchanged ($25.24B → $25.20B). Its net cash RMB9.08B was cash-and-equivalents less debt — RMB59.3B of short-term investments and HTM deposits omitted. The comparison's Sep-23 figure RMB36.38B omitted the RMB32.0B short-term investments. Correct: RMB68.39B; the issuer's published RMB105.8B reproduces it. The run also carried two stakes figures (~$3.2B vs ~$1.70B), unflagged. Corrected FV ≈ $52–58. **The comparison repeated the error** — it trusted the single-line figure and blamed the older run for not deducting debt, which it had. Caught by Mike's challenge |
 
 ### Pattern: "Net income rose but basic EPS is flat (or basic and diluted EPS diverge)"
 **Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves

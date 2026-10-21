@@ -13,7 +13,16 @@ input.json example (millions, except price and per-share values):
 {
   "ticker": "INTU",
   "owner_earnings": 6607,          # normalized FCF - SBC (Step 3.5)
-  "net_debt": 1136,                # REQUIRED; negative = net cash. Never assume 0.
+  "net_debt": 1136,                # REQUIRED unless "treasury" is given; negative = net cash. Never assume 0.
+  "treasury": {                    # preferred (Check 21): net_debt is BUILT from these, not typed
+    "cash": 3600, "short_term_investments": 0, "term_deposits": 0, "other_liquid": 0,
+    "restricted_cash": 0,           # shown, excluded from net debt
+    "debt": [3800, 936],            # every interest-bearing line incl. convertibles/exchangeables
+    "subsequent_cash_events": [],   # [{"label": "fine", "amount": -5180}] outflows negative
+    "issuer_liquidity": null,       # issuer's own published total, if any
+    "issuer_liquidity_includes_restricted": false,
+    "reconciling_items": ""         # required if the computed total misses issuer_liquidity by >5%
+  },
   "diluted_shares": 277,           # reconciled total from Step 2.5
   "price": 306.96,                 # must have passed P1-P5
   "currency": "USD",               # currency the cash flows are earned in; sets the base rate
@@ -119,11 +128,43 @@ def risk_adjustment(risk):
                          "total_pts": total, "window": risk.get("window", "not stated")}
 
 
+def build_net_debt(t):
+    """Check 21 R1/R2: net debt from every treasury line, reconciled to the issuer headline."""
+    for k in ("cash", "short_term_investments", "term_deposits", "debt"):
+        if t.get(k) is None:
+            sys.exit(f"STOP: treasury.{k} is missing. Record 0 explicitly if the issuer has none "
+                     f"(Check 21 R1: an absent treasury line is how TCOM lost RMB59.3B).")
+    debt = t["debt"] if isinstance(t["debt"], (int, float)) else sum(t["debt"])
+    gross = t["cash"] + t["short_term_investments"] + t["term_deposits"] + t.get("other_liquid", 0)
+    events = sum(e.get("amount", 0) for e in t.get("subsequent_cash_events", []))
+    info = {"gross_cash_like": gross, "total_debt": debt, "subsequent_events": events,
+            "net_cash": gross - debt + events}
+    hl = t.get("issuer_liquidity")
+    if hl:
+        ours = gross + (t.get("restricted_cash", 0) if t.get("issuer_liquidity_includes_restricted") else 0)
+        gap = abs(ours - hl) / hl
+        info["issuer_liquidity_gap_pct"] = round(gap * 100, 2)
+        if gap > 0.05 and not t.get("reconciling_items"):
+            sys.exit(f"STOP: treasury lines total {ours:,.0f} vs issuer-published {hl:,.0f} "
+                     f"({gap:.1%} gap). A line is missing, or list treasury.reconciling_items (Check 21 R2).")
+    return -(gross - debt + events), info
+
+
 def main(path):
     with open(path) as fh:
         cfg = json.load(fh)
     warnings = []
 
+    treasury_info = None
+    if cfg.get("treasury"):
+        built, treasury_info = build_net_debt(cfg["treasury"])
+        if cfg.get("net_debt") is not None and abs(cfg["net_debt"] - built) > max(1.0, 0.01 * abs(built)):
+            sys.exit(f"STOP: net_debt {cfg['net_debt']:,.0f} disagrees with the treasury lines "
+                     f"({built:,.0f}). Use one figure (Check 21 R3/R4).")
+        cfg["net_debt"] = built
+    else:
+        warnings.append("net_debt typed in, not built from a 'treasury' block (Check 21 R1): "
+                        "confirm every cash, deposit and investment line is included")
     for key in ("owner_earnings", "net_debt", "diluted_shares", "price", "scenarios"):
         if cfg.get(key) is None:
             sys.exit(f"STOP: '{key}' is missing or empty. Re-source it before valuing "
@@ -168,6 +209,7 @@ def main(path):
         sys.exit("STOP: scenario names must be unique")
 
     out = {"ticker": cfg.get("ticker"), "price": price, "currency": ccy, "discount_rate": r,
+           "net_debt_used": nd, "treasury": treasury_info,
            "rate_build": {"currency_base": base_r, "risk": parts},
            "industry_beta_check": None if beta_check is None else round(beta_check, 4), "scenarios": []}
     weighted = 0.0
@@ -187,6 +229,10 @@ def main(path):
     out["zero_growth_oe_value"] = round((oe / r - nd) / sh, 2)
     epv = cfg.get("epv")
     if epv:
+        if treasury_info and abs((epv["excess_cash"] - epv["total_debt"]) - (-nd)) > max(1.0, 0.01 * abs(nd)) \
+                and not epv.get("excess_cash_reason"):
+            warnings.append("epv excess_cash - total_debt differs from treasury net cash: state "
+                            "epv.excess_cash_reason (e.g. operating cash held back) or align (Check 21 R4)")
         equity = epv["after_tax_operating_earnings"] / r + epv["excess_cash"] - epv["total_debt"]
         out["epv_per_share"] = round(equity / sh, 2)
     else:
