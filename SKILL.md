@@ -144,7 +144,9 @@ Minimum data to collect:
 - **At least 8 quarters** of the income statement through to net income (revenue, operating
   profit, non-operating lines, pretax, tax, NI, diluted EPS) — the quarterly profit bridge needs them
 - **The last two earnings-call transcripts** — management's explanation of one-offs, tax and guidance
-- Total debt, cash and net debt from the balance sheet, plus analyst consensus and price targets
+- Total debt and **every treasury line** — cash, short-term investments, term deposits / HTM /
+  wealth products — plus the issuer's own published liquidity figure if it gives one (Check 21),
+  then analyst consensus and price targets
   **with their dates** (Step 6.5 Test 4)
 - Current share price and market cap — **run the Live Price Verification Gate (P1–P5) in
   `references/data-sources.md` before the price enters any calculation** ⚠️ NEW (Oct 2026)
@@ -342,6 +344,27 @@ Common multi-class structures:
 Document each class's count and source explicitly in the report.
 ```
 
+#### Check 21: Non-Operating Asset Reconciliation (the numerator twin of Anchors 1–4)
+```
+R1 COMPONENTS  net cash = cash + ST investments + term deposits/HTM/wealth products
+               − ALL interest-bearing debt. Never one XBRL tag. Restricted cash shown, excluded.
+R2 HEADLINE    gross cash-like within ±5% of the issuer's published liquidity figure,
+               or the reconciling items listed
+R3 ONE SOURCE  every valuation method reads net cash and stakes from that one figure —
+               a number typed into a method basis does not count
+R4 AGREE       a quantity stated twice in one analysis agrees within 1%
+R5 STAKES      listed stakes = shares held × quote × FX, each dated; unlisted holdings get
+               an explicit treatment with a reason
+R6 DATES       cash, debt and shares from one balance-sheet date (latest available, Tier 2 if
+               newer); period-end shares, never weighted; subsequent cash events deducted
+R7 MOVE        FV moves >15% while operating value moves <5% → print the non-operating
+               bridge component by component
+```
+Enforced in the pipeline by `nonop_reconciliation.py` (called from `method_rules.py`). *Case:
+TCOM #29, 2026-10-19 — net cash built from the cash-and-equivalents tag alone left out RMB59.3B
+of short-term investments and deposits; FV printed $44.74 against a corrected ~$52–58, and the
+gate passed.* See process-lessons.md Class 16 / Check 21.
+
 ### Reconciliation Output Format
 
 In the report's Data Trail section, document:
@@ -360,11 +383,12 @@ Verification:
 - EPS back-check:    (NI − senior distributions) ÷ EPS = X.XXB shares vs assumed → ±X%
                      resolution ±X.XX% (EPS to N dp) → PASSES AT ±X.XX% ✓/✗
 - BV cross-check:    BV/share × Shares = $XXB vs equity → ±X% ✓/✗
+- Net cash (Check 21): cash + ST inv + deposits − debt = XX vs issuer liquidity XX → ±X% ✓/✗
 ```
 
 ### Stop Conditions
 
-If ANY of the four anchors fails:
+If ANY of the four anchors or Check 21 fails:
 1. **STOP** — do not proceed to Step 3
 2. Re-source data from primary filings (annual report "Composition of Share Capital")
 3. Re-run all four checks
@@ -911,10 +935,20 @@ Read these when needed — don't load all at once:
 15. **The price is an input, not a lookup.** Verify it against the prices already on file before
     using it (P1–P5). A stale quote corrupts every price-relative conclusion while leaving fair
     value — and therefore the model's apparent health — untouched.
+16. **Non-operating assets are computed, never asserted.** Net cash is built from every treasury
+    line and reconciled to the issuer's own liquidity figure; every method reads it from that one
+    number. An omitted treasury line produces a self-consistent model and a clean gate.
 
 ---
 
 ## Change Log
+
+- **2026-10-21** — **Check 21 (non-operating asset reconciliation) added to Step 2.5**, Key
+  Principle 16, and the Step 2 data list. Full spec in `process-lessons.md` (Class 16 / Check 21);
+  pipeline gate `nonop_reconciliation.py`. Derivation: TCOM #29 FV fell $57.00 → $44.74 with the
+  operating value unchanged; the 2026-10-19 net cash used only the cash-and-equivalents tag
+  (RMB9.08B vs RMB68.39B from all components), the run carried two different stakes figures, and
+  the gate passed. The automated comparison then repeated the error.
 
 - **2026-10-13** — **Business-risk adjustment added to the discount rate; required margin of safety
   unified at 25%** (40%+ turnarounds/distressed). Rate = currency base + 0 to +2 points from

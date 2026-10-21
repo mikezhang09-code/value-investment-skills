@@ -7,7 +7,7 @@
 ## Most Expensive Error Classes
 
 Errors fall into three families:
-- **Mechanical errors** (Classes 1-5): Wrong inputs. Catastrophic but visible — they break things obviously.
+- **Mechanical errors** (Classes 1-5, 15-16): Wrong inputs. Catastrophic but visible — they break things obviously.
 - **Interpretive errors** (Classes 6-11, 13-14): Right inputs, wrong meaning. Subtle but cumulative — they corrupt conclusions silently.
 - **Omission errors** (Class 12): Inputs never gathered at all. The most dangerous family, because there is nothing to check — an omitted asset produces a fully self-consistent model built on the wrong number, and no reconciliation complains.
 
@@ -249,6 +249,70 @@ statements of position against fixed levels (the EPV floor), which no band prote
 **Case study:** Great Wall Motor (2333.HK) H1 FY26 thesis refresh, 2026-10-08 → corrected 2026-10-09
 on Mike's challenge. FV and floor unchanged; MoS 30% → 42%; "at the floor" → "15% below it";
 reverse DCF −0.1% → −3.0%.
+
+### 16. Non-Operating Asset Asserted, Not Computed (Partial-Tag Treasury and Unreconciled Add-Backs)
+**Family:** Mechanical — the numerator twin of Class 1, and the arithmetic sibling of Class 12
+**Frequency:** Every issuer whose treasury sits outside the "cash and cash equivalents" line: China
+internet (Trip.com, Alibaba, PDD, NetEase, Tencent, Kuaishou), HK industrials holding wealth-management
+products, Japanese cash-rich compounders holding time deposits. Also any method basis that states a net
+cash or stakes figure in prose.
+
+**Cost:** Moves fair value by more than any operating assumption, with the operating model untouched.
+On TCOM #29 it produced a 21% fair-value fall ($57.00 → $44.74) in which the operating business moved
+by $0.04B. The record passed the gate clean (`gateOk: true`).
+
+**The mechanism — two failures that compound.**
+
+```
+1. PARTIAL-TAG EXTRACTION   "Net cash" is built from the single XBRL concept
+                            CashAndCashEquivalents. For PRC issuers that line is
+                            often a minority of treasury. Term deposits, short-term
+                            investments and held-to-maturity wealth products sit
+                            on separate lines and silently drop out.
+
+2. ASSERTED ADD-BACK        Each valuation method states its non-operating add-on
+                            in prose ("net cash RMB X", "listed stakes RMB Y after
+                            20% haircut"). Nothing recomputes X or Y from the canon,
+                            and nothing checks that two parts of the same proposal
+                            agree with each other.
+```
+
+**The specific errors made (TCOM, 31-Dec-2025 balance sheet, RMB B):**
+
+```
+                                        Sep-23 run   Oct-19 run   Correct
+Cash and equivalents (ex-restricted)       39.848       39.848      39.848
+Short-term investments                      —            —          32.007
+Held-to-maturity deposits / products       27.302        —          27.302
+Less: total debt (19.335 + 11.430)        (30.765)     (30.765)    (30.765)
+---------------------------------------------------------------------------
+Net cash                                   36.385        9.083      68.392
+Issuer's own published liquidity: RMB105.8B (incl. restricted) — reproduced only by "Correct"
+
+Oct-19 run, same proposal:  stakes in DCF/EPV basis = RMB17.92B after 20% haircut (~$3.2B gross)
+                            stakes in duplicateExposureTest      = ~$1.70B gross
+                            → two figures for one asset; gate passed
+```
+
+The October record should have read roughly **$52–58**, not $44.74 — a $7–13/share understatement on
+the run that was meant to be the correction.
+
+**The uncomfortable part — the diagnosis repeated the error.** The comparison written to explain the
+drop accepted the single-tag XBRL figure as truth and concluded the *older* run had "never deducted the
+debt." It had. Rebuilding both numbers from balance-sheet components took one line of arithmetic and
+reversed the conclusion. **A diagnosis that names one run "the correction" must first rebuild both
+figures from primary components** — agreement with Tier 1 XBRL is not agreement with the balance sheet
+when the XBRL concept is narrower than the economic quantity.
+
+**Second finding — the September record did not match the September report.** The report used pro-forma
+net cash RMB68.9B and 659.4M diluted shares; the record carried RMB36.38B and 632.33M with the same
+non-operating *total*. The record was transcribed from the report, not generated from a canon. A
+back-filled record must be marked as such, or it will later be diffed as though it were a computed run.
+
+**Prevention — Check 21**, enforced in `method_rules.py` (see `nonop_reconciliation.py`).
+
+**Case study:** Trip.com (TCOM / 9961.HK) #29, runs 2026-09-23 and 2026-10-19; diagnosed 2026-10-21 on
+Mike's challenge to an automated comparison.
 
 ---
 ### OMISSION ERROR CLASSES (data never gathered)
@@ -646,6 +710,45 @@ instead of rejected; the flag was accurate and changed nothing.
 
 **When the user gives a price:** adopt it, verify, correct downstream. Do not defend the aggregator.
 
+### Check 21: Non-Operating Asset Reconciliation (2 minutes, machine-enforced)
+
+**Trigger:** every valuation that adds net cash, investments or listed stakes to an operating value.
+Enforced as a hard gate in `method_rules.py`; a red gate blocks `deliver.py`.
+
+```
+R1 COMPONENTS    Net cash = cash + short-term investments + term deposits /
+                 HTM / wealth products − ALL interest-bearing debt (ST, LT,
+                 convertibles, exchangeables). Restricted cash shown, excluded.
+                 Never one XBRL tag. Every component carries its source + date.
+R2 HEADLINE      Where the issuer publishes a liquidity figure ("cash, cash
+                 equivalents, restricted cash, short-term investments and HTM…"),
+                 the computed gross cash-like total must be within ±5% — or the
+                 reconciling items are listed. Unreconciled → gate red.
+R3 SINGLE SOURCE Every method's non-operating add-back is READ from the one
+                 computed figure. A number stated in a method basis that differs
+                 from the canon by >1% → gate red.
+R4 SELF-AGREE    Any quantity computed twice in one proposal (e.g. stakes in the
+                 method basis vs the duplicate-exposure test) must agree within 1%.
+R5 STAKES        Listed stakes priced holding by holding: shares held × quote ×
+                 FX, each dated (quote ≤ 5 trading days old). Unlisted holdings
+                 get an explicit treatment (zero, or book less haircut) with a reason.
+R6 DATE ALIGN    Cash, debt and share count share one balance-sheet date — the
+                 latest available, Tier 2 if newer than Tier 1. Subsequent cash
+                 events (fines, special dividends, deal consideration) deducted.
+                 Share count = period-end outstanding (+ dilution), never a
+                 weighted average.
+R7 MOVE REVIEW   |ΔFV| > 15% while |Δoperating value| < 5% → the non-operating
+                 bridge must be printed component by component before the gate
+                 can pass.
+```
+
+**Why R2 is the decisive check.** The TCOM issuer headline (RMB105.8B) was in every release. One
+comparison against it would have rejected both the September (RMB67.2B gross) and the October
+(RMB39.8B gross) figures. A self-consistent model can't detect a missing line; an external total can.
+
+**Why R3 and R4 are not optional.** Check 13 established that prose drifts and data does not. A method
+basis is prose. If a number can be typed into it, it must be recomputed from the canon before it counts.
+
 ## Process Behaviors to Reinforce
 
 ### The source-tier ladder — a conclusion may not outrank its source
@@ -771,6 +874,7 @@ is already sitting in the book.
 - [ ] Document each major valuation input with source
 - [ ] **Check 19 — split any profit surprise into operating vs non-operating before characterising the business**
 - [ ] **Check 18 — base-rate any "management did not do X" claim before it carries weight**
+- [ ] **Check 21 — net cash built from all treasury components and reconciled to the issuer's headline liquidity; every method's add-back read from that one figure**
 
 ### Post-Analysis
 - [ ] Apply 4 plausibility checks before publishing
@@ -956,6 +1060,7 @@ If all three agree, you're safe. If they disagree, dig deeper.
 | 2026-08-12 | **Check 18 — base-rate test on any absence, plus mandatory pairing with the presence side** | For any "management did not do X": did X occur in ≥2 of the prior 4 **comparable** periods? If no, the absence is a constant — delete the sentence rather than soften it. If yes, pair it with the presence-side evidence on the same underlying question. "No dividend" and "buyback doubled" answer the same question and only the pair answers it. Note *comparable*: Tencent's every interim quarter shows no dividend, so a Q2-vs-Q1 comparison manufactures a signal out of a calendar |
 | 2026-08-12 | **Supersede in place when a Tier 3 re-rate is later contradicted** | Where a verdict moved on flash data and the primary release reverses it, the record must carry **one dated entry with the correction inside it**, not two dated entries contradicting each other. A same-session correction is the verification step working, not an embarrassment — the failure mode to avoid is the correction never happening because the deliverable already read as finished |
 | 2026-10-09 | **Error Class 15 — stale quote accepted as the live price; Check 20 — live-price verification gate (P1–P5)** | GWM 2333.HK refresh used HK$8.64 from a cached Investing.com page (header 'Closed·10/07', FAQ 'As of Jul 12', 52-wk low HK$8.23) against a true 7-Oct close of **HK$7.115** (+21%). The file already held HK$7.58 (11-Sep) and the company had bought back at ~HK$7.40 — two checks against data in hand would have rejected the quote. The conflict was noticed and flagged ▲ but not acted on. MoS 30%→42%, 'at the floor'→'15% below', reverse DCF −0.1%→−3.0%. **The ±20% band contained the truth and still did not help** — it protects the verdict, not statements of position against fixed levels. Caught by Mike, not by any gate |
+| 2026-10-21 | **Error Class 16 — non-operating asset asserted, not computed; Check 21 — non-operating reconciliation (R1–R7), enforced in method_rules.py** | TCOM #29 FV fell $57.00 → $44.74 (−21%) with the operating business unchanged ($25.24B → $25.20B). Oct-19 net cash RMB9.08B was cash-and-equivalents less debt — RMB59.3B of short-term investments and HTM deposits omitted (one XBRL tag). Sep-23's RMB36.38B omitted the RMB32.0B short-term investments. Correct: RMB68.39B; issuer headline RMB105.8B reproduces it. Oct-19 also carried two stakes figures (~$3.2B vs ~$1.70B) in one proposal with `gateOk: true`. Corrected Oct-19 FV ≈ $52–58. **The automated comparison repeated the error** — it trusted the single-tag figure and blamed the older run for not deducting debt, which it had. Caught by Mike's challenge |
 
 ### Pattern: "Net income rose but basic EPS is flat (or basic and diluted EPS diverge)"
 **Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves
