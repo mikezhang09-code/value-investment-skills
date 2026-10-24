@@ -735,8 +735,13 @@ R3 SINGLE SOURCE Every method's non-operating add-back is READ from the one
 R4 SELF-AGREE    Any quantity computed twice in one analysis (e.g. stakes in the
                  method basis vs an exposure test) must agree within 1%.
 R5 STAKES        Listed stakes priced holding by holding: shares held × quote ×
-                 FX, each dated (quote ≤ 5 trading days old). Unlisted holdings
-                 get an explicit treatment (zero, or book less haircut) with a reason.
+                 FX, each dated (quote ≤ 5 trading days old). SHARES HELD IS READ
+                 FROM THE INVESTEE'S OWNERSHIP FILINGS (Check 22), NEVER BACK-SOLVED
+                 AS A RESIDUAL FROM A PORTFOLIO TOTAL AND NEVER CARRIED FROM A
+                 THIRD-PARTY REPORT. Every priced stake must then CONTAIN (Check 22
+                 S5): stake value ≤ carrying value of its balance-sheet line, same
+                 date. Unlisted holdings get an explicit treatment (zero, or book
+                 less haircut) with a reason.
 R6 DATE ALIGN    Cash, debt and share count share one balance-sheet date — the
                  latest available, Tier 2 if newer than Tier 1. Subsequent cash
                  events (fines, special dividends, deal consideration) deducted.
@@ -753,6 +758,47 @@ comparison against it would have rejected both the September (RMB67.2B gross) an
 
 **Why R3 and R4 are not optional.** Check 13 established that prose drifts and data does not. A method
 basis is prose. If a number can be typed into it, it must be recomputed from the balance sheet before it counts.
+
+### Check 22: Verify a Stake From the Investee's Own Filings — and Contain It (3 minutes)
+
+**Trigger:** any holding in a listed company that carries value in a valuation — a stake add-back,
+a SOTP component, a net-cash-plus-stakes floor, a duplicate-exposure test.
+
+Check 21 R5 requires stakes to be priced `shares held × quote × FX`. It did not say where
+`shares held` comes from, and that is where TME failed. **An investor's own filings frequently omit
+the share count; the investee's ownership filings carry it outright.**
+
+```
+S1  INVESTEE SIDE FIRST   Search 13G / 13D / proxy / annual-report "Major Shareholders"
+                          filed ON THE INVESTEE. Holders are named entity by entity,
+                          with exact share counts. The investor's own report often
+                          says only "an equity investment in X".
+S2  NAME THE ENTITY       Match the EXACT legal entity. A parent's group total is not
+                          the subsidiary's holding, and a listed subsidiary's slice is
+                          not the parent's. Both appear in the same table.
+S3  TWO DATES             Pull the holding at two dates. Static across years -> current
+                          == original and the vintage question is closed. Moving ->
+                          find the disposal before pricing anything.
+S4  DENOMINATOR BASIS     Shares outstanding from the INVESTEE's own cover page.
+                          Exclude instruments with votes but NO economic rights.
+S5  CONTAIN IT            shares x quote <= carrying value of the balance-sheet line
+                          that holds it, at the SAME date. A component cannot exceed
+                          its total.
+S6  VOTES                 Check for proxies / lock-ups. A stake with no votes is an
+                          economic claim, not strategic positioning.
+```
+
+**S5 is the cheapest check in this file and it alone kills the error.** The circulating TME figure of
+8,552,440 Spotify shares implies, at SPOT ~US$596, a **US$5.10bn** holding inside an FY25 FVOCI line
+of **US$3.75bn** — a negative remainder for UMG and WMG. It breaks above **US$438.59/share**, and SPOT
+traded far above that all year. **TME's own audited balance sheet refutes the number — one division,
+no external data.** The verified 4,276,200 reconciles instead to within US$15mn.
+
+**Case:** TME #53, 2026-10-23. Spotify holding named as *Tencent Music Entertainment Hong Kong Limited,
+4,276,200 shares* in the 2019-02-01 13G (event 2018-12-31) and identically in the Ek / D.G.E. 13G/A
+Amd. No.5 (event 2023-12-31). Denominator 205,832,527 off Spotify's FY25 20-F cover; beneficiary
+certificates carry votes but no economic rights and are correctly excluded. All three Tencent-group
+holdings sit under an irrevocable proxy to D.G.E. Investments — **zero votes**.
 
 ## Process Behaviors to Reinforce
 
@@ -880,6 +926,7 @@ is already sitting in the book.
 - [ ] **Check 19 — split any profit surprise into operating vs non-operating before characterising the business**
 - [ ] **Check 18 — base-rate any "management did not do X" claim before it carries weight**
 - [ ] **Check 21 — net cash built from all treasury components and reconciled to the issuer's headline liquidity; every method's add-back read from that one figure**
+- [ ] **Check 22 — every listed stake's share count read from the investee's own ownership filings, and contained within its balance-sheet line**
 
 ### Post-Analysis
 - [ ] Apply 4 plausibility checks before publishing
@@ -995,6 +1042,16 @@ Unlike mechanical errors (which fail loudly via reconciliation), interpretive er
 **Symptom:** Old share count from prior annual report.
 **Fix:** Use most recent quarterly or post-placement count.
 
+### Share-Basis Contamination of the NUMERATOR (investee holdings)
+**Symptom:** A stake share count that is an exact small multiple — 2x, 4x, 8x — of the true holding.
+**Diagnosis:** The *investor's* ADS ratio applied to an *investee* field. TME is 1 ADS = 2 ordinary
+shares; its Spotify holding was carried at **8,552,440 = 2.0000x the true 4,276,200** (plus an
+unexplained +40 shares).
+**Fix:** ADS ratios belong to the issuer being valued, never to what it owns. Divide the suspect count
+by the issuer's own ADS ratio and see whether the result is a round, filed number — then run Check 22 S5.
+**Family:** the BYD error (Classes 1/4) moved from the denominator to the numerator. Every other entry
+in this cheat sheet is a denominator trap.
+
 ---
 
 ## "Always Verify" Companies
@@ -1066,6 +1123,10 @@ If all three agree, you're safe. If they disagree, dig deeper.
 | 2026-08-12 | **Supersede in place when a Tier 3 re-rate is later contradicted** | Where a verdict moved on flash data and the primary release reverses it, the record must carry **one dated entry with the correction inside it**, not two dated entries contradicting each other. A same-session correction is the verification step working, not an embarrassment — the failure mode to avoid is the correction never happening because the deliverable already read as finished |
 | 2026-10-09 | **Error Class 15 — stale quote accepted as the live price; Check 20 — live-price verification gate (P1–P5)** | GWM 2333.HK refresh used HK$8.64 from a cached Investing.com page (header 'Closed·10/07', FAQ 'As of Jul 12', 52-wk low HK$8.23) against a true 7-Oct close of **HK$7.115** (+21%). The file already held HK$7.58 (11-Sep) and the company had bought back at ~HK$7.40 — two checks against data in hand would have rejected the quote. The conflict was noticed and flagged ▲ but not acted on. MoS 30%→42%, 'at the floor'→'15% below', reverse DCF −0.1%→−3.0%. **The ±20% band contained the truth and still did not help** — it protects the verdict, not statements of position against fixed levels. Caught by Mike, not by any gate |
 | 2026-10-21 | **Error Class 16 — non-operating asset asserted, not computed; Check 21 — non-operating reconciliation (R1–R7); `scenario_dcf.py` gains a `treasury` block enforcing R1/R2/R4** | A TCOM #29 valuation run outside this project (2026-10-19) printed $44.74 vs the recorded $57.00 with the operating value unchanged ($25.24B → $25.20B). Its net cash RMB9.08B was cash-and-equivalents less debt — RMB59.3B of short-term investments and HTM deposits omitted. The comparison's Sep-23 figure RMB36.38B omitted the RMB32.0B short-term investments. Correct: RMB68.39B; the issuer's published RMB105.8B reproduces it. The run also carried two stakes figures (~$3.2B vs ~$1.70B), unflagged. Corrected FV ≈ $52–58. **The comparison repeated the error** — it trusted the single-line figure and blamed the older run for not deducting debt, which it had. Caught by Mike's challenge |
+| 2026-10-23 | **Check 22 — verify a stake from the investee's own filings, and contain it (S1–S6); Check 21 R5 amended** | TME #53 carried Spotify at **~1.6%, back-solved as a residual** from the FVOCI total, while a circulating third-party report carried **4.155%** and a third source **2.5%**. Truth: **4,276,200 shares = 2.0775%**, named outright in two Schedule 13Gs filed **on Spotify** — a document class never consulted because the search had been framed around TME's own filings. **R5 (adopted 2026-10-21) already required stakes to be priced from a share count; it did not say where the count comes from, and the TME record predating it was never swept** — the file's own rule *validate new rules by sweeping backwards* was not applied to R5 |
+| 2026-10-23 | **The containment test — a component cannot exceed the line that holds it** | The circulating 8,552,440 implied a **US$5.10bn** Spotify stake inside an FY25 FVOCI line of **US$3.75bn** — a negative remainder for UMG and WMG; it breaks above **US$438.59/share** and SPOT was far above that all year. **Falsifiable against TME's own audited balance sheet with one division.** The verified count reconciles to within US$15mn. Also retired a **vintage error of my own**: the UMG mark was carried at a mid-2026 US$36–43bn ▲ range against a Dec-2025 balance sheet, which manufactured a phantom "fourth unidentified asset" |
+| 2026-10-23 | **A residual is not a measurement — being conservative does not make it safe** | The ~1.6% residual **understated** the stake by ~US$250mn (~US$0.15/ADS) while the third-party figure **overstated** it by US$2.18bn (~US$1.35/ADS). Both came from not reading a filing that names the number. Class 16 extends: a figure derived by **subtraction from a total** is asserted, not computed, even when the total is audited and the arithmetic is right |
+| 2026-10-23 | **Cheat-sheet entry — share-basis contamination of the numerator** | 8,552,440 = exactly 2.0000× the true 4,276,200: TME's own 1 ADS = 2 ordinary ratio applied to an investee field. The BYD error moved from denominator to numerator; the cheat sheet previously held only denominator traps |
 
 ### Pattern: "Net income rose but basic EPS is flat (or basic and diluted EPS diverge)"
 **Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves
