@@ -9,19 +9,22 @@ When installed, this skill gives Claude the ability to:
 - Research any publicly listed company as a seasoned fundamental analyst, across **5 markets**: US, Hong Kong, China A-shares, Singapore, and India
 - **Route by scope** — full deep dive, quick thesis, thesis refresh, earnings reaction, or comparison — each running a defined set of steps, with the data gates never skipped
 - **Quick-Kill screen** stocks with an 8-question pass/fail gate (integrity is an automatic veto) before deep analysis
-- **Verify the live price** (timestamp, freshness, 52-week range vs prices on file, move check, two sources) before it enters any calculation
-- **Enforce a 4-Anchor Reconciliation Gate** (market cap, EPS back-check, per-share metrics, share-class structure) before any per-share valuation — catches H+A float underreporting, ADR ratio confusion, and perpetual/AT1 capital miscounted as equity
-- Perform 10-year financial deep dives (revenue, margins, ROE, ROIC, FCF, etc.) and record a **Data gaps** list — an empty debt, share-count or tax field blocks valuation
+- **Run every number through a data gate** — each verdict-moving figure is recorded in an inputs file with its document, page and the line as printed, then checked by `scripts/validate_inputs.py` (11 checks: provenance with quote matching, units, share count, live price, net cash, statement articulation, owner-earnings tie, history, matched windows, FX, stake containment) and read a second time independently
+- **Analyse on what is in hand, and say so plainly** — the gate returns VERIFIED, QUALIFIED (gaps: verdict marked provisional, conviction capped at 6/10, +10 points margin of safety) or UNRESOLVED (a figure disagrees with its cross-check: value shown under each reading, no verdict). The analysis is never withheld
+- **Take history from structured sources first** (SEC company facts, the annual report's multi-year summary), with the latest three years tied to the filing
+- Perform 10-year financial deep dives (revenue, margins, ROE, ROIC, FCF, etc.) and keep a **Data gaps** list that becomes the next refresh's fetch list
 - **Run an Earnings Quality Gate** — 8 distortion classes (one-offs, dilution, investment income, SBC and net buybacks, related-party transactions, off-balance-sheet items, acquired growth) normalized before valuation
 - **Bridge any surprising quarter** from operating profit through one-offs, non-operating items and tax, so only the operational part moves the thesis
-- Assess competitive moats **with trend analysis** (widening/stable/narrowing), and test technology disruption **per segment** with the Deflation Sign Test
+- Assess competitive moats **with trend analysis** on an anchored /30 scorecard, and test technology disruption **per segment** with the Deflation Sign Test
 - **Apply industry playbooks** — full sector overrides for financials (insurance and banking), plus guidance for consumer, media, energy, railroads and technology
-- Calculate intrinsic value with multiple methods (owner-earnings DCF, EPV, Graham Formula, DDM, NCAV, SOTP) and **probability-weighted disruption scenarios** via a reproducible script (`scripts/scenario_dcf.py`)
+- **Value on one owner-earnings definition** — operating profit after normal tax + D&A − maintenance capex, pre-interest, stock compensation never added back — so net cash and debt are counted exactly once
+- **Charge growth for the capital it needs** (g ÷ return on new capital, with a moat-set terminal return), and use a **mid-cycle base** for cyclicals
+- **State one fair value** from the primary method for the business type — for non-financials the lower of the Base and probability-weighted DCF; residual income with an explicit fade for banks and insurers (`scripts/residual_income.py`) — with other methods as cross-checks, never averaged in
 - **Apply Output Plausibility Checks** ("too good to be true", peer multiples, reverse DCF, analyst consensus divergence)
-- Deliver a clear **BUY / ACCUMULATE / MONITOR / PASS / SELL / AVOID** verdict with conviction, margin of safety and tripwires that state both an operational and a valuation condition
+- Deliver a clear **BUY / ACCUMULATE / WATCHLIST / HOLD / PASS / AVOID** verdict with conviction, margin of safety, and tripwires that state both an operational and a valuation condition
 - **Run sell discipline and value-trap checks** — 4 sell criteria, a 5-type value-trap diagnostic, inflation/goodwill/derivatives scorecards, and a behavioral-bias self-check
-- **Learn from its own mistakes** — `process-lessons.md` records 15 error classes and 20 sanity checks, each derived from a real analysis error
-- Produce **three deliverables** per analysis — a Markdown research report, an interactive HTML dashboard, and a bilingual EN/简体中文 executive summary — all derived from one canonical figure block and checked by a final Deliverable Gate
+- **Learn from its own mistakes** — `process-lessons.md` records 16 error classes and 27 checks, each derived from a real analysis error
+- Produce **three deliverables** per analysis — a Markdown research report, an interactive HTML dashboard, and a bilingual EN/简体中文 executive summary — each opening with the data-status box, all derived from one canonical figure block and checked by a final Deliverable Gate
 
 ## Markets Covered
 
@@ -32,28 +35,38 @@ When installed, this skill gives Claude the ability to:
 | China A-Shares | SSE / SZSE | cninfo.com.cn |
 | Singapore | SGX | SGX Announcements |
 | India | NSE / BSE | BSE / NSE filings, Screener.in |
+
 ## File Structure
 
 ```
 value-investment-skills/
 ├── SKILL.md                                    # Main skill definition — 10-step workflow with quick-kill
 │                                               #   screener, industry analysis, sell discipline, and
-│                                               #   behavioral bias checks; includes mandatory Step 2.5
-│                                               #   Reconciliation Gate and Step 6.5 Plausibility Checks
+│                                               #   behavioral bias checks; Step 2.5 data gate (three
+│                                               #   outcomes), Step 6 one fair value per business type,
+│                                               #   Step 6.5 Plausibility Checks
 ├── assets/
-│   └── report-template.md                      # Spec for the THREE deliverables: 10-section Markdown
-│                                               #   report (exec summary → business → management → moat →
-│                                               #   financials + profit bridge → valuation + scenarios +
-│                                               #   plausibility → risk → thesis → portfolio → conclusion,
-│                                               #   plus data trail and data gaps); HTML dashboard tabs;
+│   ├── inputs-template.json                    # A passing synthetic inputs file to copy for a new name
+│   └── report-template.md                      # Spec for the THREE deliverables: data-status box, then a
+│                                               #   10-section Markdown report (exec summary → business →
+│                                               #   management → moat → financials + profit bridge →
+│                                               #   valuation: drivers, owner earnings, scenarios, fair
+│                                               #   value + cross-checks, dated falsifiable forecasts →
+│                                               #   risk → thesis → portfolio → conclusion, plus generated
+│                                               #   data trail and data gaps); HTML dashboard tabs;
 │                                               #   16-section bilingual EN/中文 summary; scope variations
 ├── references/
-│   ├── data-sources.md                         # Filing URLs and search strategies for all 5 markets;
-│   │                                           #   data quality hierarchy; verdict-moving number rules;
-│   │                                           #   red-flag patterns from past analyses (RF-1 to RF-8);
-│   │                                           #   data trail + data gaps; estimation discipline;
-│   │                                           #   share-class warnings and 4 reconciliation anchors;
-│   │                                           #   live price verification gate (P1–P5)
+│   ├── data-inputs.md                          # The data gate: inputs-file layout, checks D1–D11, GAP vs
+│   │                                           #   CONFLICT, the three outcomes and what each does to the
+│   │                                           #   report, tolerance ladder, source-tier ladder,
+│   │                                           #   independent second read
+│   ├── data-sources.md                         # Structured sources first (SEC company facts, HKEXnews
+│   │                                           #   lookups, multi-year summaries); filing URLs for all 5
+│   │                                           #   markets; one source-tier ladder; verdict-moving number
+│   │                                           #   rules; red-flag patterns (RF-1 to RF-10); share-class
+│   │                                           #   warnings and 4 reconciliation anchors; live price
+│   │                                           #   verification gate (P1–P5)
+│   ├── discount-rate-draft_2026-10-13.md       # Validation record for the Step 3b business-risk rate
 │   ├── disruption-scenarios.md                 # Per-segment Deflation Sign Test → four probability-
 │   │                                           #   weighted scenarios (Disruption/Bear/Base/Bull) with
 │   │                                           #   evidence rules and dual-condition tripwires
@@ -83,43 +96,49 @@ value-investment-skills/
 │   │                                           #   impact by business type; derivatives risk checklist
 │   │                                           #   (7 questions); look-through earnings for holding
 │   │                                           #   companies; macro risk overlay framework
-│   ├── data-inputs.md                          # The data gate: inputs-file layout, validator checks
-│   │                                           #   D1–D11, tolerance ladder, source-tier ladder,
-│   │                                           #   independent second pass
-│   ├── intrinsic-value.md                      # Valuation methods: Owner Earnings DCF, EPV, Graham
-│   │                                           #   Formula, DDM, NCAV; sensitivity tables; reverse
-│   │                                           #   DCF; triangulated fair value range; pre-valuation
-│   │                                           #   anchoring and 4 output plausibility checks
-│   ├── moat-analysis.md                        # Competitive moat identification: 5 moat types scored
-│   │                                           #   0–3; moat trend assessment (widening/stable/narrowing);
+│   ├── intrinsic-value.md                      # Valuation: operating owner earnings (one definition,
+│   │                                           #   mid-cycle for cyclicals); currency discount-rate table
+│   │                                           #   + business-risk add-on; growth charged at g / RONIC;
+│   │                                           #   bridge to equity; scenarios; one fair value per
+│   │                                           #   business type with cross-checks; EPV, Graham, DDM,
+│   │                                           #   NCAV, SOTP; financials fade rule; 4 plausibility checks
+│   ├── moat-analysis.md                        # Competitive moat identification: 5 moat types; anchored
+│   │                                           #   /30 scorecard (sets the discount-rate add-on and the
+│   │                                           #   terminal return); moat trend (widening/stable/narrowing);
 │   │                                           #   franchise vs. commodity test; Fisher scuttlebutt lens;
 │   │                                           #   Munger inversion stress test
 │   ├── portfolio-construction.md               # Building a concentrated 10–20 stock portfolio;
 │   │                                           #   position sizing; geographic & sector diversification;
 │   │                                           #   rebalancing rules
 │   ├── process-lessons.md                      # Self-improvement reference for analytical errors:
-│   │                                           #   15 error classes (mechanical / interpretive / omission)
-│   │                                           #   and 20 sanity checks, each derived from a real case
+│   │                                           #   16 error classes (mechanical / interpretive / omission)
+│   │                                           #   and 27 checks, each derived from a real case
 │   │                                           #   (BYD, Tencent, China Taiping, GWM, Intuit, ...)
 │   ├── quarterly-profit-bridge.md              # Operating vs tax / one-off / non-operating / seasonal
 │   │                                           #   decomposition of a quarter's profit change
-│   └── sell-discipline-and-traps.md            # 4 sell criteria (overvaluation, moat destruction,
+│   ├── sell-discipline-and-traps.md            # 4 sell criteria (overvaluation, moat destruction,
 │                                               #   integrity, better opportunity); 5-type value trap
 │                                               #   diagnostic; institutional imperative; 5 behavioral
 │                                               #   bias self-checks; monitoring framework with quarterly
 │                                               #   review checklist and sell trigger signals; error
 │                                               #   recognition protocol and speed guidelines
+│   └── working-conventions.md                  # Stage 0 read list, fetch budgets by document type,
+│                                               #   thesis-refresh structure, presentation order, Stage 6
+│                                               #   command-center procedure, final chat summary
 ├── scripts/
 │   ├── validate_inputs.py                      # Data gate → VERIFIED / QUALIFIED / UNRESOLVED (the analysis
 │   │                                           #   is always produced, labelled by what is missing or
 │   │                                           #   disagrees): checks D1–D11 on inputs_<ticker>_<date>.json
 │   │                                           #   (provenance, units, share count, price, net cash,
 │   │                                           #   statement articulation, owner-earnings tie, history,
-│   │                                           #   windows, FX, stakes); --trail prints the Data Trail
+│   │                                           #   windows, FX, stakes); --status-box prints the box that
+│   │                                           #   opens every deliverable, --trail the Data Trail; also
+│   │                                           #   reports measured ROIC (all capital and organic)
 │   ├── scenario_dcf.py                         # Scenario DCF on operating (pre-interest) owner earnings,
-│   │                                           #   growth charged at g / RONIC, one fair value; weighted IV,
-│   │                                           #   reverse DCF, EPV, sensitivity grid; takes its inputs
-│   │                                           #   from the validation and stamps the data status
+│   │                                           #   growth charged at g / RONIC, one fair_value; weighted
+│   │                                           #   value, reverse DCF, implied return, terminal-value
+│   │                                           #   share, per-share bridge, sensitivity grid; takes its
+│   │                                           #   inputs from the validation and stamps the data status
 │   ├── residual_income.py                      # Banks / insurers: residual income with explicit fade,
 │   │                                           #   fade ladder, justified-P/B validity test
 │   └── tests/                                  # python3 -m unittest discover -s scripts/tests
@@ -199,8 +218,16 @@ ln -s ~/Documents/GitHub/value-investment-skills ~/.claude/skills/value-investin
 
 Claude reads whatever is checked out, so keep `main` checked out when you are not mid-edit.
 
-Claude Code auto-discovers skills placed in `~/.claude/skills/`. The scenario script needs only
-Python 3 (standard library).
+Claude Code auto-discovers skills placed in `~/.claude/skills/`. The scripts need only Python 3
+(standard library). Run the tests with:
+
+```bash
+python3 -m unittest discover -s scripts/tests
+```
+
+The SEC filing archive (`www.sec.gov/Archives/...`) rejects downloads that do not declare a contact
+address in the User-Agent header; Claude asks you which address to use before fetching from it. The
+`data.sec.gov` structured-data API works without one.
 
 ## Usage
 
@@ -222,18 +249,18 @@ Claude will follow a 10-step research process:
 
 0. **Quick-Kill Screener** — 8-question gate (must pass before proceeding)
 1. **Identify & Scope** — clarify company, ticker, market, and research depth
-2. **Data Collection** — fetch filings from primary sources (SEC, HKEx, SGX, etc.)
-2.5. **Reconciliation Gate** — mandatory 4-anchor check (market cap, EPS back-check, per-share metrics, share-class structure) to prevent calculation and scale errors
+2. **Data Collection** — structured sources first for the history, then the filings; every number recorded with its page and quoted line in `inputs_<ticker>_<date>.json`
+2.5. **Data Gate** — `validate_inputs.py` checks the inputs file and an independent second read confirms each verdict-moving number. Outcome: **VERIFIED**, **QUALIFIED** (gaps — the analysis goes ahead, labelled) or **UNRESOLVED** (a conflict — the analysis goes ahead, with no verdict)
 3. **Financial Analysis** — 10-year quantitative deep dive
 3.5. **Earnings Quality Gate** — 8-distortion check, plus a quarterly profit bridge when a quarter's profit diverges from revenue or surprises consensus
-4. **Moat Assessment** — competitive advantage quality, durability, and **trend** (widening/stable/narrowing); per-segment disruption scenarios where technology threatens a revenue line
+4. **Moat Assessment** — anchored /30 scorecard, durability and **trend** (widening/stable/narrowing); per-segment disruption scenarios where technology threatens a revenue line
 5. **Industry Analysis** — sector-specific metrics and macro sensitivities
-6. **Intrinsic Valuation** — multiple methods triangulated into a fair value range; probability-weighted scenarios via `scripts/scenario_dcf.py`
+6. **Intrinsic Valuation** — operating owner earnings, growth charged for reinvestment, one fair value from the primary method for the business type (`scripts/scenario_dcf.py`, or `scripts/residual_income.py` for financials); other methods as cross-checks
 6.5. **Output Plausibility Checks** — four sanity checks ("Too Good to Be True", peer multiples, reverse DCF, analyst consensus divergence) before publishing
-7. **Margin of Safety** — compare current price to intrinsic value
+7. **Margin of Safety** — current price against the fair value (25% required; 40%+ for turnarounds; +10 points when the data is QUALIFIED)
 8. **Risk & Sell Check** — value trap diagnostic, inflation scorecard, sell criteria, and behavioral bias/analytical self-checks
-9. **Investment Decision** — BUY / ACCUMULATE / MONITOR / PASS / SELL / AVOID
-10. **Report Generation** — three deliverables: Markdown report, HTML dashboard, bilingual EN/中文 summary (+ optional Excel model)
+9. **Investment Decision** — BUY / ACCUMULATE / WATCHLIST / HOLD / PASS / AVOID (marked PROVISIONAL on QUALIFIED data; no verdict on UNRESOLVED data)
+10. **Report Generation** — three deliverables, each opening with the data-status box: Markdown report, HTML dashboard, bilingual EN/中文 summary (+ optional Excel model)
 10.5. **Deliverable Gate** — every file in the scope's manifest exists and the canonical figures match across them
 
 Reduced scopes (quick thesis, thesis refresh, earnings reaction, comparison) run a defined subset of these steps — see the scope routing table in `SKILL.md`. The live-price gate and Steps 2.5, 6.5 and 10.5 run at every scope.
@@ -264,7 +291,8 @@ The `web-report/` subdirectory contains an interactive HTML web report generatio
 
 This skill is grounded in time-tested value investing principles:
 
-- **Never speculate. Never fabricate data.** Every number must come from a verifiable source.
+- **Never speculate. Never fabricate data.** Every number must come from a verifiable source, recorded with the line it was read from.
+- **Be frank about what is not known.** An analysis built on incomplete data is published with its gaps stated and its verdict qualified, never presented as verified.
 - **Business quality first, price second.** A wonderful company at a fair price beats a fair company at a wonderful price.
 - **Think long-term.** The target holding period is 5–10+ years.
 - **Be conservative.** Use lower growth rates and higher discount rates when uncertain.
