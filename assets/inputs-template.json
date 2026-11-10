@@ -1,0 +1,389 @@
+{
+ "meta": {
+  "ticker": "TEST",
+  "listing": "NYSE",
+  "analysis_date": "2026-11-10",
+  "fiscal_year_end": "12-31",
+  "currency": "USD",
+  "unit": "millions",
+  "scope": "deep_dive",
+  "ads_ratio": null
+ },
+ "sources": [
+  {
+   "id": "AR25",
+   "tier": "filing",
+   "annual": true,
+   "doc": "FY2025 annual report",
+   "url": "https://example.invalid/ar25.pdf",
+   "period": "FY2025",
+   "retrieved": "2026-11-10"
+  }
+ ],
+ "shares": {
+  "classes": [
+   {
+    "name": "ordinary",
+    "count": 1000,
+    "source": "AR25 cover"
+   }
+  ],
+  "period_end_count": 1000,
+  "period_end_date": "2025-12-31",
+  "dilutive": 10,
+  "valuation_count": 1010,
+  "weighted_avg_basic": 1000,
+  "senior_instrument": {
+   "classification": "none"
+  },
+  "ni_attributable": 146.9,
+  "eps_basic": 0.147,
+  "eps_dp": 3,
+  "bvps": 2.38,
+  "equity_attributable": 2380.2,
+  "dps": 0.0588,
+  "dividends_declared": 58.8,
+  "published_market_caps": [
+   {
+    "source": "Exchange page",
+    "value": 30100,
+    "currency": "USD"
+   }
+  ]
+ },
+ "price": {
+  "value": 30.0,
+  "currency": "USD",
+  "date": "2026-11-09",
+  "p1_timestamp": "quote line: 9 Nov close",
+  "sources": [
+   {
+    "name": "A",
+    "value": 30.0,
+    "date": "2026-11-09",
+    "week52_low": 22,
+    "week52_high": 35
+   },
+   {
+    "name": "B",
+    "value": 30.05,
+    "date": "2026-11-09"
+   }
+  ],
+  "on_file": [
+   {
+    "label": "prior report",
+    "value": 28.5,
+    "date": "2026-08-01"
+   }
+  ]
+ },
+ "treasury": {
+  "as_of": "2025-12-31",
+  "cash": 816.8,
+  "short_term_investments": 0,
+  "term_deposits": 0,
+  "debt": [
+   200.0
+  ]
+ },
+ "statements": {
+  "years": [
+   {
+    "fy": "FY2021",
+    "period_end": "2021-12-31",
+    "basis": "filing_summary",
+    "source": "AR25",
+    "revenue": 1080.0,
+    "op_profit": 140.4,
+    "ni": 108.0,
+    "da": 32.4,
+    "capex": 43.2,
+    "ocf": 140.4,
+    "icf": -43.2,
+    "cff": -43.2,
+    "fx_effect": 0,
+    "cash_begin": 500.0,
+    "equity_begin": 2000.0,
+    "dividends": 43.2,
+    "buybacks": 0,
+    "issuance": 0,
+    "acquisitions": 0,
+    "oci_and_other": 0,
+    "shares_end": 1000,
+    "invested_capital": 540.0,
+    "cash_end": 554.0,
+    "equity_end": 2064.8,
+    "net_cash_end": 354.0
+   },
+   {
+    "fy": "FY2022",
+    "period_end": "2022-12-31",
+    "basis": "filing_summary",
+    "source": "AR25",
+    "revenue": 1166.4,
+    "op_profit": 151.6,
+    "ni": 116.6,
+    "da": 35.0,
+    "capex": 46.7,
+    "ocf": 151.6,
+    "icf": -46.7,
+    "cff": -46.6,
+    "fx_effect": 0,
+    "cash_begin": 554.0,
+    "equity_begin": 2064.8,
+    "dividends": 46.6,
+    "buybacks": 0,
+    "issuance": 0,
+    "acquisitions": 0,
+    "oci_and_other": 0,
+    "shares_end": 1000,
+    "invested_capital": 583.2,
+    "cash_end": 612.3,
+    "equity_end": 2134.8,
+    "net_cash_end": 412.3
+   },
+   {
+    "fy": "FY2023",
+    "period_end": "2023-12-31",
+    "basis": "filed",
+    "source": "AR25",
+    "revenue": 1259.7,
+    "op_profit": 163.8,
+    "ni": 126.0,
+    "da": 37.8,
+    "capex": 50.4,
+    "ocf": 163.8,
+    "icf": -50.4,
+    "cff": -50.4,
+    "fx_effect": 0,
+    "cash_begin": 612.3,
+    "equity_begin": 2134.8,
+    "dividends": 50.4,
+    "buybacks": 0,
+    "issuance": 0,
+    "acquisitions": 0,
+    "oci_and_other": 0,
+    "shares_end": 1000,
+    "invested_capital": 629.9,
+    "cash_end": 675.3,
+    "equity_end": 2210.4,
+    "net_cash_end": 475.3
+   },
+   {
+    "fy": "FY2024",
+    "period_end": "2024-12-31",
+    "basis": "filed",
+    "source": "AR25",
+    "revenue": 1360.5,
+    "op_profit": 176.9,
+    "ni": 136.1,
+    "da": 40.8,
+    "capex": 54.4,
+    "ocf": 176.9,
+    "icf": -54.4,
+    "cff": -54.4,
+    "fx_effect": 0,
+    "cash_begin": 675.3,
+    "equity_begin": 2210.4,
+    "dividends": 54.4,
+    "buybacks": 0,
+    "issuance": 0,
+    "acquisitions": 0,
+    "oci_and_other": 0,
+    "shares_end": 1000,
+    "invested_capital": 680.2,
+    "cash_end": 743.4,
+    "equity_end": 2292.1,
+    "net_cash_end": 543.4
+   },
+   {
+    "fy": "FY2025",
+    "period_end": "2025-12-31",
+    "basis": "filed",
+    "source": "AR25",
+    "revenue": 1469.3,
+    "op_profit": 191.0,
+    "ni": 146.9,
+    "da": 44.1,
+    "capex": 58.8,
+    "ocf": 191.0,
+    "icf": -58.8,
+    "cff": -58.8,
+    "fx_effect": 0,
+    "cash_begin": 743.4,
+    "equity_begin": 2292.1,
+    "dividends": 58.8,
+    "buybacks": 0,
+    "issuance": 0,
+    "acquisitions": 0,
+    "oci_and_other": 0,
+    "shares_end": 1000,
+    "invested_capital": 734.6,
+    "cash_end": 816.8,
+    "equity_end": 2380.2,
+    "net_cash_end": 616.8
+   }
+  ]
+ },
+ "owner_earnings": {
+  "components": {
+   "FY2023": {
+    "op_profit": 163.8,
+    "tax_rate": 0.25,
+    "da": 37.8,
+    "maintenance_capex": 37.8,
+    "wc_adjustment": 0
+   },
+   "FY2024": {
+    "op_profit": 176.9,
+    "tax_rate": 0.25,
+    "da": 40.8,
+    "maintenance_capex": 40.8,
+    "wc_adjustment": 0
+   },
+   "FY2025": {
+    "op_profit": 191.0,
+    "tax_rate": 0.25,
+    "da": 44.1,
+    "maintenance_capex": 44.1,
+    "wc_adjustment": 0
+   }
+  },
+  "maintenance_capex_basis": "75% of capex: store refits vs new stores, AR25 p.40",
+  "tax_rate_basis": "statutory 25%, in line with the five-year effective rate",
+  "adjustments": [],
+  "value": 132.93
+ },
+ "fx": [],
+ "stakes": [],
+ "notes": {},
+ "provenance": {
+  "shares.classes[ordinary].count": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 1,000",
+   "verified": {
+    "value_read": 1000
+   }
+  },
+  "shares.ni_attributable": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 146.9",
+   "verified": {
+    "value_read": 146.9
+   }
+  },
+  "shares.eps_basic": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 0.147",
+   "verified": {
+    "value_read": 0.147
+   }
+  },
+  "shares.equity_attributable": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 2,380.2",
+   "verified": {
+    "value_read": 2380.2
+   }
+  },
+  "treasury.cash": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 816.8",
+   "verified": {
+    "value_read": 816.8
+   }
+  },
+  "treasury.short_term_investments": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "no balance reported",
+   "verified": {
+    "value_read": 0
+   }
+  },
+  "treasury.term_deposits": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "no balance reported",
+   "verified": {
+    "value_read": 0
+   }
+  },
+  "treasury.debt[0]": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 200.0",
+   "verified": {
+    "value_read": 200.0
+   }
+  },
+  "statements.years[FY2025].revenue": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 1,469.3",
+   "verified": {
+    "value_read": 1469.3
+   }
+  },
+  "statements.years[FY2025].op_profit": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 191.0",
+   "verified": {
+    "value_read": 191.0
+   }
+  },
+  "statements.years[FY2025].ni": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 146.9",
+   "verified": {
+    "value_read": 146.9
+   }
+  },
+  "statements.years[FY2025].da": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 44.1",
+   "verified": {
+    "value_read": 44.1
+   }
+  },
+  "statements.years[FY2025].capex": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 58.8",
+   "verified": {
+    "value_read": 58.8
+   }
+  },
+  "statements.years[FY2025].ocf": {
+   "basis": "filed",
+   "source": "AR25",
+   "page": "57",
+   "quote": "line item 191.0",
+   "verified": {
+    "value_read": 191.0
+   }
+  }
+ }
+}

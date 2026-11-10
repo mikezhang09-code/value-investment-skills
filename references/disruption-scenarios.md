@@ -32,8 +32,9 @@ segments by owner-earnings contribution, not equally and not by revenue alone.
 - Probabilities sum to 100%, each justified in one line citing the evidence in §3.
 - **Same discount rate in every scenario** (10% default). Do not lower it in the bull case to lift
   value; uncertainty belongs in the probabilities and the cash flows, not in r.
-- Owner earnings and share count are the Step 3.5 / Step 2.5 figures in every scenario. Only growth
-  and terminal assumptions differ.
+- Owner earnings and share count are the validated figures in every scenario. Growth and terminal
+  assumptions differ, and a scenario may **shift the level** of owner earnings (`oe_factor`, with a
+  reason) — price cuts to defend share are a lower margin, not only slower growth.
 
 ## 3. Evidence the probabilities must cite
 
@@ -64,6 +65,7 @@ Run `scripts/scenario_dcf.py` with the four scenarios. Report, in the Valuation 
 | Bull | | | | |
 | **Probability-weighted** | 100% | | | |
 
-plus reverse-DCF implied growth, EPV floor, and the Base sensitivity grid. The probability-weighted
-value joins the Step 6 triangulation; it does not replace the other methods. Copy figures from the
+plus reverse-DCF implied growth, EPV floor, and the Base sensitivity grid. **The fair value is the
+lower of Base and the probability-weighted value** (`fair_value` in the script output) — a disruption
+case pulls the headline down; a bull case never lifts it above Base. Copy figures from the
 script's JSON output into the canonical figure block — never retype them.

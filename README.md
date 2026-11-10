@@ -83,6 +83,9 @@ value-investment-skills/
 │   │                                           #   impact by business type; derivatives risk checklist
 │   │                                           #   (7 questions); look-through earnings for holding
 │   │                                           #   companies; macro risk overlay framework
+│   ├── data-inputs.md                          # The data gate: inputs-file layout, validator checks
+│   │                                           #   D1–D11, tolerance ladder, source-tier ladder,
+│   │                                           #   independent second pass
 │   ├── intrinsic-value.md                      # Valuation methods: Owner Earnings DCF, EPV, Graham
 │   │                                           #   Formula, DDM, NCAV; sensitivity tables; reverse
 │   │                                           #   DCF; triangulated fair value range; pre-valuation
@@ -107,9 +110,19 @@ value-investment-skills/
 │                                               #   review checklist and sell trigger signals; error
 │                                               #   recognition protocol and speed guidelines
 ├── scripts/
-│   └── scenario_dcf.py                         # Reproducible scenario owner-earnings DCF: weighted IV,
-│                                               #   reverse DCF, EPV, sensitivity grid; stops on missing
-│                                               #   net debt, warns on an undefended discount rate
+│   ├── validate_inputs.py                      # Data gate → VERIFIED / QUALIFIED / UNRESOLVED (the analysis
+│   │                                           #   is always produced, labelled by what is missing or
+│   │                                           #   disagrees): checks D1–D11 on inputs_<ticker>_<date>.json
+│   │                                           #   (provenance, units, share count, price, net cash,
+│   │                                           #   statement articulation, owner-earnings tie, history,
+│   │                                           #   windows, FX, stakes); --trail prints the Data Trail
+│   ├── scenario_dcf.py                         # Scenario DCF on operating (pre-interest) owner earnings,
+│   │                                           #   growth charged at g / RONIC, one fair value; weighted IV,
+│   │                                           #   reverse DCF, EPV, sensitivity grid; takes its inputs
+│   │                                           #   from the validation and stamps the data status
+│   ├── residual_income.py                      # Banks / insurers: residual income with explicit fade,
+│   │                                           #   fade ladder, justified-P/B validity test
+│   └── tests/                                  # python3 -m unittest discover -s scripts/tests
 ├── *_bilingual.md, value_investing_skill_*.md  # EN/中文 records of rule amendments and sweeps, and a
 │                                               #   Mermaid architecture diagram (not loaded by the skill)
 └── web-report/                                 # Interactive HTML web report generation skill

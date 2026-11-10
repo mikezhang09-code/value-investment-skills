@@ -6,12 +6,12 @@ Intrinsic value is what a business is actually worth — independent of what the
 
 ## ⚠️ Pre-Valuation Anchor Check (MANDATORY)
 
-Before applying any of the methods below, confirm Step 2.5 reconciliation from SKILL.md is complete:
+Before applying any of the methods below, confirm the Step 2.5 data gate is complete:
 
 ```
-□ Market cap reconciliation: computed = published (±5%)
-□ EPS back-check: NI ÷ EPS = assumed share count (±2%)
-□ Per-share metrics: BV/share × shares = total equity (±5%)
+□ validate_inputs.py run at the final stage; outcome VERIFIED / QUALIFIED / UNRESOLVED stated — references/data-inputs.md
+  (QUALIFIED: +10 points margin of safety, conviction ≤ 6; UNRESOLVED: one run per reading, no fair value)
+□ Owner earnings, share count, price and net debt are read from that validation, not retyped
 □ Share-class structure: all classes documented (H + A, multi-class, ADRs, etc.)
 ```
 
@@ -23,36 +23,101 @@ Before applying any of the methods below, confirm Step 2.5 reconciliation from S
 
 This is the gold standard for high-quality businesses with predictable cash flows.
 
-### Step 1: Calculate Normalized Owner Earnings
+### Step 1: Operating Owner Earnings — one definition (changed 2026-11-10)
 
-Owner earnings represent the cash the business genuinely generates for its owners each year.
+Owner earnings are what the **operations** earn for all capital providers, after tax and after the
+spending needed to stay in place. They are struck **before interest**, so that net cash is added
+once and debt deducted once in Step 4.
 
 ```
-Owner Earnings = Net Income
-               + Depreciation & Amortization
-               + Other Non-Cash Charges (stock comp, etc.)
-               − Maintenance Capital Expenditure
-               ± Normalized Working Capital Changes
-
-Maintenance CapEx Estimation:
-  Asset-light business (software, brand): Maintenance CapEx ≈ 10–20% of Total CapEx
-  Moderate-asset business (consumer): Maintenance CapEx ≈ 40–60% of Total CapEx
-  Capital-intensive business (industrial): Maintenance CapEx ≈ 60–90% of Total CapEx
-
-Use average of last 3–5 years to normalize for one-time items.
+Operating owner earnings
+    = (Operating profit − financial items booked inside it) × (1 − normal tax rate)
+    + Depreciation & amortisation
+    − Maintenance capital expenditure
+    ± Normalised working-capital change (default 0; state the reason if not)
 ```
 
-### Step 2: Determine Growth Rate Assumptions
+Rules — each is enforced by `scripts/validate_inputs.py` (D7):
+
+1. **Start from operating profit, not net income.** Net income already carries interest on the debt
+   and the cash that Step 4 counts again. *(The old net-income base double-counted both: net-cash
+   names were overstated, levered names understated.)*
+2. **Stock compensation is an expense and stays one.** It is never added back, whatever the company's
+   "adjusted" figure does. Where buybacks only offset dilution, the cost is already in operating
+   profit; do not also credit the buyback (`earnings-quality-and-distortions.md` Class 5).
+3. **Take financial items out of operating profit** where the accounting standard puts them there
+   (PRC GAAP: investment income, fair-value changes, finance income; any standard: share of
+   associates). They are valued in the bridge (Step 4), not capitalised as operations.
+4. **Normal tax rate**, with its basis stated; more than 5 points from the reported effective rate
+   needs a reason.
+5. **Maintenance capex** — state the basis. In order of preference: (a) the company's own
+   maintenance / growth split; (b) capex less growth capex, where growth capex = (net fixed assets ÷
+   revenue) × revenue growth (Greenwald); (c) depreciation as the floor for a capital-intensive
+   business. Never above total capex; a figure below depreciation needs a reason.
+6. **Window — normalise the margin, not the scale.** Base = **latest full-year revenue × the
+   three-year average owner-earnings margin** (`"method": "margin"` in the inputs file). A plain
+   three-year average of the amounts understates a growing business and overstates a shrinking one;
+   use it only where revenue moved less than 10% over the window. **Cyclicals use mid-cycle**
+   (below). TTM alone is never the base.
+7. **Cross-check against cash:** owner earnings more than 25% above average free cash flow over the
+   same years needs an explanation (growth capex, working-capital build).
+
+**Mid-cycle base for cyclical and capital-heavy businesses** (autos, semiconductors, batteries,
+materials, shipping, airlines — the same list that carries the Step 3b cyclical flag):
+
+```
+Mid-cycle owner earnings = normal revenue × mid-cycle operating margin × (1 − tax) + D&A − maintenance capex
+
+mid-cycle margin   average operating margin over a full cycle: at least 7 years and at least one
+                   down year; if the window has no down year, say so and haircut the average
+normal revenue     the latest full year, unless that year is itself a peak or trough by volume or price
+```
+
+Print reported, three-year and mid-cycle figures side by side. The rate add-on in Step 3b prices the
+*variability*; it does not correct a *peak-year base* — both apply.
+
+### Step 2: Growth
 
 Be conservative. Buffett says to be skeptical of high growth assumptions.
 
-| Stage | Period | Recommended Approach |
-|-------|--------|---------------------|
-| Near-term growth | Years 1–5 | Use last 5-yr earnings CAGR, but cap at 15% |
-| Mid-term growth | Years 6–10 | Haircut the near-term rate by 30–50% |
-| Terminal growth | Year 10+ | Use 2–3% (in line with GDP) |
+| Stage | Period | Approach |
+|-------|--------|----------|
+| Near-term | Years 1–5 | **Built from drivers** — volume × price by segment and the margin path — then checked against the last five-year growth of operating profit; cap at 15% |
+| Mid-term | Years 6–10 | Haircut the near-term rate by 30–50% |
+| Terminal | Year 10+ | At most the currency table's cap (Step 3); never the "2–3%" default without checking the cap |
 
-**Rule**: For most businesses, assume mid-term growth = 50–70% of recent history. If a company grew at 20%, assume 10–12% going forward.
+State the two or three drivers that produce the growth rate. A rate taken from history alone is an
+extrapolation and must be labelled as one.
+
+### Step 2b: Growth is not free — reinvestment (added 2026-11-10)
+
+A business that grows must invest. Each year's cash to owners is owner earnings less the capital
+that year's growth needs:
+
+```
+cash to owners(t)  = owner earnings(t) × (1 − g(t) ÷ RONIC)
+terminal value     = owner earnings(11) × (1 − tg ÷ terminal RONIC) ÷ (r − tg)
+
+RONIC = return on NEW invested capital
+```
+
+| Input | Rule |
+|---|---|
+| **RONIC, years 1–10** | Read from data, matched to **how the growth is achieved**. *Organic growth:* the lower of average and incremental ROIC on invested capital **excluding goodwill and acquired intangibles** — the capital the existing business actually needs to grow. *Growth that relies on acquisitions:* ROIC **including** goodwill, because that is what acquired growth costs. The validator prints all four when statement rows carry `invested_capital` and `invested_capital_organic`. **House cap 60%:** even a business whose growth spending runs through the income statement pays something. A figure above the measured ones needs a stated reason |
+| **Terminal RONIC** | Set by the moat class, because excess returns do not last for ever: **none → r · narrow → r + 2 points · wide → r + 4 points**, and never above the years 1–10 RONIC |
+| **Growth above RONIC** | Not self-funded: it needs debt or new shares the model does not charge. The script warns; cut the growth or model the dilution |
+| **Shrinking business** | No capital is released (conservative) |
+
+*Why the organic / acquired split matters — Intuit, FY2026 10-K.* ROIC on all invested capital is
+about 17% because US$20bn of it is goodwill and intangibles from Credit Karma and Mailchimp; charged
+at 17%, a 9% organic growth rate would consume more than half of owner earnings, which is not how a
+software business grows. The acquisitions' poor return is already in the price paid and in the
+amortisation; it is not the cost of the next dollar of organic growth.
+
+Consequences worth knowing: with terminal RONIC = r, perpetual growth adds nothing; an asset-light
+business with a 40% RONIC gives up little; a capital-heavy grower gives up a great deal, which is
+the point. *The earlier model let every business grow at no cost — the same rate was worth the same
+whether it needed one dollar of capital or ten.*
 
 ### Step 3: Choose Discount Rate — one hurdle, translated by currency (adopted 2026-10-11)
 
@@ -152,23 +217,24 @@ current price** beside it — the discount rate at which the Base cash flows equ
 (`implied_return_pct` in `scripts/scenario_dcf.py`). The implied return needs no rate assumption, so
 it lets a reader judge the price without arguing about 9% versus 10%.
 
-### Step 4: Calculate Present Value
+### Step 4: Present Value and the Bridge to Equity
 
 ```
-DCF Formula:
-  Year N Cash Flow = Owner Earnings × (1 + growth rate)^N
-  PV of Year N = Year N Cash Flow / (1 + discount rate)^N
-
-Terminal Value (at Year 10):
-  TV = Year 10 Owner Earnings × (1 + terminal growth) / (discount rate − terminal growth)
-  PV of Terminal Value = TV / (1 + discount rate)^10
-
-Intrinsic Value = Sum of PV Years 1–10 + PV of Terminal Value + Cash − Debt
-
-Per Share Value = Intrinsic Value / Diluted Shares Outstanding
+Enterprise value  = Σ PV of cash to owners, years 1–10  +  PV of terminal value
+Equity value      = Enterprise value
+                    + net cash (or − net debt)      built by Check 21, every treasury line
+                    + listed stakes and other non-operating assets   (Check 22; each with a reason)
+                    − minority interests' share of the operations
+                    − pension deficit and other debt-like claims
+Value per share   = Equity value ÷ valuation share count (latest period-end count + dilution)
 ```
 
-**⚠️ Per-Share Reminder:** "Diluted Shares Outstanding" must equal the reconciled total from Step 2.5 — including ALL share classes (H + A for HK Chinese, Class A + B + C for US dual-class, etc.). Always cross-check by computing: Total IV (RMB B) ÷ Per-Share IV (RMB) = shares (should match reconciliation).
+Because owner earnings are pre-interest, **every balance-sheet item appears exactly once**: its
+income is out of owner earnings and its value is in the bridge. Lease liabilities are debt wherever
+operating profit is struck before lease interest (IFRS 16).
+
+`scripts/scenario_dcf.py` does this arithmetic. It prints, per scenario, the per-share bridge
+(operations years 1–10, terminal, net cash, other) and the **terminal-value share**.
 
 ### Step 5: Sensitivity Table
 
@@ -187,7 +253,11 @@ The range of these outcomes is your intrinsic value range.
 Where a disruption, regulatory or binary risk makes one base case misleading, value four explicit
 scenarios (Disruption / Bear / Base / Bull) with probabilities summing to 100%, each justified in one
 line — see `references/disruption-scenarios.md`. Only growth and terminal assumptions differ between
-scenarios; owner earnings, share count, net debt and the discount rate are the same.
+scenarios (plus an explicit level shift where a scenario needs one); share count, net debt and the
+discount rate are the same.
+
+A scenario may also shift the **level** of owner earnings (`oe_factor`, with a reason) — a
+margin-compression case is a lower level, not just slower growth — and carry its own RONIC.
 
 Run `scripts/scenario_dcf.py` for the arithmetic. It computes the per-scenario values, the
 probability-weighted IV, a reverse DCF (Base terminal growth and step-down held fixed), EPV as
@@ -197,6 +267,10 @@ net-debt figure and warns on an undefended discount rate. Report its warnings; d
 ---
 
 ## Method 2: Earnings Power Value (EPV)
+
+> With the 2026-11-10 owner-earnings definition, EPV and the DCF share one base: EPV is the DCF with
+> zero growth, on a 5–7 year (or mid-cycle) average. It is the floor, and the gap between the two is
+> exactly what is being paid for growth.
 
 EPV calculates what the business is worth assuming zero growth — only the earnings from existing operations, in perpetuity. It's Buffett's "floor value."
 
@@ -210,7 +284,7 @@ Normalized EBIT:
 
 After-Tax Operating Earnings = Normalized EBIT × (1 − effective tax rate)
 
-Cost of Capital: Use same discount rate as DCF (8–12%)
+Cost of Capital: the SAME rate as the DCF — currency table + Step 3b. Never a separate range.
 
 EPV = After-Tax Operating Earnings / Discount Rate
 Adjusted EPV = EPV + Excess Cash − Total Debt
@@ -236,7 +310,7 @@ Where:
   8.5 = P/E appropriate for a zero-growth company
   2g  = premium for growth (g = expected annual EPS growth rate, %)
   4.4 = Graham's original "normal" AAA bond yield
-  Y   = current AAA corporate bond yield (use ~4.5–5.0% in 2024)
+  Y   = current AAA corporate bond yield — fetch it, with its date; never a remembered figure
 
 Example:
   EPS = $5.00, expected growth = 8%, AAA yield = 4.7%
@@ -263,7 +337,7 @@ Gordon Growth Model (simplest DDM):
 
 Where:
   D1 = expected dividend next year = Current Dividend × (1 + g)
-  r  = required rate of return (8–10%)
+  r  = required rate of return — the currency table rate + Step 3b (financials: validated cost of equity)
   g  = sustainable dividend growth rate
 
 Example:
@@ -517,46 +591,54 @@ companion constraint on the same family of methods, and **§F.5's method table w
 
 ---
 
-## Triangulation and Final Estimate
+## Fair Value — one headline figure (changed 2026-11-10)
 
-After running at least two methods, compare results:
+The report states **one** fair value, and the margin of safety, entry zone and verdict are struck on
+it and on nothing else. It comes from the **primary method for the business type**; the other
+methods are cross-checks. Methods are not averaged with free weights — that was the last number in
+the process that could be tuned toward an answer.
 
-| Method | Intrinsic Value (per share) | Confidence | Weight |
-|--------|----------------------------|-----------|--------|
-| Owner Earnings DCF | | | |
-| EPV | | | |
-| Graham Formula | | | |
-| DDM (if applicable) | | | |
-| SOTP (if holdco/conglomerate) | | | |
-| **Weighted Average** | | | |
+| Business type | Primary method → fair value | Cross-checks |
+|---|---|---|
+| Non-financial going concern | Owner-earnings DCF: **the lower of the Base value and the probability-weighted value** (`fair_value` in `scenario_dcf.py`) | EPV (floor), reverse DCF, peer multiples |
+| Bank / insurer | Residual income with explicit fade (`scripts/residual_income.py`), house rung stated | EPV on normalized profit (floor), DDM, fade ladder |
+| Mature, stable-payout business | DCF as above | DDM |
+| Holding company / conglomerate | Unchanged for now: SOTP is mandatory and sits beside the DCF (Method 6). *A SOTP-only headline is still a proposal, not adopted* | duplicate-exposure test |
+| Distressed / asset play | NCAV or liquidation value | EPV if earnings exist |
 
-**Method selection is not universal.** Financials (insurers, banks) use a different method set —
-**residual income with an explicit, moat-calibrated fade as the primary anchor** (justified P/B is
-conditional and VOID where g ≥ r — see the Mandatory Fade Disclosure above), EPV as floor, DDM or
-SOTP alongside, and **no Graham Formula and no NCAV**. See `industry-playbooks.md` §F.5 before
-valuing any financial.
-Where the standard DCF-led set is not used, say so explicitly in the report rather than leaving the
-reader to assume it was skipped.
+**Why "the lower of Base and weighted".** Where a disruption or bear case pulls the weighted value
+below Base, the weighted value is the honest central estimate. Where a bull case pulls it above,
+the excess is hope and is not paid for.
 
-**When methods diverge significantly:**
-- EPV << DCF: The market is paying a lot for growth. Risky if growth disappoints.
-- EPV ≈ DCF: Modest growth expectations. More conservative investment.
-- NCAV approach gives much lower value: Company is not trading on asset value; intrinsic value comes from earnings power.
+**Cross-check rule.** State each cross-check beside the fair value. Where one differs from it by
+more than 30%, name the assumption that explains the gap; if none does, the primary method's inputs
+are re-examined before publishing. A cross-check never moves the fair value by being averaged in.
 
-**Final intrinsic value range (always present this way):**
 ```
-Conservative:  $XX (use most pessimistic method or assumptions)
-Base case:     $XX (weighted average of methods)
-Optimistic:    $XX (most favorable method/assumptions)
-Current price: $XX
+Fair value:      $XX   (basis: Base / probability-weighted)
+Conservative:    $XX   (EPV floor, or the Bear / Disruption scenario)
+Optimistic:      $XX   (Bull scenario)
+Current price:   $XX   → margin of safety XX% on fair value
+Terminal-value share XX% · implied return at price XX% · market-implied growth XX% vs assumed XX%
 ```
+
+**Transition.** Fair values on file were struck on the old method. Each name moves at its next
+refresh; that refresh prints the old-method value beside the new one (`legacy_owner_earnings` in
+the script input) and says how much of the change is method and how much is the business. A fair
+value that changes only because the method changed does not, by itself, move the verdict upward.
+
+**When methods diverge:**
+- EPV << DCF: the price pays for growth; risky if it disappoints.
+- EPV ≈ DCF: modest growth expectations; the conservative case.
+- Fair value below net cash plus stakes: check the bridge before believing it.
 
 ---
 
 ## Margin of Safety Calculation
 
 ```
-Margin of Safety = (Intrinsic Value − Current Price) / Intrinsic Value × 100%
+Margin of Safety = (Fair Value − Current Price) / Fair Value × 100%
+                   Fair Value = the one headline figure defined above
 
 Positive = stock is undervalued (discount to intrinsic value)
 Negative = stock is overvalued (premium to intrinsic value)
@@ -569,6 +651,7 @@ Negative = stock is overvalued (premium to intrinsic value)
 | All going concerns | **25%** | Business risk is now priced in the discount rate (Step 3b); a tiered requirement would charge it twice |
 | Turnaround or distressed | **40%+** | Outcomes the cash-flow model cannot represent |
 | Earnings-quality gate failed (3+ distortion classes) | **+10–15 points** on the above | Unchanged — model-input uncertainty, not business risk |
+| Data gate QUALIFIED (`data-inputs.md`) | **+10 points** (not stacked beyond the larger of this and the row above) | Unverified inputs |
 
 *Replaces the moat-tiered table (wide 20–25%, narrow 30–35%, cyclical 40–50%).* Existing entry zones
 stand until each name's next refresh.
@@ -696,8 +779,8 @@ High recent growth (15–20%) often reverts toward GDP growth over time. Be skep
 **3. Terminal value dominates**
 In a standard DCF, the terminal value often represents 60–80% of total value. Small changes in terminal growth rate dramatically change the answer. This is why you must be conservative and check with EPV.
 
-**4. Ignoring the balance sheet**
-A company with $50/share in debt has the same enterprise value math but the equity value is $50/share less. Always subtract net debt from equity value.
+**4. Ignoring the balance sheet — or counting it twice**
+A company with $50/share in debt has the same enterprise value but $50/share less equity value. Subtract net debt once, from a value built on **pre-interest** earnings. Subtracting it from a value built on net income charges the debt twice; adding cash to it counts the cash twice.
 
 **5. Confusing market cap with enterprise value**
 - **Market Cap** = Shares × Price (equity value)
@@ -723,6 +806,21 @@ Particularly common share-count errors:
 ---
 
 ## Change Log
+
+- **2026-11-10** — **Method 1 rebuilt on operating owner earnings; growth charged for reinvestment;
+  one headline fair value.** (1) Owner earnings start from operating profit after normal tax, not
+  net income — the old base deducted interest and then deducted net debt again (and capitalised
+  interest income, then added the cash). (2) Stock compensation is never added back; the three
+  conflicting definitions are one. (3) Step 2b: each year reinvests g ÷ RONIC, the terminal year
+  tg ÷ terminal RONIC (r / r+2 / r+4 by moat class). (4) Mid-cycle base for cyclicals. (5) Scenarios
+  may shift the level of owner earnings. (6) "Triangulation" with free weights is replaced by a
+  primary method per business type with cross-checks; fair value for non-financials is the lower of
+  Base and probability-weighted. (7) Stale constants removed (EPV 8–12%, DDM 8–10%, a 2024 bond
+  yield). `scripts/scenario_dcf.py` implements 1–6; `scripts/residual_income.py` added for
+  financials. **Effect, script sample (USD, r 11%):** Base $427 on the old method; $329 at RONIC 30%
+  / terminal 15%; $260 at RONIC 15% / terminal 11% — the same growth path. **Not validated by a
+  retrospective sweep** of the coverage book; the terminal-RONIC spreads (0 / 2 / 4 points) are a
+  house calibration to be tested at each refresh. Holding companies unchanged.
 
 - **2026-10-13** — **Step 3b business-risk adjustment adopted; margin of safety unified at 25%.** The
   rate is now currency base + a one-directional addition (0 to +2) from operating-profit variability,

@@ -61,7 +61,7 @@ When asked to research a company or build a portfolio, follow this process:
 0. QUICK-KILL SCREENER     → 8-question gate (must pass before proceeding)
 1. IDENTIFY & SCOPE        → Clarify company, ticker, market, and research depth
 2. DATA COLLECTION         → Fetch filings, reports, financials from primary sources
-2.5 DATA RECONCILIATION    → MANDATORY four-anchor verification (mechanical accuracy)
+2.5 DATA RECONCILIATION    → MANDATORY inputs file + validator + second pass (mechanical accuracy)
 3. FINANCIAL ANALYSIS      → 10-year financial deep dive (quantitative)
 3.5 EARNINGS QUALITY GATE  → MANDATORY 8-distortion check (interpretive accuracy)
 4. MOAT ASSESSMENT         → Competitive advantage quality, durability, and TREND
@@ -170,6 +170,11 @@ debt, share-count, or tax field blocks valuation until re-sourced** from the fil
 "cash ≈ debt" or "debt = 0" because a data page left the field blank — a missing debt figure once
 inflated intrinsic value by ~10%.
 
+**Record as you fetch.** Every number goes into `inputs_<ticker>_<date>.json` with its document,
+page and the line as printed (`references/data-inputs.md`). History comes from structured sources
+first, with the latest three years tied to the filing (`references/data-sources.md`). A number
+supplied from memory has no quote to record and shows up as a gap or a conflict — that is the intent.
+
 ### Live price — the input with no anchor until now
 
 ```
@@ -191,7 +196,29 @@ file (HK$7.58).* See process-lessons.md Class 15 / Check 20.
 
 ## Step 2.5: Data Reconciliation Gate (MANDATORY) ⚠️
 
-Before running ANY per-share calculation, you MUST verify these four anchors. Skipping this step is the single most common source of analytical errors. **One bad upstream number poisons every downstream calculation.**
+Before running ANY per-share calculation, the inputs go through the data gate. Skipping this step is the single most common source of analytical errors. **One bad upstream number poisons every downstream calculation.**
+
+```
+A  BUILD        inputs_<ticker>_<date>.json — every verdict-moving number with source, page, quote
+B  VALIDATE     python3 scripts/validate_inputs.py inputs_X.json --stage first   → close what can be closed
+C  SECOND READ  independent re-read of each verdict-moving number, then validate again
+```
+
+**The analysis is always produced; the gate decides how it is labelled.**
+
+| Outcome | When | The report |
+|---|---|---|
+| VERIFIED | nothing missing, nothing disagrees | normal |
+| QUALIFIED | gaps only (not read / not explained) | full analysis; data-status box on top; verdict **PROVISIONAL**; conviction ≤ 6; required margin of safety +10 points; gaps become the next fetch list |
+| UNRESOLVED | a number disagrees with its cross-check | data-status box; value under **each reading**; **no fair value, no verdict** |
+
+The validator runs checks D1–D11 (`references/data-inputs.md`): provenance, units, the four
+anchors below, the live-price gate, net cash, statement articulation, the owner-earnings tie,
+history basis, matched windows, FX and stake containment. **A gap is closed by reading the source and
+a conflict by finding which figure is wrong — never by editing a number to fit.** Say frankly what
+each open item affects, with its size where it can be sized. The anchors and
+checks below explain what the script tests and why; the parts it cannot test (reading the right
+filing, naming the right entity) stay with the analyst.
 
 ### The Four Reconciliation Anchors
 
@@ -236,7 +263,9 @@ listing-agnostic because both net income and EPS come from the same filing.
 ```
 Implied Shares = Reported Net Income ÷ Reported EPS
 
-This MUST match your assumed share count within ±2%.
+This MUST match the WEIGHTED-AVERAGE share count for the same period within ±2%.
+(EPS is struck on the weighted average. The count used for VALUATION is the latest
+period-end count plus dilution — Check 21 R6 — never the back-solved figure.)
 
 This is mechanical arithmetic — no judgment involved. The company has 
 already done the division for you when they reported EPS. If your share 
@@ -331,11 +360,11 @@ every financial and on any issuer carrying hybrid capital.
 
 #### Anchor 3: Per-Share Metrics Cross-Check
 ```
-Reported BV per share × Shares ≈ Total Equity (within 5%)
-Reported DPS × Shares ≈ Total Dividends Paid (within 5%)
-Reported FCF per share × Shares ≈ Total FCF (within 5%)
+Reported BV per share × Shares ≈ Total Equity
+Reported DPS × Shares ≈ Total Dividends Paid
+Reported FCF per share × Shares ≈ Total FCF
 
-Any mismatch >10% = data quality issue. Do NOT proceed to valuation.
+One ladder: gap ≤2% passes · 2–5% passes only with a written reconciling item · >5% STOP.
 ```
 
 #### Anchor 4: Share-Class Structure Check (Critical for Multi-Class Stocks)
@@ -400,38 +429,27 @@ S7 TOTAL + FRESH   counts from the investee's TOTAL-holding table (restricted sh
 elsewhere; two Schedule 13Gs filed on Spotify name 4,276,200 shares = 2.0775%. S5 alone refuted the
 circulating figure with one division.* See process-lessons.md Check 22.
 
-### Reconciliation Output Format
+### Reconciliation Output — generated, not typed
 
-In the report's Data Trail section, document:
+The Data Trail section of the report carries two generated blocks, copied from the tools:
 
-```
-Share Count Reconciliation
-- H-shares (HK-listed):       X.XX billion (source: ...)
-- A-shares (Shenzhen-listed): X.XX billion (source: ...)
-- Total diluted:              X.XX billion
+1. The check table from `validation_<ticker>_<date>.json` — every D-check with its status and
+   detail (the EPS back-check line states the senior-instrument gate and the resolution; the
+   net-cash line states the gap to the issuer's figure). Every NOTE and FLAG is shown.
+2. The Data Trail from `python3 scripts/validate_inputs.py inputs_X.json --trail` — each
+   verdict-moving number with document, page, quoted line, basis and second-pass read.
 
-Verification:
-- Market cap check:  Shares × Price = $XXB vs published $XXB → ±X% ✓/✗
-- Senior instruments: classification gate = EQUITY / LIABILITY / none present
-                     if EQUITY: distribution = $XXmn — deducted ✓/✗
-                     if LIABILITY: "#13 not applicable — coupon in interest expense"
-- EPS back-check:    (NI − senior distributions) ÷ EPS = X.XXB shares vs assumed → ±X%
-                     resolution ±X.XX% (EPS to N dp) → PASSES AT ±X.XX% ✓/✗
-- BV cross-check:    BV/share × Shares = $XXB vs equity → ±X% ✓/✗
-- Net cash (Check 21): cash + ST inv + deposits − debt = XX vs issuer liquidity XX → ±X% ✓/✗
-- Listed stakes (Check 22): X.XXm shares (investee filing, date) × quote × FX (fixing, date)
-                     = XX ≤ carrying value XX ✓/✗
-```
+### When the gate is not clean
 
-### Stop Conditions
+1. **Conflict** — first try to resolve it: re-read the primary filing (e.g. annual report
+   "Composition of Share Capital"), correct the inputs file, re-run the validator on the whole file.
+2. **Still a conflict** — carry on with the analysis, value the business under each reading of the
+   number, give **no verdict**, and put the conflict at the top of the report.
+3. **Gaps** — fetch what the budget allows. For what remains, carry on: the report is QUALIFIED and
+   says, for each gap, what it affects and by how much.
+4. Never present a QUALIFIED or UNRESOLVED analysis as a verified one, in any deliverable.
 
-If ANY of the four anchors, Check 21 or Check 22 fails:
-1. **STOP** — do not proceed to Step 3
-2. Re-source data from primary filings (annual report "Composition of Share Capital")
-3. Re-run all four checks
-4. Only proceed when all four reconcile
-
-**This step is not optional.** It takes 5 minutes and prevents the most expensive class of errors in fundamental analysis.
+**This step is not optional.** A clean gate takes minutes; an unlabelled gap is how the most expensive errors got published.
 
 ---
 
@@ -680,22 +698,26 @@ After identifying the industry, apply the sector-specific lens:
 
 Read `references/intrinsic-value.md` for calculation methods.
 
-Use **at least two** of these methods and triangulate:
+**One fair value, from the primary method for the business type; the other methods are
+cross-checks, never averaged in** (`references/intrinsic-value.md` "Fair Value"):
 
-1. **Owner Earnings DCF** (Buffett's preferred): conservative growth, discount rate from the currency table (10% USD)
-2. **Earnings Power Value (EPV)**: no-growth baseline, normalized earnings
-3. **Graham Formula**: for simpler businesses with predictable earnings
-4. **Dividend Discount Model**: for mature dividend-paying companies
-5. **Asset-based / NCAV**: for deeply distressed situations (Graham-style)
-6. **Sum-of-the-Parts (SOTP)**: mandatory for holdcos and conglomerates, and for any business whose
-   segments would command materially different standalone multiples
+| Business type | Primary method | Cross-checks |
+|---|---|---|
+| Non-financial going concern | Owner-earnings DCF — fair value = the **lower of Base and probability-weighted** | EPV floor, reverse DCF, peers |
+| Bank / insurer | Residual income with explicit fade (`scripts/residual_income.py`); no Graham Formula, no NCAV; justified P/B VOID where g ≥ r (#11-R, `industry-playbooks.md` §F.5) | EPV floor, DDM, fade ladder |
+| Holding company / conglomerate | SOTP mandatory beside the DCF (Method 6) | duplicate-exposure test |
+| Distressed / asset play | NCAV or liquidation value | EPV |
 
-⚠️ **Method selection is not universal.** Financials use a different set — **residual income with an
-explicit, moat-calibrated fade as the primary anchor** (justified P/B is conditional and VOID where
-g ≥ r — amendment #11-R), EPV as floor, DDM or SOTP alongside, and **no Graham Formula, no NCAV**.
-See `references/industry-playbooks.md` §F.5 and the Mandatory Fade Disclosure in
-`references/intrinsic-value.md`. Where the standard set is not used, say so
-explicitly in the report.
+**Three rules that changed on 2026-11-10 — they move every DCF:**
+1. **Owner earnings are operating and pre-interest:** operating profit × (1 − normal tax) + D&A −
+   maintenance capex. Not net income; stock compensation is never added back. Net cash is then added
+   once and debt deducted once.
+2. **Growth is charged for:** each year reinvests g ÷ RONIC (read from measured ROIC); the terminal
+   year reinvests tg ÷ terminal RONIC, set by moat class (r / r+2 / r+4).
+3. **Cyclicals are valued on a mid-cycle base,** not the latest year.
+
+A cross-check more than 30% from the fair value needs a named assumption that explains it. State
+the method set used; where it is not the DCF, say why.
 
 **Discount rate: from the currency table, and ALWAYS stated.** The hurdle is 10% in USD, translated
 to the currency the cash flows are earned in (`references/intrinsic-value.md` Method 1 Step 3: HKD 9%,
@@ -710,16 +732,18 @@ rate across scenarios — uncertainty belongs in the probabilities and cash flow
 
 **Run the arithmetic through `scripts/scenario_dcf.py`** for the owner-earnings DCF: scenario values,
 probability-weighted IV, reverse DCF, EPV and the sensitivity grid in one reproducible JSON. It refuses
-to run with a missing net-debt figure and flags an undefended discount rate. Its output is the source
+to run without a validation file for the same inputs (owner earnings, shares, price and net debt must
+be the validated figures), stamps QUALIFIED data as such, runs UNRESOLVED data only one named reading
+at a time, and flags an undefended discount rate. Its output is the source
 for the canonical figure block (Key Principle 14).
 
-Present as a range:
+Present it this way:
 ```
-Conservative case:  $XX
-Base case:          $XX
-Optimistic case:    $XX
-Current price:      $XX
-Implied upside/downside: XX%
+Fair value:        $XX   (basis: Base / probability-weighted)
+Conservative:      $XX   (EPV floor or Bear / Disruption scenario)
+Optimistic:        $XX   (Bull scenario)
+Current price:     $XX   → margin of safety XX% on fair value
+Terminal-value share XX% · implied return at price XX% · market-implied growth XX% vs assumed XX%
 ```
 
 ---
@@ -728,45 +752,18 @@ Implied upside/downside: XX%
 
 Before reporting valuation conclusions, apply these sanity checks. A surprising result is more often an analytical error than a market inefficiency — especially in heavily-covered large-cap markets.
 
-### Test 1: "Too Good to Be True"
-For a heavily-covered mega-cap stock (top 50 by market cap in any major index, or covered by 20+ analysts), a margin of safety >40% to base-case IV is **rare and warrants skepticism**. The market is not usually that wrong about widely-followed stocks.
+The four tests, their thresholds and the coverage condition live in **one place**:
+`references/intrinsic-value.md` "Output Plausibility Checks". Run all four and report each result.
 
-If your model says it is:
-1. Recheck the math (start with reconciliation anchors)
-2. Identify the specific assumption causing the gap vs. analyst consensus
-3. Stress-test that assumption — does it hold under scrutiny?
+| Test | Question |
+|---|---|
+| 1 Too good to be true | Mega-cap with margin of safety above 40%: why is the market wrong? (Not applied by reflex to thinly covered names) |
+| 2 Peer multiples | Does the fair value imply 2–3× peer multiples for a similar business? |
+| 3 Reverse DCF | What growth does the price imply, and is it outside what the business can plausibly do? |
+| 4 Consensus divergence | More than 50% from dated consensus: which specific assumption differs? |
 
-A 40%+ MoS on a mega-cap should require an explicit explanation of "why is the market wrong here?" — not a default conclusion.
-
-### Test 2: Peer Multiple Cross-Check
-Compare your implied valuation multiples against industry peers:
-- P/E vs. peer median
-- EV/EBITDA vs. peer median
-- P/B vs. peer median
-
-If your "fair value" implies the stock should trade at 2-3x peer multiples, ask: *why are peers mispriced too?* If they aren't (similar business quality at similar multiples), your model has an error.
-
-### Test 3: Reverse DCF
-Solve for the implied growth rate at current market price:
-- If implied growth is 5–12% (reasonable for the industry) → stock is fairly valued
-- If implied growth is negative or > 20% → either rare opportunity OR (more commonly) model error
-
-Reverse DCF anchors your conclusion in *what the market believes* rather than just what your model says.
-
-### Test 4: Analyst Consensus Divergence
-If your fair value is >50% above or below analyst consensus, identify the specific driving assumption:
-- "I'm using a different normalization period for earnings"
-- "I'm assuming higher maintenance capex than the Street"
-- "I'm applying a higher discount rate for X risk"
-
-These are strong explanations. **"Analysts are wrong"** is a weak explanation — usually wrong itself.
-
-### Stop Conditions
-If your output fails 2+ of these tests:
-1. Return to reconciliation gate (Step 2.5)
-2. Verify all inputs
-3. Re-run valuation
-4. Only publish if the divergence can be explained by a specific, defensible assumption difference
+**If two or more tests fail:** return to the data gate (Step 2.5), re-check the inputs, re-run the
+valuation, and publish only if the divergence is explained by a specific, defensible assumption.
 
 ---
 
@@ -774,13 +771,14 @@ If your output fails 2+ of these tests:
 
 Graham's principle: **never buy without a margin of safety**.
 
-| Scenario | Your Intrinsic Value Estimate | Current Price | Margin of Safety |
-|----------|------------------------------|---------------|-----------------|
-| Conservative | | | |
-| Base | | | |
+| | Value | Current Price | Margin of Safety |
+|---|---|---|---|
+| **Fair value** (the one headline figure — Step 6) | | | **← the verdict uses this row only** |
+| Conservative (EPV floor / Bear) | | | shown for downside |
 
 **Required margin of safety: 25% for every going concern, 40%+ for turnarounds and distressed cases**
-(plus 10–15 points if the earnings-quality gate fails). Business risk is priced in the discount rate,
+(plus 10–15 points if the earnings-quality gate fails; plus 10 points when the data gate is QUALIFIED —
+the two do not stack beyond the larger). Business risk is priced in the discount rate,
 so the requirement no longer varies by moat — see `references/intrinsic-value.md`.
 
 Guidelines:
@@ -840,6 +838,10 @@ Deliver a clear, unambiguous recommendation:
 **HOLD** — Already owned: keep, do not add at this price (not an entry recommendation)
 **PASS** — Business quality insufficient or no margin of safety
 **AVOID** — Structural decline, excessive debt, or integrity concerns
+
+**Data status travels with the verdict.** On QUALIFIED data the verdict is written with the tag —
+"WATCHLIST (PROVISIONAL)" — conviction is at most 6/10, and the row's note names the open gaps. On
+UNRESOLVED data there is no verdict: record "NO VERDICT — data conflict" and what must be resolved.
 
 These six are the **only** values the command-center `verdict` field takes — use them verbatim in the
 report, dashboard, summary and JSON row, and avoid new hybrids (`HOLD/ACCUM`-style labels). **SELL** is
@@ -973,13 +975,17 @@ Read these when needed — don't load all at once:
 | File | When to Read |
 |------|-------------|
 | `references/financial-analysis.md` | Step 3 — scoring and ratio analysis |
-| `references/data-sources.md` | Step 2 — before fetching any data; includes share-class structure guidance |
+| `references/data-sources.md` | Step 2 — before fetching any data; structured sources, share-class structure guidance |
+| `references/data-inputs.md` | **Steps 2 and 2.5, every run** — the inputs file, validator checks D1–D11, tolerance ladder, the second pass |
+| `scripts/validate_inputs.py` | Step 2.5 — the data gate; `--trail` prints the report's Data Trail |
+| `assets/inputs-template.json` | Step 2 — a passing synthetic inputs file to copy |
 | `references/earnings-quality-and-distortions.md` | Step 3.5 — distortion checks (one-time items, dilution, investment portfolios, RPTs, etc.) |
 | `references/frameworks.md` | Steps 3–6 — applying investment checklists; includes per-share scorecard |
 | `references/moat-analysis.md` | Step 4 — competitive analysis |
 | `references/disruption-scenarios.md` | Step 4 → 6 — when a technology/regulation could hit a segment's revenue line; per-segment Deflation Sign Test and four probability-weighted scenarios |
 | `references/quarterly-profit-bridge.md` | Step 3.5, thesis refresh and earnings reaction — when a quarter's profit diverges from revenue or surprises consensus |
-| `scripts/scenario_dcf.py` | Step 6 — reproducible scenario DCF, weighted IV, reverse DCF, EPV, sensitivity grid |
+| `scripts/scenario_dcf.py` | Step 6 — scenario DCF on operating owner earnings with reinvestment; one `fair_value`; reverse DCF, implied return, terminal-value share, per-share bridge, sensitivity grid |
+| `scripts/residual_income.py` | Step 6, banks and insurers — residual income with explicit fade, the fade ladder and the justified-P/B validity test |
 | `references/industry-playbooks.md` | **Step 1 (check sector index), then Steps 0/3/5/6** — sector-specific metric substitutions, valuation method overrides, and sector distortion classes. Financials (insurance + banking) written; other sectors use the generic workflow |
 | `references/intrinsic-value.md` | Step 6 — valuation calculations; includes output plausibility checks |
 | `references/sell-discipline-and-traps.md` | Step 8 — sell criteria, value traps, behavioral biases, error recognition |
@@ -995,7 +1001,7 @@ Read these when needed — don't load all at once:
 
 1. **Never fabricate data.** If you cannot find a number from a reliable source, say so.
 2. **Reconcile before you analyze.** The four anchors in Step 2.5 take 5 minutes and prevent the most expensive class of errors. Skipping them is unprofessional.
-3. **Trust reported per-share metrics over independent share counts.** EPS, BV/share, and DPS are ground truth — back-solve for shares from these rather than sourcing independently.
+3. **Check every share count against reported per-share metrics.** EPS, BV/share and DPS are the issuer's own arithmetic: a count that does not reconcile to them is wrong. The count used for valuation is the latest period-end count plus dilution, read from a filing; the EPS back-check tests it against the weighted average, it does not replace it.
 4. **Treat surprising conclusions as flags, not validations.** A 40%+ MoS on a mega-cap should trigger re-verification, not confidence.
 5. **Think long-term.** The holding period is ideally 5–10+ years.
 6. **Be conservative.** When in doubt, use lower growth rates and higher discount rates.
@@ -1026,6 +1032,35 @@ Read these when needed — don't load all at once:
 ---
 
 ## Change Log
+
+- **2026-11-10 (f)** — **Valuation method rebuilt** (full record in `references/intrinsic-value.md`).
+  Operating, pre-interest owner earnings with stock compensation left as an expense (ends the debt
+  and cash double count and the three conflicting definitions); growth charged at g ÷ RONIC with a
+  moat-set terminal RONIC; mid-cycle base for cyclicals; one headline fair value from a primary
+  method per business type (non-financials: lower of Base and probability-weighted) replacing
+  free-weight triangulation; scenarios may shift the earnings level. Step 6 rewritten; Step 6.5 now
+  points to the single home of the four tests (the two files carried different reverse-DCF bands);
+  Step 7 strikes the margin of safety on the fair value only. `scripts/residual_income.py` added.
+  Not swept across the coverage book: each name moves at its next refresh with old and new values
+  side by side.
+
+- **2026-11-10 (e)** — **Data gate no longer stops the analysis.** Three outcomes replace pass / stop:
+  VERIFIED, QUALIFIED (gaps only: analysis produced with a data-status box, PROVISIONAL verdict,
+  conviction ≤ 6, margin of safety +10) and UNRESOLVED (a conflict: value under each reading, no
+  verdict). Step 2.5 "Stop Conditions" rewritten; Steps 6, 7 and 9 updated. Reason: the Great Wall
+  pilot stopped on seven checks that were all "not yet read" — an analysis that says so is worth
+  more than none.
+
+- **2026-11-10 (d)** — **Data gate added.** Step 2.5 now runs through an inputs file
+  (`references/data-inputs.md`), `scripts/validate_inputs.py` (checks D1–D11, 43 unit tests
+  including the recorded BYD, China Taiping, PICC, Great Wall, Trip.com, Anker, Shenzhen
+  International and TME cases) and an independent second pass; `scenario_dcf.py` takes its figures
+  from the validation (superseded in part by (e): it no longer refuses on gaps). New: provenance with quote matching, unit checks, statement articulation and
+  the owner-earnings tie (Checks 26–27). Changed: one tolerance ladder (2% / 5%) replaces the
+  5% / 10% bands; the valuation share count is the period-end count plus dilution and the EPS
+  back-check tests the weighted average (Key Principle 3 reworded); history is verdict-moving and
+  comes from structured sources; one source-tier ladder; fetch budget about 16 for a deep dive.
+  No valuation rule changed.
 
 - **2026-11-10 (c)** — **`references/working-conventions.md` added** and listed in the Reference
   Files table. It carries the Stage 0 read list, fetch budgets, thesis-refresh structure,

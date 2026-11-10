@@ -11,3 +11,6 @@ research-note-*.md
 # Python bytecode
 __pycache__/
 *.py[cod]
+# Per-analysis inputs and validation results (live data)
+inputs_*.json
+validation_*.json

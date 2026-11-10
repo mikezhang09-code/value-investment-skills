@@ -196,23 +196,30 @@ A moat can be wide, narrow, or nonexistent — and its width can change over tim
 
 ## Moat Scorecard
 
-Rate each dimension 1–5, then calculate overall moat strength:
+Rate each dimension 1–5 **against the anchors below** — the score sets the discount-rate add-on
+(Step 3b) and the terminal RONIC (Step 2b), so two analysts must reach the same number from the
+same facts. Score 2 or 4 only when the evidence sits between two anchors, and say which.
 
-| Dimension | Score (1–5) | Evidence |
-|-----------|------------|---------|
-| Pricing power (can raise prices?) | | |
-| Customer retention / low churn | | |
-| Market share stability over 5–10 years | | |
-| Returns on capital vs. industry peers | | |
-| Barriers to competitive entry | | |
-| Moat trend (widening/stable/eroding) | | |
-| **Total Moat Score** | **/30** | |
+| Dimension | 1 | 3 | 5 |
+|---|---|---|---|
+| **Pricing power** | Prices fall or follow input costs; gross margin swings more than 5 points over the cycle | Holds price in line with inflation; gross margin within ±3 points over 10 years | Raised price above inflation in most of the last 10 years with stable or rising volume; gross margin stable or rising |
+| **Customer retention** | No retention data and purchases are one-off or tendered | Repeat purchase / renewal about 80–90%, or top customers stable for 5+ years | Renewal or net revenue retention above 95–100%, or switching demonstrably costly (data, integration, regulation) |
+| **Market share stability (5–10 yrs)** | Lost more than 5 points, or share is not measurable in a fragmented market | Within ±2 points | Gained share in most years, or holds above 40% of a defined market |
+| **Returns on capital vs peers** | 10-year average ROIC below the discount rate | ROIC above the rate by 0–5 points, in line with peers | ROIC above the rate by more than 10 points and above peer median in at least 8 of 10 years |
+| **Barriers to entry** | New entrants took share in the last 5 years; capital is the only barrier | Scale, licences or distribution deter most entrants; one credible entrant in 10 years | No successful entrant in 10 years despite attractive returns; barrier is structural (network, regulation, switching cost) |
+| **Moat trend** | Margins and share both falling for 3+ years; management cites competition | Stable | Margins or share rising for 3+ years with a cause that is not cyclical |
+| **Total Moat Score** | | | **/30** |
+
+Each score cites its evidence (figure, source, years). No evidence for a dimension → score it 2 and
+list it as a data gap, not 3.
 
 **Interpretation:**
 - 24–30: Wide moat — exceptional business quality
 - 18–23: Narrow moat — good business, requires ongoing monitoring
 - 10–17: Questionable moat — price must compensate for vulnerability
 - < 10: No moat — avoid unless extremely cheap (Graham deep value)
+
+(For the discount rate and terminal RONIC: ≥24 wide · 18–23 narrow · <18 none.)
 
 ---
 

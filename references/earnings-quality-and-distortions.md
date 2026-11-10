@@ -321,8 +321,8 @@ Many tech companies (especially US, increasingly China ADRs and HK tech) report 
 |----------|------------------|
 | Using GAAP earnings | Already deducts SBC — no adjustment needed |
 | Using non-GAAP / "adjusted" earnings that excludes SBC | Either subtract SBC back, OR use fully-diluted shares including all RSU vesting |
-| Computing FCF | SBC is non-cash → added back to OCF — but you must use fully-diluted share count to reflect true per-share FCF |
-| DCF valuation | Project SBC as ongoing expense; project share count growth from RSU vesting; do not "save" the SBC and not dilute |
+| Reading reported FCF | Reported OCF adds SBC back — so reported FCF overstates owner cash by the SBC. Never use it as the valuation base |
+| DCF valuation | Owner earnings start from operating profit, where SBC is already an expense; it is **never added back** (`intrinsic-value.md` Method 1 Step 1). Use the period-end share count plus dilution |
 
 ### SBC Magnitude Check
 

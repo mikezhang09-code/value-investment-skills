@@ -164,16 +164,14 @@ FCF Conversion = FCF / Net Income
 - Underreporting of capex (capitalizing operating expenses)
 
 ### Owner Earnings
-More conservative than FCF for capital-intensive businesses:
+One definition for the whole skill — `intrinsic-value.md` Method 1 Step 1:
 ```
-Owner Earnings = Net Income + D&A − Maintenance CapEx ± Working Capital Changes
-
-Maintenance CapEx ≈ CapEx × [% needed to maintain current capacity]
-(vs. Growth CapEx which generates future earnings)
+Operating owner earnings = (Operating profit − financial items inside it) × (1 − normal tax rate)
+                           + D&A − Maintenance CapEx ± normalised working-capital change
 ```
-
-For asset-light businesses (software, consumer brands), maintenance capex is minimal — owner earnings ≈ net income or FCF.
-For heavy industry, maintenance capex can be 60–80% of total capex.
+Pre-interest, so net cash and debt are counted once in the bridge to equity. Stock compensation is
+an expense and is not added back. Cyclicals use a mid-cycle margin. Growth capex is not deducted
+here; it is charged in the valuation as reinvestment (g ÷ RONIC).
 
 ### Cash Flow Priorities (what management does with FCF)
 Rank from best to worst for shareholders (depends on return opportunities):

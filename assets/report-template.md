@@ -41,6 +41,27 @@ Conviction:      [High / Medium / Low]
 
 ---
 
+## Data Status Box *(first thing in every deliverable — report, dashboard, bilingual summary)*
+
+Paste the output of `python3 scripts/validate_inputs.py inputs_<ticker>_<date>.json --status-box`,
+then add one line per gap or conflict saying **what it affects and by how much**:
+
+```
+> Data status: QUALIFIED — 19 checks passed, 7 gaps, 0 conflicts.
+> Verdict is PROVISIONAL; conviction capped at 6/10; required margin of safety +10 points.
+> Gaps:
+> - FY2023 taken from the five-year summary, not the FY2024 report → growth and the
+>   profit-decline count rest on one unverified year
+> - Balance sheet 31 Dec 2025, share count 31 Oct 2026 → net cash per share may be off by the
+>   2026 buybacks and dividend (est. RMB x per share)
+```
+
+- **VERIFIED:** one line. **QUALIFIED:** the verdict everywhere reads "<VERDICT> (PROVISIONAL)".
+- **UNRESOLVED:** the Valuation section shows a table of value under each reading of the conflicting
+  number; the verdict box reads "NO VERDICT — data conflict: <what disagrees>".
+
+---
+
 ## Section 1: Executive Summary
 
 *2–4 sentences maximum. State the investment case clearly.*
@@ -202,68 +223,75 @@ Conclusion: "Of the [X]-point gap, [Y] points are non-recurring; [Z] points are 
 
 ## Section 6: Intrinsic Value Calculation
 
-### Method 1: Owner Earnings DCF
+*Lead with the argument, then the arithmetic. Every figure is copied from the script output.*
 
-**Normalized Owner Earnings (TTM):** $[X]M = $[X] per share
+### 6.1 What the value rests on
 
-*Calculation:*
-- Net Income: $[X]M
-- Add: D&A: $[X]M
-- Add: Other non-cash: $[X]M
-- Less: Estimated Maintenance CapEx: $[X]M
-- **Owner Earnings: $[X]M**
+| Driver (the two or three that matter) | Assumed | What the price implies | Break-even for today's price | Evidence |
+|---|---|---|---|---|
+| Growth, years 1–5 | [X%] — built from [volume × price by segment] | [reverse-DCF X%] | | |
+| Operating margin / owner-earnings level | | | | |
+| Return on new capital (RONIC) | [X%] vs measured ROIC [X%] | | | |
 
-**Growth Assumptions:**
-- Years 1–5: [X%] (based on [justification])
-- Years 6–10: [X%] (haircut from recent growth)
-- Terminal growth: [X%]
+- **Implied return at the current price:** [X%] against a required [X%].
+- **Terminal-value share:** [X%] of enterprise value. Above ~65%, say what has to stay true after year 10.
+- **Where I differ from the market, in one sentence:** [ ]
 
-**Discount Rate:** [X%] (currency base + Step 3b business-risk build-up; see `references/intrinsic-value.md`)
+### 6.2 Operating owner earnings *(from the validated inputs file)*
 
-| Year | Owner Earnings | Discount Factor | PV |
-|------|---------------|-----------------|-----|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
-| Terminal Value | | | |
-| **Enterprise Value** | | | |
-| Less: Net Debt | | | |
-| **Equity Value** | | | |
-| Shares Outstanding | | | |
-| **Intrinsic Value / Share** | | | |
+| | FY-2 | FY-1 | FY | Used |
+|---|---|---|---|---|
+| Operating profit | | | | |
+| − financial items inside it | | | | |
+| × (1 − normal tax rate [X%]) | | | | |
+| + D&A | | | | |
+| − Maintenance capex (basis: [ ]) | | | | |
+| **Operating owner earnings** | | | | **[three-year average / mid-cycle]** |
+| Memo: free cash flow (OCF − capex) | | | | |
+| Memo: stock compensation (expensed, not added back) | | | | |
 
-### Method 2: Earnings Power Value (EPV)
+Cyclical: print reported, three-year and mid-cycle side by side and say which is used.
 
-- Normalized EBIT (5-yr avg): $[X]M
-- Tax Rate: [X%]
-- After-tax operating earnings: $[X]M
-- Discount rate: [X%]
-- EPV (enterprise): $[X]M
-- Less: Net Debt: $[X]M
-- **Equity EPV: $[X]M = $[X] per share**
+### 6.3 Valuation *(primary method for this business type: [DCF / residual income / SOTP / NCAV])*
 
-### Valuation Summary
+**Discount rate:** [X%] = [currency base] + [Step 3b build-up] · industry-beta check [X%]
+**Reinvestment:** RONIC [X%] (basis: [ ]) · terminal RONIC [X%] ([moat class]: r + [0/2/4])
 
-| Method | Intrinsic Value/Share | Premium/Discount to Market |
-|--------|----------------------|---------------------------|
-| Owner Earnings DCF | $[X] | [+X% / -X%] |
-| EPV | $[X] | [+X% / -X%] |
-| Graham Formula | $[X] | [+X% / -X%] |
-| **Weighted Average** | **$[X]** | **[+X% / -X%]** |
+| Scenario | p | g1 / g2 / tg | Earnings level | Value/share | TV share | MoS |
+|---|---|---|---|---|---|---|
+| Disruption | | | | | | |
+| Bear | | | | | | |
+| Base | | | | | | |
+| Bull | | | | | | |
+| **Probability-weighted** | 100% | | | | | |
 
-**Intrinsic Value Range:**
-- Conservative: $[X] — [Margin of Safety: X%]
-- Base Case: $[X] — [Margin of Safety: X%]
-- Optimistic: $[X] — [Margin of Safety: X%]
+**Per-share bridge (Base):** operations years 1–10 [X] + terminal [X] + net cash [X] + stakes / other [X] = [X]
 
-**Current Price: $[X]**
+### 6.4 Fair value and cross-checks
+
+```
+Fair value:      $[X]   (basis: Base / probability-weighted — the lower)
+Conservative:    $[X]   (EPV floor or Bear / Disruption)
+Optimistic:      $[X]   (Bull)
+Current price:   $[X]   → margin of safety [X]% on fair value (required: [25 / 35 / 40]%)
+```
+
+| Cross-check | Value/share | vs fair value | If more than 30% apart: the assumption that explains it |
+|---|---|---|---|
+| EPV (zero growth) | | | |
+| Peer multiples | | | |
+| DDM / SOTP (if applicable) | | | |
+
+**Transition line (first refresh under the 2026-11-10 method):** old-method value $[X] → new $[X];
+of the change, [X] is method and [X] is the business.
+
+### 6.5 What would prove this wrong *(dated and numeric)*
+
+| By | Observable | Base case expects | Thesis is wrong if |
+|---|---|---|---|
+| [next results date] | [e.g. segment revenue growth] | | |
+| [FY end] | [e.g. operating margin] | | |
+| [FY end] | [e.g. capex ÷ revenue, to test RONIC] | | |
 
 ### Disruption Scenarios *(required when Step 4 flagged a revenue-line threat — see `references/disruption-scenarios.md`)*
 
@@ -379,6 +407,14 @@ Reverse-DCF implied growth: [X%] · EPV floor: $[X] · Source: `scenario_dcf.py`
 | [Other] | | | |
 
 **Fiscal-year convention:** [e.g., FY ends 31 July]
+
+### Data Trail *(generated — never typed)*
+
+1. Validation result: the outcome (VERIFIED / QUALIFIED / UNRESOLVED), the inputs file name, and
+   every gap, conflict, NOTE and FLAG with its text, from `validation_<ticker>_<date>.json`.
+2. Verdict-moving numbers: paste the output of
+   `python3 scripts/validate_inputs.py inputs_<ticker>_<date>.json --trail`
+   (document, page, quoted line, basis, second-pass read; price sources; FX fixings).
 
 ### Data Gaps
 

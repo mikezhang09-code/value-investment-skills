@@ -20,7 +20,8 @@ work:
 | `SKILL.md` | workflow, scope routing, gates |
 | `assets/report-template.md` | the three deliverables and the Step 10.5 manifest |
 | `references/process-lessons.md` (+ any `process-lessons-ADDENDUM_*`) | error classes and checks; addendum items marked PROPOSED are not binding |
-| `references/data-sources.md` | source tiers, the live-price gate P1–P5, the RF list |
+| `references/data-sources.md` | where to fetch, structured sources, the live-price gate P1–P5, the RF list |
+| `references/data-inputs.md` | the inputs file, the validator checks D1–D11, the second pass |
 | `command-center.md` | the coverage universe; needed to position the name and for Stage 6 |
 
 Load the other reference files when the step that needs them is reached (Reference Files table in
@@ -42,14 +43,20 @@ reconstruct its prior contents from memory.
 
 ## 3. Fetch budgets
 
-Ceilings on filing and data fetches, not targets:
+Ceilings on filing and data fetches, not targets, counted by document type. **Structured sources
+first** (`data-sources.md`): one structured-data fetch or one multi-year summary table supplies the
+history, so the budget is spent on the documents that carry notes.
 
-| Scope | Budget |
-|---|---|
-| Full deep dive | about 12 (annual reports, 8 quarters, two call transcripts, peers, price) |
-| Quick thesis | about 6 |
-| Thesis refresh / earnings reaction | about 5 (new filing, issuer release, transcript, price and its second source) |
-| Stage 6 and deliverable building | no new fetches except the live-price check |
+| Scope | Budget | Typical spend |
+|---|---|---|
+| Full deep dive | about 16 | history 1–2 · latest annual report 1 · two prior annual reports (ties the latest three years) 2 · latest interim / quarterly 1–2 · quarterly series 1–2 · two call transcripts 2 · share-count return 1 · price ×2 · FX fixing 1 · peers and consensus 2 |
+| Quick thesis | about 8 | history 1 · latest annual report 1 · latest quarterly 1 · transcript 1 · share count 1 · price ×2 · FX 1 |
+| Thesis refresh / earnings reaction | about 6 | new filing, issuer release, transcript, price and its second source, FX |
+| Second pass (`data-inputs.md` §4) | re-reads of sources already fetched | not counted |
+| Stage 6 and deliverable building | no new fetches except the live-price check | |
+
+A fetch that returns a truncated or unreadable document does not count and is repeated. Never fill
+a number from memory to save a fetch: the quote-matching check will stop it, and it should.
 
 If the budget runs out, finish with what is in hand and list what was not obtained under "Data
 gaps". Label a self-imposed budget limit as a budget limit, not as a data-availability gap. An empty

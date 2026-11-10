@@ -81,19 +81,21 @@ A business worth owning has most of these characteristics:
 - [ ] Minimal government regulation risk (or regulation as a moat)
 
 ### Owner Earnings Calculation
-Buffett's preferred earnings metric — more accurate than reported net income:
+Buffett's 1986 idea — what the owner could take out without harming the business. The skill uses one
+operating, pre-interest form of it so the balance sheet is counted once:
 
 ```
-Owner Earnings = Net Income
-               + Depreciation & Amortization
-               + Other Non-Cash Charges
-               − Average Annual Capital Expenditures Required to Maintain Business
-               ± Changes in Working Capital
-
-Note: "Capex required to maintain" is the key judgment call.
-For an asset-light business (software, consumer brands), maintenance capex << D&A.
-For capital-intensive businesses (railroads, utilities), maintenance capex ≈ D&A.
+Operating owner earnings = (Operating profit − financial items inside it) × (1 − normal tax rate)
+                           + Depreciation & Amortization
+                           − Capital expenditure required to maintain the business
+                           ± normalised working-capital change
 ```
+
+Stock compensation stays an expense. "Capex required to maintain" is the key judgment — see
+`intrinsic-value.md` Method 1 Step 1 for the order of evidence. Asset-light: maintenance capex << D&A.
+Capital-intensive (railroads, utilities): maintenance capex ≈ D&A or above.
+
+---
 
 ### Buffett's 10-Year Earnings Test
 Project owner earnings 10 years out using conservative growth rates, discount at 10% (or current long-term Treasury + 3%), compare to current market cap.

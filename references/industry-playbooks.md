@@ -144,6 +144,10 @@ of the compression as transitional and carried a BUY at a fair value ~48% above 
 > method for the purpose of the probability weighting, then reach for a genuinely independent third —
 > DDM, SOTP, or a peer multiple cross-check.
 
+**Arithmetic:** `scripts/residual_income.py` computes the residual-income value, its split (book /
+fade period / terminal), the fade ladder (including the no-fade rung, printed as undefined where it
+does not exist) and the justified-P/B validity test. State which rung is the house case and why.
+
 This means a financial will usually triangulate on **residual income with explicit fade + EPV + DDM
 or SOTP** (justified P/B only where it clears the #11-R condition, and then counted with EPV as one method),
 not on the DCF-led combination used elsewhere. State the method set explicitly in the report — a

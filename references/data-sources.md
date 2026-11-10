@@ -2,6 +2,35 @@
 
 This file covers where and how to find primary financial data for each covered market. Always prefer official exchange filings over secondary aggregators — they are authoritative and legally required to be accurate.
 
+> **Every number collected here goes into the inputs file and through the validator** —
+> `references/data-inputs.md`. That file also defines the single source-tier ladder
+> (`filing` / `issuer_release` / `structured` / `aggregator` / `wire`) used throughout the skill.
+
+---
+
+## Structured Sources First — where the history comes from ⚠️ NEW (Nov 2026)
+
+The ten-year history sets the growth rate, the normalised earnings base and the profit-decline count
+behind the discount rate, so it is verdict-moving. Take it from a source that is itself drawn from
+filings, tie the **latest three years to the full filing**, and use aggregator series only as
+`context_only` rows.
+
+| Market | History source (one fetch) | Current share count |
+|---|---|---|
+| US | SEC company facts: `https://data.sec.gov/api/xbrl/companyfacts/CIK<10-digit CIK>.json` (every tagged fact) or `.../api/xbrl/companyconcept/CIK<10-digit>/us-gaap/<Tag>.json` (one line item). Send a `User-Agent` header; the filing archive (`www.sec.gov/Archives/...`) rejects clients that do not declare a contact address in it, so ask the user which address to send — never choose one for them. Each fact carries `end`, `fy`, `fp`, `form` and the filing accession number — record them as the page and quote. Both endpoints confirmed responding 2026-11-10 | Cover page of the latest 10-Q / 10-K |
+| Hong Kong | The annual report's own multi-year "Financial Summary" table (`filing_summary`) | Latest "Monthly Return" or "Next Day Disclosure Return" on HKEXnews; the annual report's share-capital note for classes |
+| China A-shares | 年报 "主要会计数据和财务指标" (three years per report; chain successive reports for ten) | 年报 / 季报 "股份变动及股东情况" |
+| Singapore / India | The annual report's multi-year highlights table where the issuer prints one; otherwise successive annual reports | Annual report share-capital note; India: quarterly shareholding-pattern filing |
+
+Cautions:
+- **Restated comparatives.** The same period appears in several filings. Use the value from the
+  latest filing that reports the period, and write a `break_note` when it differs from the original.
+- **Tags differ by issuer.** A missing tag is not a zero; find the issuer's tag or read the filing.
+  Foreign issuers may be tagged under an IFRS taxonomy rather than `us-gaap` — check before assuming
+  no data.
+- **Units.** Structured data is in single currency units; filings print thousands or millions. Set
+  `quote_scale` in the provenance entry so the quoted figure reconciles (RF-10).
+
 ---
 
 ## US Markets — SEC EDGAR
@@ -9,7 +38,7 @@ This file covers where and how to find primary financial data for each covered m
 **Primary source for all US-listed companies.**
 
 ### Key URLs
-- **Full-text search**: `https://efts.sec.gov/LATEST/search-index?q="COMPANY NAME"&dateRange=custom&startdt=2014-01-01&enddt=2024-12-31&forms=10-K`
+- **Full-text search**: `https://efts.sec.gov/LATEST/search-index?q="COMPANY NAME"&forms=10-K` (add `&dateRange=custom&startdt=YYYY-MM-DD&enddt=YYYY-MM-DD` for the ten years ending today — never a fixed range)
 - **EDGAR company search**: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&company=NAME&CIK=&type=10-K&dateb=&owner=include&count=40`
 - **Direct CIK lookup**: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=TICKER&type=10-K`
 - **EDGAR full-text search**: `https://efts.sec.gov/LATEST/search-index?q="ticker"&forms=10-K,10-Q`
@@ -46,6 +75,10 @@ This file covers where and how to find primary financial data for each covered m
 - **Company filings by stock code**: `https://www.hkexnews.hk/listedco/listconews/SEHK/[YEAR]/[MMDD]/[FILING].pdf`
 - **Direct company search**: Search by stock code (e.g., 0001, 0700, 2318) at hkexnews.hk
 - **Stock code lookup**: `https://www.hkex.com.hk/Market-Data/Securities-Prices/Equities`
+- **Scripted lookup (both confirmed responding 2026-11-10):**
+  stock id from code — `https://www1.hkexnews.hk/search/prefix.do?callback=callback&lang=EN&type=A&name=<code>&market=SEHK`;
+  filings by title — `https://www1.hkexnews.hk/search/titleSearchServlet.do?sortDir=0&sortByOptions=DateTime&category=0&market=SEHK&stockId=<stock id>&documentType=-1&fromDate=YYYYMMDD&toDate=YYYYMMDD&title=<words>&searchType=0&rowRange=20&lang=EN`
+  (returns each filing's title, date and PDF path; use `title=annual report` or `title=monthly`)
 
 ### Documents to Fetch
 | Document | Frequency | Key Contents |
@@ -193,14 +226,17 @@ Use web search to find:
 
 ## Data Quality Hierarchy
 
-When multiple sources conflict, trust in this order:
+One ladder, defined in `references/data-inputs.md` §2. When sources conflict, trust in this order:
 
-1. **Official exchange filing** (10-K, HKEx annual report) — authoritative
-2. **Company IR press release** — official but less audited
-3. **Audit-verified aggregator** (Macrotrends, Screener.in) — generally reliable
-4. **Yahoo Finance / Google Finance** — convenient but can have errors
-5. **Analyst estimates** — forward-looking, use with caution
-6. **News articles** — useful for context, not for financial data
+1. **`filing`** — annual / interim report, 10-K, 10-Q, 20-F, ownership filing. Authoritative
+2. **`issuer_release`** — the issuer's own results release with statements. Official; no notes
+3. **`structured`** — regulator-hosted structured data drawn from filings (SEC company facts)
+4. **`aggregator`** — Macrotrends, Screener.in, Yahoo / Google Finance, quote pages. Context only;
+   quotes for the price gate
+5. **`wire`** — earnings flashes and news. A logged headline, never a number in the inputs file
+
+Analyst estimates are opinions, not data: they enter only Step 6.5 Test 4, with their dates.
+"Tier 1 / 2 / 3" in older text maps to `filing` / `issuer_release` / everything below.
 
 **Always note**: fiscal year end dates vary — Apple (Sep), Berkshire (Dec), many HK companies (Dec or Mar). When comparing across companies, normalize to calendar year or clearly label fiscal years.
 
@@ -294,6 +330,9 @@ The same shares trade on both NSE and BSE. Total share count is NOT NSE + BSE.
 | Pinduoduo / PDD | 1 ADR = 4 ordinary shares | |
 | NetEase (NTES) | 1 ADR = 5 ordinary shares | |
 | NIO (NIO) | 1 ADR = 1 Class A ordinary share | Simpler |
+
+**Ratios change.** Read the current ratio from the cover of the latest 20-F or the depositary's
+notice and record it as `meta.ads_ratio`; the table above is a dated example, not a source.
 
 **Critical:** ADR price ≠ ordinary share price × ratio always — premium/discount exists. EPS reported per ADR ≠ EPS per ordinary share. Always confirm which basis you're using.
 
@@ -402,13 +441,17 @@ Reported Net Income (attributable to owners): $X B
 LESS perpetual / AT1 / preference distribution: $S B   ← Warning Class G; often overlooked
 Reported EPS: $Y per share
 Implied Shares = (X − S) / Y = Z B
-Gap vs. assumed share count: ±W% — must be ≤ 2%
+Gap vs. the WEIGHTED-AVERAGE count for the same period: ±W% — must be ≤ 2%
 ```
+EPS is struck on the weighted average, so that is what the back-check tests. **The count used for
+valuation is the latest period-end count plus dilution** (validator D3) — the back-check confirms
+the profit line and the capital stack, it does not supply the valuation count.
 
 **Anchor 3: Per-Share Metrics Cross-Check**
 ```
-Reported BV per share × Shares = $X B ≈ Total Equity (within 5%)
-Reported DPS × Shares = $X M ≈ Total Dividends Paid (within 5%)
+Reported BV per share × Shares = $X B ≈ Total Equity
+Reported DPS × Shares = $X M ≈ Total Dividends Paid
+Ladder: ≤2% pass · 2–5% only with a written reconciling item · >5% stop
 ```
 
 **Anchor 4: Share-Class Structure**
@@ -449,7 +492,7 @@ If any anchor fails → STOP, re-source data from primary filings, re-run all fo
 
 ## Verdict-Moving Numbers — When to Escalate
 
-The hierarchy above tells you which sources to trust. This section tells you when to escalate from Tier 3 (aggregators) up to Tier 1 (filings).
+The hierarchy above tells you which sources to trust. This section tells you when a number must come from a `filing`, `issuer_release` or `structured` source rather than an aggregator. The validator enforces it (D1, D8).
 
 **The ±20% rule:** if shifting a number by ±20% would flip the recommendation (Buy / Hold / Avoid) or push intrinsic value outside the margin-of-safety band, that number is **verdict-moving** and must be verified against the primary filing before the report reaches verdict stage. Aggregator data is not sufficient for verdict-movers.
 
@@ -460,11 +503,13 @@ Typical verdict-movers:
 - Classification of items as recurring vs. one-time
 - **Share count — basic vs. diluted vs. post-buyback vs. all-class total** (see Share-Class Structure Warnings above)
 - Segment revenue/profit for moat assessment
+- **Any historical year that feeds a growth rate, a normalised average or the operating-profit
+  decline count behind the discount rate** (Step 3b) — in practice the whole history used in Step 6
 
-Non-verdict-movers (Tier 3 aggregator acceptable):
-- Revenue figures 3+ years back
+Non-verdict-movers (aggregator acceptable, marked `context_only` in the inputs file):
+- Years shown in a chart but excluded from growth, normalisation and the decline count
 - General margin trend direction
-- Historical ROE for context (not used in intrinsic-value calc)
+- Peer figures used only for narrative context
 
 ---
 
@@ -593,9 +638,21 @@ toll segment H1 × 2 = HK$951m vs FY25 HK$565m.*
 
 ---
 
+### RF-10. Scale or per-share basis slip ⚠️ NEW (November 2026)
+A figure read in thousands and stored as millions, RMB 亿 read as millions, or a per-depositary-share
+figure set beside an ordinary-share count. The inputs file declares one scale and one currency; the
+quote-matching check (D1) and the unit check (D2) catch the slip when the quoted line is recorded
+as printed with its `quote_scale`.
+
+---
+
 ## Data Trail — 数据台账
 
-Any report reaching verdict stage should include a minimal audit trail for the top 5–10 inputs driving the valuation. Inline table or appendix — analyst's choice.
+**Mandatory, and generated.** Every report carries the Data Trail printed by
+`python3 scripts/validate_inputs.py inputs_X.json --trail`: every verdict-moving number with its
+document, page, quoted line, basis and second-pass read, plus the price sources and FX fixings. It
+is not typed and it is not limited to a "top 5–10". The rows below show the older hand-built format
+for reference only.
 
 | Metric | Value | Source | Date retrieved | Vintage |
 |--------|-------|--------|----------------|---------|
@@ -629,6 +686,10 @@ When an exact number is unavailable and an estimate is used:
 
 Run before finalizing any Buy / Hold / Avoid recommendation:
 
+- [ ] **Inputs file validated at the final stage and the outcome stated — VERIFIED, QUALIFIED or
+      UNRESOLVED — with the data-status box in every deliverable and every gap, conflict, NOTE and
+      FLAG printed (`references/data-inputs.md`). QUALIFIED: verdict PROVISIONAL, conviction ≤ 6,
+      margin of safety +10. UNRESOLVED: each reading shown, no verdict** ⚠️ NEW
 - [ ] Every verdict-moving number has a Tier 1 or Tier 2 source
 - [ ] **Share count reconciled via all four anchors (per Share-Class Structure Warnings section)** ⚠️ NEW
 - [ ] **Classification gate run: senior instrument is EQUITY or LIABILITY? (Warning Class G) — only

@@ -39,7 +39,8 @@ Each family needs a separate defense. Mechanical errors are stopped at Step 2.5 
 
 **Prevention:** Always state currency explicitly. Cross-check published market cap in user's preferred currency.
 
-**Common HK conversion:** 1 HKD ≈ 0.92 CNY ≈ 0.128 USD.
+**No memorised rates.** A rate quoted from memory is an assumed rate (an earlier version of this file
+carried "1 HKD ≈ 0.92 CNY" while the fixing cited below was 0.857). Read the fixing.
 
 **Dated-fixing rule (added 2026-11-09).** An FX rate that enters a valuation leg is read from a dated
 official fixing (CFETS central parity, HKMA, Fed H.10) and printed with its date. An assumed rate is
@@ -937,6 +938,47 @@ Is the investor still recognising its share of the associate's losses (carrying 
 A competing report added back a +HK$548m "embedded airline drag" that was not in the numbers and
 deducted a HK$5.5bn carrying value that does not exist.
 
+### Check 26: Statement Articulation and the Owner-Earnings Tie (script-enforced) — added 2026-11-10
+
+**Trigger:** every valuation. Until this check the share count had four anchors, the price five and
+net cash seven, while the owner-earnings base — the DCF's whole numerator — had none.
+
+```
+A1 CASH ROLLS      opening cash + operating + investing + financing + FX = closing cash
+A2 EQUITY ROLLS    opening equity + profit − dividends − buybacks + issuance + other = closing;
+                   an "other" above 10% of profit is itemised (OCI, share-based pay, senior
+                   distributions, NCI)
+A3 CASH WENT       five-year free cash flow ≈ dividends + buybacks + acquisitions + change in
+   SOMEWHERE       net cash. Free cash flow that reached neither owners nor the balance sheet
+                   was not free
+A4 COMPONENT TIE   each owner-earnings component equals its statement line for the stated years;
+                   maintenance capex ≤ total capex, with its basis stated
+A5 ONE FIGURE      the owner earnings handed to the valuation is the computed one
+A6 VS CASH         owner earnings more than 25% above average free cash flow needs a stated reason
+```
+
+Enforced by `scripts/validate_inputs.py` (D6, D7). Spec: `data-inputs.md`.
+
+### Check 27: Provenance and the Second Pass (script-enforced) — added 2026-11-10
+
+**Trigger:** every verdict-moving number.
+
+```
+V1 PAGE AND LINE   source, page and the line as printed are recorded with the number
+V2 QUOTE MATCH     the quoted line contains the number (after scale) — catches transcription,
+                   scale slips and figures supplied from memory
+V3 BASIS           a verdict-mover is read from a filing, issuer release or structured filing
+                   data — never an aggregator or a wire flash
+V4 SECOND READ     an independent re-read of the source, without sight of the first value,
+                   returns the same number
+V5 HISTORY         latest three years from the filing; older years from structured data or the
+                   filing's own summary; aggregator years are context only
+```
+
+Enforced by `scripts/validate_inputs.py` (D1, D8). **Why:** every earlier check is filled in by the
+reader that made the error; the Great Wall price, Anker windows and Shenzhen International toll
+profit all passed written gates and were caught by the user.
+
 ## Process Behaviors to Reinforce
 
 ### The source-tier ladder — a conclusion may not outrank its source
@@ -1240,6 +1282,8 @@ If all three agree, you're safe. If they disagree, dig deeper.
 
 | Date | Lesson Added | Trigger |
 |------|--------------|---------|
+| 2026-11-10 | **Valuation method rebuilt** — operating pre-interest owner earnings, growth charged for reinvestment, mid-cycle base for cyclicals, one headline fair value, anchored moat scorecard (`intrinsic-value.md` change log) | Repo review: the DCF deducted interest and then net debt again, let growth cost nothing, carried three owner-earnings definitions, and left the headline figure and method weights open to choice |
+| 2026-11-10 | **Checks 26–27 and the data gate** — inputs file, `validate_inputs.py`, second pass; outcomes VERIFIED / QUALIFIED / UNRESOLVED — the analysis is always produced and labelled, never withheld | Repo review: owner earnings and the ten-year history had no check, the fetch budget forced aggregator data, and every gate was self-attested |
 | 2026-05-18 | Share count reconciliation (BYD case) | User caught wrong market cap on BYD deep dive |
 | 2026-08-31 | Deliverable omission (Class 6) + Step 10.5 Deliverable Gate | User caught 4 consecutive rounds missing the bilingual summary and Stage 6 |
 | 2026-08-31 | Trigger specification (Class 7) | June "OCF rebound = BUY" trigger fired against a valuation that did not support BUY |
