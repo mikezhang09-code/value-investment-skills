@@ -551,8 +551,8 @@ Announced-but-not-closed acquisitions must not appear in the current sum-of-part
 *Case: TME — pending Ximalaya acquisition was initially double-counted in SOTP.*
 
 ### RF-2. Unverified stakes or cross-holdings
-Minority investments and strategic stakes must come from the most recent annual report's notes, not from press summaries or legacy filings.
-*Case: TME — unverified Spotify stake estimate drove a ~$11B vs. ~$6.4B non-operating asset discrepancy until corrected against the balance sheet.*
+Minority investments and strategic stakes must come from the most recent annual report's notes, not from press summaries or legacy filings. **For a listed investee, the share count is read from the investee's own ownership filings** (13G/13D, "Major Shareholders" / top-holder tables) — process-lessons.md Check 22 (added 2026-10-23) — and never back-solved as a residual from a portfolio total. **Use the investee's total-holding table (restricted shares included), not the tradable-float table, and re-verify every stake % against announcements up to the latest filing used** (Check 22 S7, 2026-11-10). **Before normalizing or deducting an associate, run the zero-carry test** (Check 25).
+*Case: TME — unverified Spotify stake estimate drove a ~$11B vs. ~$6.4B non-operating asset discrepancy until corrected against the balance sheet; resolved 2026-10-23 to 4,276,200 shares from two Schedule 13Gs filed on Spotify.*
 
 ### RF-3. Headline loss vs. cash performance
 For companies reporting large GAAP losses, separate cash impact from non-cash impairments, fair-value remeasurements, and one-time writedowns before concluding anything about operating health.
@@ -563,7 +563,7 @@ DCFs combining annual actuals with quarterly run-rates must label vintage per li
 *Case: BYD — FY2025 actuals (¥804B revenue, 17.7% GM) alongside Q1 2026 sales (700K units, -30% YoY) required explicit vintage labeling.*
 
 ### RF-5. Currency and listing-venue mismatches
-Price in HKD, financials in RMB, ADR ratio ≠ 1:1 — verify the full conversion chain. For H-share vs. A-share dual listings, confirm which share class the EPS and book value correspond to.
+Price in HKD, financials in RMB, ADR ratio ≠ 1:1 — verify the full conversion chain. For H-share vs. A-share dual listings, confirm which share class the EPS and book value correspond to. **Any FX rate used in a valuation leg comes from a dated official fixing, printed with its date — never assumed** (process-lessons.md Class 2; cases: TCOM 2026-09-23, Shenzhen International 2026-11-09).
 
 ### RF-6. Share count confusion
 Match the share count to the period of the earnings figure. For companies with aggressive buybacks, current shares outstanding can diverge meaningfully from weighted-average diluted.
@@ -580,6 +580,15 @@ the "rise" ran opposite to the company's own buyback prices. Run the **Live Pric
 Gate** (P1–P5) on every live price.
 *Case: Great Wall Motor (2333.HK) refresh, 2026-10-08 — HK$8.64 used vs true HK$7.115 (+21%). MoS,
 reverse DCF and the price-vs-floor statement were all wrong; caught by the user the next day.*
+
+### RF-9. Seasonal-window mismatch ⚠️ NEW (November 2026)
+A flow ratio, a segment profit or a balance-sheet growth rate compared across windows of different
+length or season: FY vs a YTD stub, September vs December, H1 × 2 vs a full year. Print FY,
+YTD-vs-YTD and TTM; measure balance-sheet growth quarter-end on quarter-end; never annualise a
+part-year segment result. Full rule: process-lessons.md Check 23 (W1–W5).
+*Cases: Anker #73, 2026-11-09 — "cash conversion broken down" built on FY25 OCF/NI 0.19 vs a 9M stub
+0.16; TTM was 0.60 and 9M-on-9M improved −0.45 → +0.17. Shenzhen International #43 v1, 2026-11-09 —
+toll segment H1 × 2 = HK$951m vs FY25 HK$565m.*
 
 
 ---
@@ -633,9 +642,12 @@ Run before finalizing any Buy / Hold / Avoid recommendation:
 - [ ] **Live price passed P1–P5 (timestamp, freshness, 52-wk range vs prices on file, >10% move
       second-sourced, two sources) and recorded in the Data Trail with check marks (RF-8)** ⚠️ NEW
 - [ ] No pending M&A is embedded in current SOTP (RF-1)
-- [ ] Headline losses/gains decomposed into cash vs. non-cash (RF-3)
+- [ ] **Listed stakes: share count read from the investee's own ownership filings (RF-2 / Check 22)**
+- [ ] Headline losses/gains decomposed into cash vs. non-cash (RF-3); **for gain-dependent issuers,
+      each gain event tied to a year's segment profit before normalizing (Check 24)**
 - [ ] Data vintage labeled per line for time-sensitive figures (RF-4)
-- [ ] Currency and share-class conversions verified (RF-5, RF-6, RF-7)
+- [ ] Currency and share-class conversions verified (RF-5, RF-6, RF-7); **FX from a dated fixing**
+- [ ] **Cash conversion, working capital and part-year segment figures on matched windows (RF-9)**
 - [ ] Data trail table present for top inputs (including share-count row for multi-class stocks)
 - [ ] Estimates flagged with basis and sensitivity tested if verdict-moving
 - [ ] **"Data gaps" list present; no empty debt, share-count or tax field reached the valuation**

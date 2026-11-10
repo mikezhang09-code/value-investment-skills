@@ -113,6 +113,10 @@ the file listing the three deliverables had not synced yet, and nothing later fo
 
 If files sync mid-session, re-run the listing and re-read anything new.
 
+**Addenda.** If the listing shows any `process-lessons-ADDENDUM_*` file, read it with
+`process-lessons.md`. Items it marks as merged or binding apply now; items it marks **PROPOSED** are
+not binding and may not be applied as rules until adopted.
+
 ---
 
 ## Step 1: Identify & Scope
@@ -148,6 +152,13 @@ Minimum data to collect:
   wealth products — plus the issuer's own published liquidity figure if it gives one (Check 21),
   then analyst consensus and price targets
   **with their dates** (Step 6.5 Test 4)
+- **For every listed stake that carries value: the investee's own ownership filing** (13G/13D,
+  "Major Shareholders" or top-holder table) giving the share count held — the total-holding
+  table, restricted shares included, re-checked against the latest announcements (Check 22)
+- **The last full-year segment table and the prior-year YTD comparatives** for cash flow and segment
+  profit — matched windows need them (Check 23)
+- **A dated official FX fixing** (CFETS, HKMA, Fed H.10) for every currency conversion that enters a
+  valuation leg, printed with its date — never an assumed rate ⚠️ NEW (Nov 2026)
 - Current share price and market cap — **run the Live Price Verification Gate (P1–P5) in
   `references/data-sources.md` before the price enters any calculation** ⚠️ NEW (Oct 2026)
 
@@ -353,17 +364,41 @@ R2 HEADLINE    gross cash-like within ±5% of the issuer's published liquidity f
 R3 ONE SOURCE  every valuation method reads net cash and stakes from that one figure —
                a number typed into a method basis does not count
 R4 AGREE       a quantity stated twice in one analysis agrees within 1%
-R5 STAKES      listed stakes = shares held × quote × FX, each dated; unlisted holdings get
-               an explicit treatment with a reason
+R5 STAKES      listed stakes = shares held × quote × FX, each dated. SHARES HELD IS READ FROM
+               THE INVESTEE'S OWN OWNERSHIP FILINGS (Check 22), never back-solved as a residual
+               from a portfolio total and never carried from a third-party report. FX from a
+               dated official fixing. Each stake must be CONTAINED: stake value ≤ carrying value
+               of its balance-sheet line, same date. Unlisted holdings get an explicit treatment
+               with a reason
 R6 DATES       cash, debt and shares from one balance-sheet date (latest available, Tier 2 if
                newer); period-end shares, never weighted; subsequent cash events deducted
 R7 MOVE        FV moves >15% while operating value moves <5% → print the non-operating
                bridge component by component
 ```
-Enforced in the pipeline by `nonop_reconciliation.py` (called from `method_rules.py`). *Case:
-TCOM #29, 2026-10-19 — net cash built from the cash-and-equivalents tag alone left out RMB59.3B
-of short-term investments and deposits; FV printed $44.74 against a corrected ~$52–58, and the
-gate passed.* See process-lessons.md Class 16 / Check 21.
+R1, R2 and R4 are enforced by `scripts/scenario_dcf.py`: give it a `treasury` block and it builds
+net debt itself, stops if a line is missing or the total misses the issuer's figure by >5%, and
+stops if a typed `net_debt` disagrees. R3 and R5–R7 are manual checks. *Case: TCOM #29 — a
+2026-10-19 valuation (run outside this project) built net cash from the cash-and-equivalents line
+alone, leaving out RMB59.3B of short-term investments and deposits; FV printed $44.74 against
+~$52–58.* See process-lessons.md Class 16 / Check 21.
+
+#### Check 22: Verify a Stake From the Investee's Own Filings — and Contain It
+```
+S1 INVESTEE SIDE   13G / 13D / proxy / "Major Shareholders" / top-holder table filed ON THE
+                   INVESTEE names each holder with an exact share count
+S2 NAME THE ENTITY match the exact legal entity; a parent's total is not a subsidiary's holding
+S3 TWO DATES       pull the holding at two dates; if it moved, find the disposal first
+S4 DENOMINATOR     shares outstanding from the investee's own cover page; exclude instruments
+                   with votes but no economic rights
+S5 CONTAIN IT      shares × quote ≤ carrying value of the balance-sheet line, same date
+S6 VOTES           check for proxies and lock-ups
+S7 TOTAL + FRESH   counts from the investee's TOTAL-holding table (restricted shares included),
+                   never the float table; every stake % re-verified against announcements up to
+                   the latest filing used
+```
+*Case: TME #53, 2026-10-23 — Spotify carried at ~1.6% as a residual, with 4.155% and 2.5% circulating
+elsewhere; two Schedule 13Gs filed on Spotify name 4,276,200 shares = 2.0775%. S5 alone refuted the
+circulating figure with one division.* See process-lessons.md Check 22.
 
 ### Reconciliation Output Format
 
@@ -384,11 +419,13 @@ Verification:
                      resolution ±X.XX% (EPS to N dp) → PASSES AT ±X.XX% ✓/✗
 - BV cross-check:    BV/share × Shares = $XXB vs equity → ±X% ✓/✗
 - Net cash (Check 21): cash + ST inv + deposits − debt = XX vs issuer liquidity XX → ±X% ✓/✗
+- Listed stakes (Check 22): X.XXm shares (investee filing, date) × quote × FX (fixing, date)
+                     = XX ≤ carrying value XX ✓/✗
 ```
 
 ### Stop Conditions
 
-If ANY of the four anchors or Check 21 fails:
+If ANY of the four anchors, Check 21 or Check 22 fails:
 1. **STOP** — do not proceed to Step 3
 2. Re-source data from primary filings (annual report "Composition of Share Capital")
 3. Re-run all four checks
@@ -458,7 +495,7 @@ This step is the **interpretive twin** of Step 2.5 (mechanical reconciliation). 
 | 1. One-time items | Earnings level | Are there material gains (asset sales, FV remeasurements, subsidies) or costs (restructuring, impairments) in current NI? |
 | 2. Dilution drift | Per-share economics | Does 10-yr per-share growth track 10-yr aggregate growth? |
 | 3. Investment portfolios | Operating vs. investing returns | Is reported NI dominated by mark-to-market on investments? |
-| 4. Working capital quality | Revenue reality | DSO rising? Bills receivable significant? Cash conversion <80%? |
+| 4. Working capital quality | Revenue reality | DSO rising? Bills receivable significant? Cash conversion <80% — on matched windows (Check 23)? |
 | 5. Stock-based compensation | Earnings & dilution | Is non-GAAP adjusted upward by SBC without corresponding dilution accounting? |
 | 6. Related-party transactions | Value leakage | RPTs material? Pattern of value transfer to controlling shareholder? |
 | 7. Off-balance-sheet items | True leverage | Pension underfund? Guarantees? VIE exposure? Lease debt? |
@@ -522,6 +559,7 @@ If 3+ distortion classes show material issues:
 | HK property developers | Class 1 (investment property revaluation), 3 (holding company), 7 (off-BS guarantees) |
 | Chinese ADRs (PDD, BIDU, JD, NTES) | Class 5 (SBC), 7 (VIE), 8 (intangibles from acquired tech) |
 | HK conglomerates (CK, Swire, Jardine) | Class 3 (SOTP required), 7 (cross-holdings), 8 (goodwill) |
+| HK/PRC SOE infrastructure holdcos (0152.HK) | Class 1 (land-preparation / REIT-injection gains), 3 (associates), 4 (cash dividend on non-cash gains) |
 | Insurance (Ping An, AIA, Prudential) | Class 1 (FV gains), 3 (float portfolio is core), 7 (provisioning) |
 | Banks (HSBC, Standard Chartered, Indian banks) | Class 1 (provisioning), 7 (off-BS exposures), 4 (loan quality) |
 | Indian family conglomerates | Class 6 (RPTs), 7 (promoter pledging), 8 (acquisition-led growth) |
@@ -536,6 +574,46 @@ Run `references/quarterly-profit-bridge.md` when reported profit beats or misses
 or turns negative while revenue grows. Bridge through **pretax income first** — a prior-year tax
 benefit can turn a +47% pretax quarter into a −5% net income headline (Intuit Q4 FY26). Only the
 operational component of the gap may move the moat trend, growth assumptions or verdict.
+
+### Matched Windows (Check 23) ⚠️ NEW (Nov 2026)
+
+Any statement about cash conversion, working-capital growth, or an annual figure built from a
+part-year result must use matched windows:
+
+```
+W1 THREE WINDOWS   OCF/NI for FY vs FY, YTD vs the same YTD a year earlier, and TTM — never one
+W2 NO STUB MIXING  a full-year figure is never set beside a YTD figure as a trend
+W3 COMPUTE TTM     TTM = FY(t−1) − YTD(t−1) + YTD(t); if computable, no ▲ estimate
+W4 SAME QUARTER-END balance-sheet growth vs the same quarter-end a year earlier
+W5 SEASONALITY     state which quarter or half carries the cash or profit; never annualise a
+                   part-year SEGMENT result (H1 × 2) — use the last full-year figure or TTM
+```
+
+Class 4 is scored on FY, TTM and the 5-year aggregate; a YTD stub lowers a score only if the
+same-YTD comparison also deteriorates. If the cash-flow statement is not in the trail, declare
+W1–W3 UNRUNNABLE under Data gaps. *Cases: Anker #73 (FY 0.19 vs a 9M stub 0.16; TTM was 0.60) and
+Shenzhen International #43 (toll H1 × 2 = HK$951m vs FY HK$565m), 2026-11-09.* See
+process-lessons.md Check 23.
+
+### Gain Tie-Out and Zero-Carry (Checks 24–25) ⚠️ NEW (Nov 2026)
+
+**Check 24** runs for any issuer whose profit depends on land, REIT-injection, disposal or
+revaluation gains, and whenever one gain type exceeds 50% of attributable profit:
+
+```
+E1 LIST EVENTS    every approval / injection / disposal in the year, with date and stated gain
+E2 TIE            each event tied to that year's segment profit, or to a named other year;
+                  an untied event blocks normalization
+E3 NO PRICE=GAIN  a contract price or land premium is not a gain
+E4 EX-GAIN SERIES reported vs ex-gain attributable profit for ≥3 periods before any recurring base
+E5 FINITE BANK    a depleting land/parcel bank is a finite asset, never a perpetuity credit
+E6 DIVIDEND FUND  if profit is majority non-cash gains: DPS cash cost, scrip, OCF, debt movement
+```
+
+**Check 25** runs before normalizing an associate's drag or deducting its carrying value in a SOTP:
+if the associate is zero-carried (losses no longer recognised), its normalized contribution is 0 and
+its carrying deduction is 0. *Case for both: Shenzhen International #43, 2026-11-09.* See
+process-lessons.md Checks 24–25.
 
 ### Stop Conditions
 
@@ -908,6 +986,8 @@ Read these when needed — don't load all at once:
 | `references/inflation-goodwill-derivatives.md` | Step 8 — inflation/goodwill/derivatives risk |
 | `references/portfolio-construction.md` | Portfolio construction or adding a new name |
 | `assets/report-template.md` | **Step 10 — the THREE deliverables**: the 10-section report, the 12-tab dashboard, and the bilingual EN/中文 summary (16-section spec + terminology table + anti-drift controls) |
+| `references/working-conventions.md` | **Step 0, every run** — what to read at Stage 0, fetch budgets, thesis-refresh structure, presentation order, the Stage 6 command-center procedure and the final chat summary |
+| `references/process-lessons.md` (+ any `process-lessons-ADDENDUM_*`) | **Step 0, every run** — error classes and Checks 1–25; addendum items marked PROPOSED are not binding |
 
 ---
 
@@ -937,18 +1017,48 @@ Read these when needed — don't load all at once:
     value — and therefore the model's apparent health — untouched.
 16. **Non-operating assets are computed, never asserted.** Net cash is built from every treasury
     line and reconciled to the issuer's own liquidity figure; every method reads it from that one
-    number. An omitted treasury line produces a self-consistent model and a clean gate.
+    number. An omitted treasury line produces a self-consistent model and a clean gate. A listed
+    stake's share count is read from the investee's own filings, not derived.
+17. **Match the window before reading a trend.** A full year is never compared with a stub, and a
+    half-year is never doubled into a year. Print FY, YTD-vs-YTD and TTM; use the last full-year
+    segment figure. An FX rate in a valuation leg carries a date and a source.
 
 ---
 
 ## Change Log
 
+- **2026-11-10 (c)** — **`references/working-conventions.md` added** and listed in the Reference
+  Files table. It carries the Stage 0 read list, fetch budgets, thesis-refresh structure,
+  presentation order, the Stage 6 command-center procedure and the final chat summary, so the skill
+  runs from the repository without a Claude Project's instructions. No analytical rule changed.
+
+- **2026-11-10 (b)** — **Checks 24–25 and Check 22 S7 adopted** from the 2026-11-09 addendum.
+  Step 3.5 gains the gain tie-out (Check 24, E1–E6) and the zero-carry test for associates
+  (Check 25); the Step 2.5 Check 22 block gains S7 (total-holding table, stake freshness). Full
+  specs in `process-lessons.md`. Still a proposal, not adopted: the SOTP-only headline for holding
+  companies (it conflicts with the triangulation table in `intrinsic-value.md`).
+
+- **2026-11-10** — **Synced with `process-lessons.md` Checks 22–23 and the 2026-11-09 merge.**
+  (1) Check 21 R5 brought up to the 2026-10-23 wording: shares held read from the investee's own
+  ownership filings, never a residual or third-party figure, with the containment test; a compact
+  **Check 22** block (S1–S6) added to Step 2.5, to the reconciliation output format and to the stop
+  conditions. (2) **Check 23 (matched windows W1–W5)** added to Step 3.5, including the rule against
+  annualising a part-year segment result; Class 4 quick check references it. (3) Step 2 data list
+  gains the investee ownership filing, the full-year segment table with prior-year YTD comparatives,
+  and a **dated official FX fixing** for every valuation leg. (4) Step 0 now reads any
+  `process-lessons-ADDENDUM_*` file and treats PROPOSED items as non-binding. (5) Hot-spot row for
+  HK/PRC SOE infrastructure holdcos; Key Principle 16 extended and **Key Principle 17** added;
+  Reference Files row for process-lessons. Derivation: TME #53 (2026-10-23), Anker #73 and Shenzhen
+  International #43 (2026-11-09). Not included at that point: the four proposals staged in
+  `process-lessons-ADDENDUM_2026-11-09.md` (three were adopted later the same day — see (b)).
+
 - **2026-10-21** — **Check 21 (non-operating asset reconciliation) added to Step 2.5**, Key
-  Principle 16, and the Step 2 data list. Full spec in `process-lessons.md` (Class 16 / Check 21);
-  pipeline gate `nonop_reconciliation.py`. Derivation: TCOM #29 FV fell $57.00 → $44.74 with the
-  operating value unchanged; the 2026-10-19 net cash used only the cash-and-equivalents tag
-  (RMB9.08B vs RMB68.39B from all components), the run carried two different stakes figures, and
-  the gate passed. The automated comparison then repeated the error.
+  Principle 16, and the Step 2 data list. Full spec in `process-lessons.md` (Class 16 / Check 21).
+  `scenario_dcf.py` gains a `treasury` block that builds net debt from every line and reconciles it
+  to the issuer's published figure; a typed `net_debt` still runs but warns. Derivation: a TCOM #29
+  valuation run outside this project (2026-10-19) printed $44.74 vs $57.00 with the operating value
+  unchanged; its net cash used only the cash-and-equivalents line (RMB9.08B vs RMB68.39B), and a
+  comparison written to explain the drop repeated the error.
 
 - **2026-10-13** — **Business-risk adjustment added to the discount rate; required margin of safety
   unified at 25%** (40%+ turnarounds/distressed). Rate = currency base + 0 to +2 points from

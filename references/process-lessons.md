@@ -41,6 +41,12 @@ Each family needs a separate defense. Mechanical errors are stopped at Step 2.5 
 
 **Common HK conversion:** 1 HKD ≈ 0.92 CNY ≈ 0.128 USD.
 
+**Dated-fixing rule (added 2026-11-09).** An FX rate that enters a valuation leg is read from a dated
+official fixing (CFETS central parity, HKMA, Fed H.10) and printed with its date. An assumed rate is
+not allowed; if no fixing can be fetched, mark the leg unrunnable. *Case: Shenzhen International #43
+v1 — RMB/HKD assumed at 1.10 against a CFETS 6-Nov-2026 fixing of 1.1667 (HKD/CNY 0.85712),
+understating the per-share-class stake mark by ~HK$0.36/sh.*
+
 ---
 
 ### 3. Mixed Data Vintage
@@ -55,6 +61,37 @@ leg alone can be verdict-relevant. See Check 12.
 **Cost:** Inconsistent base, misleading trends, confused multipliers.
 
 **Prevention:** Label vintage per line. Annual and quarterly figures never silently mixed.
+
+**Seasonal sub-case — windows of different length or season (added 2026-11-09).** A flow ratio, a
+segment profit or a balance-sheet growth rate compared across windows that are not matched: FY vs a
+YTD stub, September vs December, H1 × 2 vs a full year. See Check 23.
+
+*Case 1 — Anker #73 (0668.HK), 2026-11-09.* The initiation said "cash conversion has broken down",
+placing FY25 OCF/NI (0.19, a full year) beside 9M-26 OCF/NI (0.16, a nine-month stub), and showed TTM
+OCF as "~0.0 ▲" when it was computable. The 9M-25 comparative (OCF −¥865m) was already in the source
+trail. On matched windows:
+
+```
+window        OCF (¥m)   NI (¥m)   OCF/NI
+9M-2025         −865      1,933    −0.45
+9M-2026         +378      2,261    +0.17      ← improving, not breaking down
+Q4-2025       +1,346        612    +2.20      ← Q4 is where this business converts
+TTM 3Q26      +1,724      2,873    +0.60      ← still below 0.8: weak, recovering
+```
+
+The same error ran through inventory: "+68% YTD" compared September with December (the seasonal peak
+with the seasonal trough); September-on-September was **+36.5%** against revenue +24%. Cost: no change
+to fair value or verdict, but EQ Class 4 2 → 3 (EQ 27 → 28/40), value-trap "accounting quality"
+WARNING → CLEAR (monitored), Quick-Kill Q5 No → CONDITIONAL, and the headline risk. **The mirror
+failure:** an external harness printed only TTM ("OCF recovered to ¥1,723m"), which hid that three
+quarters of 2026 converted at 0.17. Each single window tells half the story. Caught by Mike's
+external cross-check, not by any gate.
+
+*Case 2 — Shenzhen International #43 (0152.HK) v1, 2026-11-09.* Toll-segment recurring profit was
+taken as H1 × 2 = **HK$951m**; the FY25 segment figure was **HK$565m** (H1-25 484, so H2 ≈ +81,
+because Shenzhen Expressway books year-end charges in H2). Recurring look-through base 451 → 65; EPV
+floor 1.84 → 0.27. The headline SOTP was insulated (stake at market). Caught by a user-supplied
+benchmark adjudication.
 
 ---
 
@@ -91,6 +128,19 @@ leg alone can be verdict-relevant. See Check 12.
 **Asymmetric trap:** Management highlights one-time costs aggressively but quietly includes one-time gains. The analyst must independently identify both directions.
 
 **The analyst's own asymmetry — and it is the harder one.** A gate built to catch one-time *gains inflating* earnings does not automatically fire on one-time *losses depressing* them. Both are Class 6; only the sign differs. The habit of asking "is this profit too good?" has no reflex counterpart asking "is this profit too bad?" — so a depressed print gets accepted at face value and read as operating deterioration. That is **Class 13**, and it is Class 6 running backwards through the analyst rather than through management.
+
+**Case study — a gain year read as a no-gain year (Shenzhen International #43, found 2026-11-09).**
+The 2026-06-24 initiation said FY25 attributable profit (HK$2,249m) reflected the *absence* of land
+gains and normalized a "recurring base ~HK$1.3–1.6bn" from it. FY25 in fact contained **~HK$2,933m**
+of after-tax land-preparation gains (plot 02-20-02 HK$2,878m + a HK$54m true-up on plot 02-20-04).
+The figure the initiation relied on ("only RMB266m land transfer") was a different plot's
+*land-premium contract price*. Ex land/REIT, attributable profit was −81.6 (FY24), −683.6 (FY25) and
+−220.6 (H1-26) HK$m; the yield-backstopped WATCHLIST at FV ~HK$7.5 had no recurring base under it
+(refresh: PASS, FV HK$3.75 ▲▲). **Root cause:** the FY25 segment table was never read; a Tier 3
+narrative supplied the normalization, and an event (a contract price) was mistaken for a P&L
+recognition (a gain). **Gate that should have caught it:** Check 4. It asks what is unusual in a
+reported figure; it does not ask for the list of gain-generating events in the year. **Check 24**
+(event-to-P&L tie, adopted 2026-11-10) supplies that question.
 
 ---
 
@@ -786,7 +836,17 @@ S5  CONTAIN IT            shares x quote <= carrying value of the balance-sheet 
                           its total.
 S6  VOTES                 Check for proxies / lock-ups. A stake with no votes is an
                           economic claim, not strategic positioning.
+S7  TOTAL TABLE +         (adopted 2026-11-10) Share counts come from the investee's
+    FRESHNESS             TOTAL-holding table (restricted / locked-up shares included),
+                          never the tradable-float table. Every stake % — listed or
+                          unlisted — is re-verified against announcements up to the
+                          latest interim/annual report used in the analysis.
 ```
+
+**S7 cases (Shenzhen International #43, 2026-11-09).** v1 read Xin Tong Chan's Shenzhen Expressway
+holding from the float table (654.78m) instead of the total-holding table (730.71m incl. 75.93m
+restricted), which invented a 134.2m "H-leg". A competing report used a Shenzhen Airlines stake of
+28.09% that a June-2026 announcement had already diluted to 12.37%.
 
 **S5 is the cheapest check in this file and it alone kills the error.** The circulating TME figure of
 8,552,440 Spotify shares implies, at SPOT ~US$596, a **US$5.10bn** holding inside an FY25 FVOCI line
@@ -799,6 +859,83 @@ no external data.** The verified 4,276,200 reconciles instead to within US$15mn.
 Amd. No.5 (event 2023-12-31). Denominator 205,832,527 off Spotify's FY25 20-F cover; beneficiary
 certificates carry votes but no economic rights and are correctly excluded. All three Tencent-group
 holdings sit under an irrevocable proxy to D.G.E. Investments — **zero votes**.
+
+### Check 23: Matched-Window Rule for Flow Ratios, Segment Profit and Balance-Sheet Growth (60 seconds)
+
+**Trigger:** any statement about cash conversion (OCF/NI, FCF/NI), working-capital days, growth in
+inventory, receivables or payables, **or any annual figure built from a part-year segment result**,
+at every scope. Mandatory for any seasonal business (Q4-heavy consumer, retail, tax-season,
+agricultural; toll operators with H2 year-end charges).
+
+```
+W1 THREE WINDOWS   Print OCF/NI for the last full year (FY vs FY), the year-to-date vs the
+                   same YTD prior year, and TTM. Never a single window.
+W2 NO STUB MIXING  Never place a full-year figure beside a YTD figure as if they were a trend.
+W3 COMPUTE TTM     TTM = FY(t−1) − YTD(t−1) + YTD(t). The prior-year YTD comparative is printed
+                   in every quarterly/interim filing. Where it is computable, a ▲ estimate is
+                   not allowed.
+W4 SAME QUARTER-END  Balance-sheet growth (inventory, receivables, payables, contract
+                   liabilities) is measured against the same quarter-end a year earlier, never
+                   against the last year-end. Compare it with TTM or same-period revenue growth.
+W5 SEASONALITY     State which quarter or half carries the cash or the profit before reading any
+                   YTD figure (Anker: Q4-25 OCF ¥1,346m against an FY25 total of ¥481m).
+                   Never annualise a part-year SEGMENT result (H1 × 2): use the last full-year
+                   segment figure or TTM (0152 toll: H1 475.5 × 2 = 951 vs FY25 565).
+```
+
+**Scoring consequence.** Class 4 and the value-trap "accounting quality" test are scored on FY, TTM
+and the 5-year aggregate. A YTD stub may lower a score only when the same-YTD comparison also
+deteriorates. Where the cash-flow statement is not in the trail, W1–W3 are declared UNRUNNABLE in
+Data gaps — never estimated.
+
+**Cases:** Anker #73 and Shenzhen International #43, 2026-11-09 (Class 3 seasonal sub-case).
+
+### Check 24: Event-to-P&L Tie for Gain-Dependent Issuers (2 minutes) — adopted 2026-11-10
+
+**Trigger:** any issuer whose profit depends on land, REIT-injection, disposal or revaluation gains
+(HK/PRC SOE holdcos, developers, conglomerates), and in any case when one gain type exceeds 50% of
+attributable profit.
+
+```
+E1 LIST EVENTS    From the year's announcements, list every approval, injection, disposal or
+                  land-swap event, with date and stated gain.
+E2 TIE            Each event either appears in that year's segment profit or is shown as
+                  recognised in a named other year. An untied event blocks normalization.
+E3 NO PRICE=GAIN  A contract price, land premium or consideration is not a gain. Read the gain
+                  from the segment note or MD&A.
+E4 EX-GAIN SERIES Print reported vs ex-gain attributable profit for at least 3 periods before
+                  any "recurring base" is stated.
+E5 FINITE BANK    A depleting parcel/land bank is valued as a finite asset (remaining disclosed
+                  area × realised gain per unit, haircut, discounted), never as a perpetuity credit.
+E6 DIVIDEND FUND  When a period's profit is majority non-cash gains, print DPS cash cost, scrip
+                  take-up, OCF and the debt movement together.
+```
+
+**Case:** Shenzhen International #43. The June initiation read FY25 (HK$2,249m) as ex-land when it
+contained ~HK$2,933m of land-preparation gains (Class 6 case study). A competing report made the
+mirror error: it capitalised the same finite land bank as a HK$1.2bn/yr perpetuity, worth ~HK$12bn at
+10% against ~HK$7bn gross left in the disclosed pipeline. E6 on the same name: FY25 DPS cost
+HK$1,124m in cash (scrip HK$45m) against a profit that was 130% non-cash land gain, while borrowings
+rose HK$5.7bn in the next half.
+
+### Check 25: Zero-Carry Test for Associates (30 seconds) — adopted 2026-11-10
+
+**Trigger:** before normalizing any associate's or JV's drag on earnings, and before deducting or
+adding any associate's carrying value in a SOTP.
+
+```
+Is the investor still recognising its share of the associate's losses (carrying value > 0)?
+
+  YES → the drag is in reported profit; normalize it on evidence.
+  NO  → zero-carried (equity-method loss cap). Its losses are NOT in reported profit and
+        its carrying value is ~0: normalized contribution = 0, carrying deduction = 0.
+        Value any upside as an explicit option, and check separately for guarantees or
+        funding obligations (Class 10).
+```
+
+**Case:** Shenzhen Airlines inside Shenzhen International #43, 2026-11-09. Zero-carried since 2023.
+A competing report added back a +HK$548m "embedded airline drag" that was not in the numbers and
+deducted a HK$5.5bn carrying value that does not exist.
 
 ## Process Behaviors to Reinforce
 
@@ -927,6 +1064,11 @@ is already sitting in the book.
 - [ ] **Check 18 — base-rate any "management did not do X" claim before it carries weight**
 - [ ] **Check 21 — net cash built from all treasury components and reconciled to the issuer's headline liquidity; every method's add-back read from that one figure**
 - [ ] **Check 22 — every listed stake's share count read from the investee's own ownership filings, and contained within its balance-sheet line**
+- [ ] **Check 23 — every cash-conversion, working-capital or part-year segment figure printed on matched windows (FY, YTD-vs-YTD, TTM); no H1 × 2**
+- [ ] **FX for any valuation leg read from a dated official fixing (Class 2)**
+- [ ] **Check 22 S7 — stake counts from the investee's total-holding table; every stake % re-verified against the latest announcements**
+- [ ] **Check 24 — for gain-dependent issuers, every gain event tied to a year's segment profit and an ex-gain series printed before any recurring base; finite land banks valued as assets**
+- [ ] **Check 25 — zero-carry test run before normalizing or deducting any associate**
 
 ### Post-Analysis
 - [ ] Apply 4 plausibility checks before publishing
@@ -1127,6 +1269,10 @@ If all three agree, you're safe. If they disagree, dig deeper.
 | 2026-10-23 | **The containment test — a component cannot exceed the line that holds it** | The circulating 8,552,440 implied a **US$5.10bn** Spotify stake inside an FY25 FVOCI line of **US$3.75bn** — a negative remainder for UMG and WMG; it breaks above **US$438.59/share** and SPOT was far above that all year. **Falsifiable against TME's own audited balance sheet with one division.** The verified count reconciles to within US$15mn. Also retired a **vintage error of my own**: the UMG mark was carried at a mid-2026 US$36–43bn ▲ range against a Dec-2025 balance sheet, which manufactured a phantom "fourth unidentified asset" |
 | 2026-10-23 | **A residual is not a measurement — being conservative does not make it safe** | The ~1.6% residual **understated** the stake by ~US$250mn (~US$0.15/ADS) while the third-party figure **overstated** it by US$2.18bn (~US$1.35/ADS). Both came from not reading a filing that names the number. Class 16 extends: a figure derived by **subtraction from a total** is asserted, not computed, even when the total is audited and the arithmetic is right |
 | 2026-10-23 | **Cheat-sheet entry — share-basis contamination of the numerator** | 8,552,440 = exactly 2.0000× the true 4,276,200: TME's own 1 ADS = 2 ordinary ratio applied to an investee field. The BYD error moved from denominator to numerator; the cheat sheet previously held only denominator traps |
+| 2026-11-09 | **Class 3 seasonal sub-case; Check 23 — matched windows (W1–W5)** | Anker #73: "cash conversion broken down" built on FY25 (0.19) vs a 9M stub (0.16); TTM OCF guessed at ~0 when ¥1,724m was computable; inventory "+68% YTD" was +36.5% Sep-on-Sep. Mirror failure in an external harness (TTM only) hid the 2026 YTD 0.17. Caught by Mike's external cross-check |
+| 2026-11-09 (d) | **Class 6 case — a gain year read as a no-gain year** | Shenzhen International #43: the June initiation read FY25 (HK$2,249m) as ex-land when it contained ~HK$2,933m of land-preparation gains, and normalized a HK$1.3–1.6bn recurring base that does not exist (ex-land: −81.6 / −683.6 / −220.6 HK$m). WATCHLIST FV ~7.5 → PASS FV 3.75. Led to Check 24 (adopted 2026-11-10) |
+| 2026-11-09 (e) | **Check 23 W5 extended to segment profit; dated-FX rule (Class 2)** | #43 v1, caught by a user-supplied benchmark: toll segment annualised H1 × 2 = 951 vs FY25 565 (recurring base 451 → 65); RMB/HKD assumed 1.10 vs CFETS 1.1667. Remaining v1 lessons adopted 2026-11-10 (next row), except the SOTP-only headline for holdcos, still a proposal in the addendum |
+| 2026-11-10 | **Check 24 — event-to-P&L tie (E1–E6); Check 22 S7 — total-holding table + stake freshness; Check 25 — zero-carry test for associates** | Adopted from the 2026-11-09 addendum after the Shenzhen International #43 benchmark: June read a land-gain year as a no-gain year; v1 read a stake from the float table (654.78m vs 730.71m); a competing report capitalised a finite land bank as a perpetuity, used a stake six months stale (28.09% vs 12.37%) and normalized a drag from a zero-carried associate |
 
 ### Pattern: "Net income rose but basic EPS is flat (or basic and diluted EPS diverge)"
 **Trigger:** NI up mid-single-digits, basic EPS ~0%, diluted EPS +1-2%; or weighted-avg basic shares jump while diluted barely moves
