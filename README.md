@@ -17,7 +17,7 @@ When installed, this skill gives Claude the ability to:
 - **Bridge any surprising quarter** from operating profit through one-offs, non-operating items and tax, so only the operational part moves the thesis
 - Assess competitive moats **with trend analysis** on an anchored /30 scorecard, and test technology disruption **per segment** with the Deflation Sign Test
 - **Apply industry playbooks** — full sector overrides for financials (insurance and banking), plus guidance for consumer, media, energy, railroads and technology
-- **Value on one owner-earnings definition** — operating profit after normal tax + D&A − maintenance capex, pre-interest, stock compensation never added back — so net cash and debt are counted exactly once
+- **Value on one owner-earnings definition** — operating profit after normal tax + D&A − maintenance capex, pre-interest, stock compensation never added back — so net cash and debt are counted exactly once. The base is latest revenue × the three-year average margin; the latest year's margin may replace it only for a **proven structural shift** (a filed, quantified cause seen in the last two reported periods that explains at least half the gap, never for a cyclical), and then both bases are valued through to fair value side by side
 - **Charge growth for the capital it needs** (g ÷ return on new capital, with a moat-set terminal return), and use a **mid-cycle base** for cyclicals
 - **State one fair value** from the primary method for the business type — for non-financials the lower of the Base and probability-weighted DCF; residual income with an explicit fade for banks and insurers (`scripts/residual_income.py`) — with other methods as cross-checks, never averaged in
 - **Apply Output Plausibility Checks** ("too good to be true", peer multiples, reverse DCF, analyst consensus divergence)
@@ -133,15 +133,21 @@ value-investment-skills/
 │   │                                           #   statement articulation, owner-earnings tie, history,
 │   │                                           #   windows, FX, stakes); --status-box prints the box that
 │   │                                           #   opens every deliverable, --trail the Data Trail; also
-│   │                                           #   reports measured ROIC (all capital and organic)
+│   │                                           #   reports measured ROIC (all capital and organic) and,
+│   │                                           #   for a structural-margin shift (D7.structural), the
+│   │                                           #   three-year-margin basis as a second figure
 │   ├── scenario_dcf.py                         # Scenario DCF on operating (pre-interest) owner earnings,
 │   │                                           #   growth charged at g / RONIC, one fair_value; weighted
 │   │                                           #   value, reverse DCF, implied return, terminal-value
-│   │                                           #   share, per-share bridge, sensitivity grid; takes its
-│   │                                           #   inputs from the validation and stamps the data status
+│   │                                           #   share, per-share bridge (stakes and minorities in every
+│   │                                           #   per-share figure), sensitivity grid, and a second fair
+│   │                                           #   value on the alternative owner-earnings basis; takes
+│   │                                           #   its inputs from the validation, stamps the data status,
+│   │                                           #   and stops if its cyclical flag disagrees with the inputs
 │   ├── residual_income.py                      # Banks / insurers: residual income with explicit fade,
 │   │                                           #   fade ladder, justified-P/B validity test
-│   └── tests/                                  # python3 -m unittest discover -s scripts/tests
+│   └── tests/                                  # Unit tests for all three scripts:
+│                                               #   python3 -m unittest discover -s scripts/tests
 ├── *_bilingual.md, value_investing_skill_*.md  # EN/中文 records of rule amendments and sweeps, and a
 │                                               #   Mermaid architecture diagram (not loaded by the skill)
 └── web-report/                                 # Interactive HTML web report generation skill
@@ -255,7 +261,7 @@ Claude will follow a 10-step research process:
 3.5. **Earnings Quality Gate** — 8-distortion check, plus a quarterly profit bridge when a quarter's profit diverges from revenue or surprises consensus
 4. **Moat Assessment** — anchored /30 scorecard, durability and **trend** (widening/stable/narrowing); per-segment disruption scenarios where technology threatens a revenue line
 5. **Industry Analysis** — sector-specific metrics and macro sensitivities
-6. **Intrinsic Valuation** — operating owner earnings, growth charged for reinvestment, one fair value from the primary method for the business type (`scripts/scenario_dcf.py`, or `scripts/residual_income.py` for financials); other methods as cross-checks
+6. **Intrinsic Valuation** — operating owner earnings (three-year margin, or the latest margin for a proven structural shift with both bases shown), growth charged for reinvestment, one fair value from the primary method for the business type (`scripts/scenario_dcf.py`, or `scripts/residual_income.py` for financials); other methods as cross-checks
 6.5. **Output Plausibility Checks** — four sanity checks ("Too Good to Be True", peer multiples, reverse DCF, analyst consensus divergence) before publishing
 7. **Margin of Safety** — current price against the fair value (25% required; 40%+ for turnarounds; +10 points when the data is QUALIFIED)
 8. **Risk & Sell Check** — value trap diagnostic, inflation scorecard, sell criteria, and behavioral bias/analytical self-checks

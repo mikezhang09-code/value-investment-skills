@@ -708,13 +708,24 @@ cross-checks, never averaged in** (`references/intrinsic-value.md` "Fair Value")
 | Holding company / conglomerate | SOTP mandatory beside the DCF (Method 6) | duplicate-exposure test |
 | Distressed / asset play | NCAV or liquidation value | EPV |
 
-**Three rules that changed on 2026-11-10 — they move every DCF:**
+**Rules that changed on 2026-11-10 and 2026-11-11 — they move every DCF:**
 1. **Owner earnings are operating and pre-interest:** operating profit × (1 − normal tax) + D&A −
    maintenance capex. Not net income; stock compensation is never added back. Net cash is then added
    once and debt deducted once.
 2. **Growth is charged for:** each year reinvests g ÷ RONIC (read from measured ROIC); the terminal
    year reinvests tg ÷ terminal RONIC, set by moat class (r / r+2 / r+4).
-3. **Cyclicals are valued on a mid-cycle base,** not the latest year.
+3. **The earnings base is latest revenue × the three-year average margin.** Cyclicals use a
+   mid-cycle margin instead, never the latest year. State `meta.cyclical` in the inputs file; the
+   rate build's cyclical flag must agree with it.
+4. **The latest year's margin replaces the three-year average only for a proven structural shift**
+   (`"method": "latest_margin"`, adopted 2026-11-11). The cause must be a filed, quoted
+   income-statement line that moved the margin the same way in the last two reported periods and,
+   after tax, explains at least half the gap between the two bases. A narrative reason is required
+   but is never the evidence, and the exception is never available to a cyclical. Check
+   D7.structural enforces it: a failure makes the data UNRESOLVED. When it passes, the three-year
+   basis is valued through to a **second fair value**, printed beside the headline in every
+   deliverable (`alternative_basis` in `scenario_dcf.py`). Full rule: `intrinsic-value.md` Method 1
+   Step 1, rule 6.
 
 A cross-check more than 30% from the fair value needs a named assumption that explains it. State
 the method set used; where it is not the DCF, say why.
@@ -1032,6 +1043,13 @@ Read these when needed — don't load all at once:
 ---
 
 ## Change Log
+
+- **2026-11-11** — **Structural-margin exception added to Step 6** (rule 4): the latest year's
+  margin may replace the three-year average only with a filed cause that persists over two reported
+  periods and explains at least half the gap, never for a cyclical; both bases are valued to fair
+  value. Enforced by `validate_inputs.py` D7.structural and `scenario_dcf.py` `alternative_basis`.
+  Stakes and minority interests now enter every per-share figure, EPV included. Derivation: the Zoom
+  pilot, where stock compensation fell about $300m and the three-year average understated the margin.
 
 - **2026-11-10 (f)** — **Valuation method rebuilt** (full record in `references/intrinsic-value.md`).
   Operating, pre-interest owner earnings with stock compensation left as an expense (ends the debt

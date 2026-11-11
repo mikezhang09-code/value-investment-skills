@@ -1,7 +1,7 @@
 # Value Investing Skill Architecture & Workflow Specification
 # 价值投资 Research Skill 架构与工作流程图解指南 (中英双语版)
 
-> **Document Version**: 2026-11-10 (Data gate with three outcomes; valuation method rebuilt)  
+> **Document Version**: 2026-11-11 (Data gate with three outcomes; valuation method rebuilt; structural-margin exception)  
 > **Target Skill**: `value-investing`  
 > **Core Philosophy**: Benjamin Graham, Warren Buffett, Charlie Munger, Philip Fisher  
 > **Supersedes**: 2026-07-27 version (Post-Amendment #13)
@@ -12,6 +12,7 @@
 |---|---|---|
 | Step 2.5 | Four anchors checked by hand; any failure stopped the analysis / 四锚点人工核对，任一失败即中断 | `validate_inputs.py` runs 11 checks (D1–D11) on an inputs file, plus an independent second read; outcome **VERIFIED / QUALIFIED / UNRESOLVED** — the analysis is always produced / 脚本化11项校验+独立复核；三种结果，分析始终输出 |
 | Owner earnings / 所有者盈余 | Net income + D&A − maintenance capex (three conflicting definitions) / 以净利润为起点，三种口径并存 | Operating profit × (1 − tax) + D&A − maintenance capex, pre-interest, SBC not added back / 以经营利润为起点、税后、息前，不加回股权激励 |
+| Earnings base / 盈余基数 | Three-year average / 三年平均 | Latest revenue × three-year average margin; latest margin only for a proven structural shift (D7.structural), never for a cyclical, with both bases valued to fair value / 最新收入×三年平均利润率；仅在证实结构性变化时用最新利润率（周期股除外），两种基数均需估值列示 |
 | Growth / 增长 | Free / 增长无成本 | Charged at g ÷ RONIC; terminal RONIC by moat (r / r+2 / r+4) / 按 g ÷ 新增资本回报率扣除再投资 |
 | Fair value / 公允价值 | Multi-method triangulation with free weights / 多方法自由加权 | One figure from the primary method per business type; others are cross-checks / 按业务类型取单一主方法，其余仅作交叉校验 |
 | Financials / 金融 | P/B to ROE | Residual income with explicit fade (`residual_income.py`) / 带衰减的剩余收益模型 |
@@ -140,7 +141,7 @@ flowchart TD
         D4["D4 Live price P1–P5 / 实时股价校验"]
         D5["D5 Net cash from every treasury line (Check 21) / 净现金"]
         D6["D6 Statements articulate: cash & equity roll-forward,<br>5-yr cash identity / 报表勾稽"]
-        D7["D7 Owner-earnings tie: operating profit, tax, D&A,<br>maintenance capex = statement lines / 所有者盈余对账"]
+        D7["D7 Owner-earnings tie: operating profit, tax, D&A,<br>maintenance capex = statement lines / 所有者盈余对账<br>D7.structural: latest-margin base needs a filed cause,<br>2 periods, ≥ half the gap; not for cyclicals"]
         D8["D8 History basis: latest 3 yrs filed / 历史数据来源"]
         D9["D9 Matched windows: FY, YTD vs YTD, TTM / 期间匹配"]
         D10["D10 FX: dated official fixing / 官方定盘汇率"]
@@ -255,14 +256,19 @@ flowchart LR
 
 ## 5. Valuation Engine & Plausibility Feedback Loop / 估值引擎与合理性校验闭环
 
-Step 6 values the business on **one owner-earnings definition**, charges growth for the capital it needs, bridges to equity counting every balance-sheet item once, and states **one fair value**. Other methods are cross-checks, never averaged in. Step 6.5 then runs four sanity tests and loops back to the data gate if two or more fail.
+Step 6 values the business on **one owner-earnings definition** (base: latest revenue × three-year average margin; mid-cycle for cyclicals; the latest margin only for a structural shift proven by D7.structural, with the three-year basis valued alongside), charges growth for the capital it needs, bridges to equity counting every balance-sheet item once, and states **one fair value**. Other methods are cross-checks, never averaged in. Step 6.5 then runs four sanity tests and loops back to the data gate if two or more fail.
 
 步骤 6 采用**统一的所有者盈余口径**，对增长扣除所需再投资，在权益桥接中每个资产负债表项目只计一次，并给出**单一公允价值**。其他方法仅作交叉校验，不参与加权。步骤 6.5 执行4项合理性测试，2项以上异常则退回数据关口。
 
 ```mermaid
 flowchart TD
     subgraph OE ["Operating owner earnings (validated, D7) / 经营性所有者盈余"]
-        OE1["(Operating profit − financial items inside it) × (1 − normal tax)<br>+ D&A − maintenance capex ± normal working capital<br>Pre-interest · SBC stays an expense · base = latest revenue × avg margin<br>Cyclicals: mid-cycle margin<br>息前 · 股权激励视为费用 · 周期股用周期中值利润率"]
+        OE1["(Operating profit − financial items inside it) × (1 − normal tax)<br>+ D&A − maintenance capex ± normal working capital<br>Pre-interest · SBC stays an expense<br>息前 · 股权激励视为费用"]
+        OEB{"Earnings base<br>盈余基数"}
+        OE1 --> OEB
+        OEB -->|Default / 默认| B3["Latest revenue × three-year average margin<br>最新收入 × 三年平均利润率"]
+        OEB -->|Cyclical / 周期股| BM["Mid-cycle margin (≥7 yrs, ≥1 down year)<br>周期中值利润率"]
+        OEB -->|Proven structural shift<br>D7.structural passes| BL["Latest full-year margin<br>+ three-year basis valued alongside<br>最新利润率 + 并列三年基数估值"]
     end
 
     subgraph Rate ["Discount rate / 折现率"]
@@ -281,10 +287,11 @@ flowchart TD
     Rate --> Scen
     Growth --> Scen
 
-    Scen --> Bridge["Bridge to equity: EV + net cash (Check 21) + stakes (Check 22)<br>− minorities − pension deficit; ÷ period-end shares + dilution<br>权益桥接：每项只计一次"]
+    Scen --> Bridge["Bridge to equity: EV + net cash (Check 21) + stakes (Check 22)<br>− minorities − pension deficit; ÷ period-end shares + dilution<br>applied to every per-share figure (scenarios, EPV, zero-growth)<br>权益桥接：每项只计一次，适用于所有每股数值"]
     Bridge --> FV["ONE FAIR VALUE = lower of Base and probability-weighted<br>单一公允价值 = 基准情景与概率加权值中较低者"]
 
     FV --> XC["Cross-checks: EPV floor · reverse DCF · peers · DDM / SOTP<br>> 30% apart → name the assumption that explains it<br>交叉校验：差距>30%须说明原因"]
+    BL -.->|Second fair value on the three-year basis,<br>printed beside the headline / 并列第二公允价值| FV
 
     subgraph Step65 ["Step 6.5: Output Plausibility / 合理性4项校验"]
         T1["Test 1: 'Too Good to Be True' (heavily covered names)"]
@@ -380,7 +387,7 @@ flowchart TD
 1. **Record Before You Analyze (先录入，后分析)**: every verdict-moving number goes into the inputs file with its page and the line as printed, and is read twice.
 2. **Analyse on What You Have, and Say So (据实分析，如实标注)**: gaps qualify the verdict; conflicts remove it. The analysis is never withheld and never presented as more verified than it is.
 3. **Normalize Before You Value (先归一化，后估值)**: Step 3.5 bridges accounting earnings to economic owner earnings.
-4. **One Owner-Earnings Definition, Counted Once (统一口径，只计一次)**: operating, pre-interest, SBC as an expense; net cash and debt enter the bridge exactly once.
+4. **One Owner-Earnings Definition, Counted Once (统一口径，只计一次)**: operating, pre-interest, SBC as an expense; net cash and debt enter the bridge exactly once. A latest-margin base needs a filed, persistent cause, and the three-year basis is always shown beside it.
 5. **Growth Is Not Free (增长有成本)**: every point of growth is charged for the capital it needs.
 6. **One Fair Value (单一公允价值)**: from the primary method for the business type; other methods cross-check, they do not average in.
 7. **Per-Share Economics Over Aggregates (每股价值高于总量增长)**: Dilution drag matters to existing shareholders.
