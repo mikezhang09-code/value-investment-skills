@@ -31,6 +31,8 @@ input.json example (millions, except price and per-share values):
   "bridge": [],                    # optional: [{"label": "Spotify stake", "amount": 2549, "reason": "Check 22"}]
                                    #   stakes +, minority interests -, pension deficit -
   "legacy_owner_earnings": null,   # optional: old-definition figure, prints the old method beside the new
+  "alternative_owner_earnings": null,  # illustrative runs only: {"basis": ..., "value": ...}. On a validated run
+                                   #   the second basis comes from the validation file (method 'latest_margin')
   "net_debt": 1136,                # REQUIRED unless "treasury" is given; negative = net cash. Never assume 0.
   "treasury": {                    # preferred (Check 21): net_debt is BUILT from these, not typed
     "cash": 3600, "short_term_investments": 0, "term_deposits": 0, "other_liquid": 0,
@@ -215,6 +217,8 @@ def check_validation(cfg, cfg_path, reading=None):
         sys.exit("STOP: the inputs file changed after it was validated. Re-run validate_inputs.py.")
     gate = {"status": status, "file": os.path.basename(vpath), "inputs_sha256": digest[:12],
             "measured_roic": (v.get("derived") or {}).get("roic"),
+            "owner_earnings_alternative": (v.get("derived") or {}).get("owner_earnings_alternative"),
+            "cyclical": (v.get("derived") or {}).get("cyclical"),
             "consequences": v.get("consequences", {}), "gaps": v.get("gaps", []), "conflicts": v.get("conflicts", []),
             "not_validated": []}
     if status == "UNRESOLVED":
@@ -288,6 +292,11 @@ def main(path, illustrative=False, reading=None):
         adj, parts = 0.0, {}
     else:
         adj, parts = risk_adjustment(risk)
+        # The cyclical flag is a fact about the business, stated once in the validated inputs file.
+        validated_cyc = gate.get("cyclical") if isinstance(gate, dict) else None
+        if isinstance(validated_cyc, bool) and bool(risk.get("cyclical")) != validated_cyc:
+            sys.exit(f"STOP: risk.cyclical {bool(risk.get('cyclical'))} disagrees with meta.cyclical {validated_cyc} "
+                     f"in the validated inputs file. One business, one flag: fix whichever is wrong and re-validate.")
     table_r = base_r + adj
     r = cfg.get("discount_rate", table_r)
     if abs(r - table_r) > 1e-9 and not cfg.get("discount_rate_reason"):
@@ -436,6 +445,31 @@ def main(path, illustrative=False, reading=None):
         out["legacy_method_base"] = {"value_per_share": round((pv + tvl - nd + bridge) / sh, 2),
                                      "note": "pre-2026-11-10 method: net-income-based owner earnings, growth free, "
                                              "net debt deducted again. For the transition comparison only"}
+
+    # Second owner-earnings basis (intrinsic-value.md Method 1 Step 1, rule 6 exception): when the latest
+    # year's margin is used, the three-year-margin basis runs through the same scenarios to a fair value.
+    alt = gate.get("owner_earnings_alternative") if isinstance(gate, dict) else None
+    if alt is None and illustrative:
+        alt = cfg.get("alternative_owner_earnings")
+    if alt:
+        a_oe, a_out, a_w = alt["value"], [], 0.0
+        for s in scen:
+            pv, tv = enterprise_parts(a_oe * s.get("oe_factor", 1.0), s["g1"], s["g2"], s["tg"], s.get("r", r),
+                                      s.get("ronic", ronic), tronic)
+            v = (pv + tv - nd + bridge) / sh
+            a_w += v * s["p"]
+            a_out.append({"name": s["name"], "p": s["p"], "value_per_share": round(v, 2), "mos_pct": mos_pct(v, price)})
+        a_base = next(x["value_per_share"] for x in a_out if x["name"] == base["name"])
+        a_fv = min(a_base, round(a_w, 2)) if len(scen) > 1 else a_base
+        a_ir = implied_return(a_oe * base.get("oe_factor", 1.0), price, nd, sh, base["g1"], base["g2"], base["tg"],
+                              b_ronic, tronic, bridge)
+        out["alternative_basis"] = {"basis": alt.get("basis", "alternative"), "owner_earnings": a_oe,
+                                    "scenarios": a_out, "weighted_iv": round(a_w, 2), "fair_value": a_fv,
+                                    "fair_value_mos_pct": mos_pct(a_fv, price),
+                                    "implied_return_pct": None if a_ir is None else round(a_ir * 100, 2),
+                                    "note": alt.get("note", "")}
+        warnings.append(f"owner earnings use the latest year's margin; on the {alt.get('basis', 'alternative')} "
+                        f"basis fair value is {a_fv} vs {out['fair_value']} — print both in every deliverable")
 
     grid = {}
     for dr in (r - 0.02, r - 0.01, r, r + 0.01, r + 0.02):

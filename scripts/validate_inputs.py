@@ -119,7 +119,7 @@ def resolve(data, path):
             if key.isdigit() and int(key) < len(cur) and not isinstance(cur[int(key)], dict):
                 cur = cur[int(key)]
                 continue
-            hit = [e for e in cur if isinstance(e, dict) and key in (str(e.get("fy")), str(e.get("name")))]
+            hit = [e for e in cur if isinstance(e, dict) and key in (str(e.get("fy")), str(e.get("name")), str(e.get("period")))]
             if hit:
                 cur = hit[0]
             elif key.isdigit() and int(key) < len(cur):
@@ -184,6 +184,15 @@ def verdict_movers(data):
         paths += [f"statements.years[{years[-1].get('fy')}].{k}" for k in LATEST_FACTS]
     for s in data.get("stakes", []):
         paths += [f"stakes[{s.get('name')}].shares_held", f"stakes[{s.get('name')}].carrying_value"]
+    oe = data.get("owner_earnings") or {}
+    sc = oe.get("structural_cause")
+    if oe.get("method") == "latest_margin" and isinstance(sc, dict):
+        if isinstance(sc.get("window_start"), dict):
+            paths.append("owner_earnings.structural_cause.window_start.value")
+        for p_ in sc.get("periods") or []:
+            if isinstance(p_, dict) and p_.get("period"):
+                base = f"owner_earnings.structural_cause.periods[{p_['period']}]"
+                paths += [f"{base}.value", f"{base}.prior_value"]
     return paths
 
 
@@ -586,7 +595,7 @@ def check_owner_earnings(data, rep, usable):
     oe = data.get("owner_earnings")
     if not oe or not num(oe.get("value")):
         rep.add("D7", "GAP", "owner_earnings block with a 'value' is required")
-        return None
+        return None, None
     by_fy = {y.get("fy"): y for y in sorted_years(data)}
     comps, probs, clash, totals, fcfs = oe.get("components") or {}, [], [], [], []
     if not comps:
@@ -635,23 +644,31 @@ def check_owner_earnings(data, rep, usable):
     if not totals:
         if clash:
             rep.add("D7", "CONFLICT", "; ".join(clash))
-        return oe["value"]
-    method = oe.get("method", "average")
-    if method == "margin":      # normalise the margin, not the scale: latest revenue x average owner-earnings margin
+        return oe["value"], None
+    method, alt = oe.get("method", "average"), None
+    if method == "latest_margin":
+        base_val, alt, how = check_structural_cause(data, rep, comps, by_fy)
+        if base_val is None:
+            return oe["value"], None
+    elif method == "margin":      # normalise the margin, not the scale: latest revenue x average owner-earnings margin
         pairs = [(oe_year(c), by_fy[fy].get("revenue")) for fy, c in comps.items()
                  if fy in by_fy and all(num(c.get(k)) for k in ("op_profit", "tax_rate", "da", "maintenance_capex"))]
         latest_rev = sorted_years(data)[-1].get("revenue")
         if not num(latest_rev) or not all(num(r_) and r_ > 0 for _, r_ in pairs):
             rep.add("D7", "GAP", "method 'margin' needs revenue for every component year and for the latest year")
-            return oe["value"]
+            return oe["value"], None
         base_val = latest_rev * sum(v_ / r_ for v_, r_ in pairs) / len(pairs)
         how = f"latest revenue {latest_rev:,.6g} × {len(pairs)}-year average owner-earnings margin"
     elif method == "average":
         base_val, how = sum(totals) / len(totals), f"{len(totals)}-year average of components"
     else:
-        rep.add("D7", "GAP", f"owner_earnings.method '{method}' must be 'average' or 'margin'")
-        return oe["value"]
-    computed = base_val + sum(a["amount"] for a in oe.get("adjustments", []) if num(a.get("amount")))
+        rep.add("D7", "GAP", f"owner_earnings.method '{method}' must be 'average', 'margin' or 'latest_margin'")
+        return oe["value"], None
+    adj_total = sum(a["amount"] for a in oe.get("adjustments", []) if num(a.get("amount")))
+    computed = base_val + adj_total
+    if alt is not None:
+        alt = {"basis": "three-year average margin", "value": round(alt + adj_total, 4),
+               "note": "printed through to fair value beside the latest-margin basis (intrinsic-value.md Step 1, rule 6)"}
     gap = abs(computed - oe["value"]) / max(abs(computed), 1e-9)
     text = (f"operating owner earnings handed to the valuation {oe['value']:,.6g} vs computed ({how}) "
             f"{computed:,.6g} (gap {gap:.2%})")
@@ -669,7 +686,108 @@ def check_owner_earnings(data, rep, usable):
                      "explain in notes['D7.vs_fcf'] (growth capex, working-capital build, interest paid) or lower it"))
         else:
             rep.add("D7.vs_fcf", "PASS", f"owner earnings {oe['value']:,.6g} vs average free cash flow {fcf:,.6g}")
-    return oe["value"]
+    return oe["value"], alt
+
+
+STRUCTURAL_SHARE = 0.5   # the cause, after tax, must explain at least half of the gap between the two bases
+
+
+def margin_basis(comps, by_fy, latest_rev):
+    """Latest revenue x average owner-earnings margin over the component years (None if revenue missing)."""
+    pairs = [(oe_year(c), by_fy[fy].get("revenue")) for fy, c in comps.items() if fy in by_fy]
+    if not num(latest_rev) or not pairs or not all(num(r_) and r_ > 0 for _, r_ in pairs):
+        return None
+    return latest_rev * sum(v_ / r_ for v_, r_ in pairs) / len(pairs)
+
+
+def check_structural_cause(data, rep, comps, by_fy):
+    """method 'latest_margin' (intrinsic-value.md Method 1 Step 1, rule 6 exception). The latest full year's
+    actual margin replaces the three-year average only when a filed, quantified cause explains the shift and
+    shows in the last two reported periods. Any failure is a CONFLICT: the figure is not a permitted basis.
+    Returns (latest-year owner earnings, three-year-margin owner earnings, description) or (None, None, None)."""
+    oe, years = data["owner_earnings"], sorted_years(data)
+    sc, bad = oe.get("structural_cause"), []
+    latest = years[-1] if years else {}
+    lfy = latest.get("fy")
+    fail = lambda: (rep.add("D7.structural", "CONFLICT", "method 'latest_margin': " + "; ".join(bad)), (None, None, None))[1]
+    if lfy not in comps:
+        bad.append(f"the latest full year {lfy} must be an owner-earnings component (its margin is the one used)")
+    cyc = data.get("meta", {}).get("cyclical")
+    if cyc is True:
+        bad.append("meta.cyclical is true: a cyclical's margin rise is the cycle until shown otherwise — use the "
+                   "mid-cycle base (intrinsic-value.md Method 1 Step 1), not the latest year's margin")
+    elif cyc is not False:
+        bad.append("meta.cyclical must be stated as true or false before the latest year's margin can be used "
+                   "(autos, semiconductors, batteries, materials, shipping, airlines are cyclical)")
+    if len(comps) < 3:
+        bad.append(f"needs at least three component years so the three-year-margin basis can print beside it "
+                   f"(has {len(comps)})")
+    if not isinstance(sc, dict):
+        bad.append("structural_cause is required: the line, kind, reason, amount, window_start and the last two "
+                   "reported periods, each figure quoted from a filing")
+        return fail()
+    if not str(sc.get("line", "")).strip():
+        bad.append("structural_cause.line missing: name the income-statement line that moved")
+    if sc.get("kind") not in ("cost", "income"):
+        bad.append("structural_cause.kind must be 'cost' or 'income'")
+    if not str(sc.get("reason", "")).strip():
+        bad.append("structural_cause.reason missing: say why the shift is structural, not cyclical")
+    amount = sc.get("amount")
+    if not num(amount) or amount == 0:
+        bad.append("structural_cause.amount missing: the cause must be a figure from the filings, not a narrative")
+    if bad:
+        return fail()
+    sign = -1 if sc["kind"] == "cost" else 1               # a cost that falls raises the margin
+    first_fy = sorted(comps, key=lambda fy: str(by_fy.get(fy, {}).get("period_end", fy)))[0]
+    ws = sc.get("window_start") or {}
+    if ws.get("period") != first_fy or not num(ws.get("value")):
+        bad.append(f"window_start must give the line's value for {first_fy}, the first component year")
+    periods = [p_ for p_ in sc.get("periods") or [] if isinstance(p_, dict)]
+    by_label = {p_.get("period"): p_ for p_ in periods}
+    ytd = (data.get("statements") or {}).get("ytd") or {}
+    second = ytd.get("label") if ytd.get("label") else (years[-2].get("fy") if len(years) > 1 else None)
+    need = [x for x in (lfy, second) if x]
+    if len(by_label) < 2:
+        bad.append(f"the cause must show in at least the last two reported periods; {len(by_label)} given")
+    missing = [x for x in need if x not in by_label]
+    if missing:
+        bad.append(f"periods must include the last two reported periods {need}; missing {missing}")
+    for p_ in periods:
+        if not (num(p_.get("value")) and num(p_.get("prior_value"))):
+            bad.append(f"period {p_.get('period')}: value and prior_value (same window a year earlier) are required")
+    if bad:
+        return fail()
+    latest_line = by_label[lfy]["value"]
+    if not same_number(latest_line - ws["value"], amount) or (latest_line - ws["value"]) * amount < 0:
+        bad.append(f"amount {amount:,.6g} is not the filed change in the line, {lfy} {latest_line:,.6g} less "
+                   f"{first_fy} {ws['value']:,.6g} = {latest_line - ws['value']:,.6g}")
+    latest_oe = oe_year(comps[lfy])
+    three_year = margin_basis(comps, by_fy, latest.get("revenue"))
+    if three_year is None:
+        bad.append("revenue missing for a component year or the latest year: the three-year-margin basis cannot print")
+        return fail()
+    shift = latest_oe - three_year
+    effect = sign * amount * (1 - comps[lfy]["tax_rate"])  # after-tax effect on owner earnings
+    moves = [sign * (p_["value"] - p_["prior_value"]) for p_ in periods]
+    direction = 1 if (shift if abs(shift) > 0.01 * abs(three_year) else effect) > 0 else -1
+    against = [p_["period"] for p_, m in zip(periods, moves) if m * direction <= 0]
+    if against:
+        bad.append(f"the line did not move the margin the same way in {against}: the shift is not persistent")
+    if abs(shift) > 0.01 * abs(three_year):
+        if effect * shift <= 0:
+            bad.append(f"the cause moves owner earnings by {effect:+,.6g} after tax but the latest margin is "
+                       f"{'above' if shift > 0 else 'below'} the three-year average")
+        elif abs(effect) < STRUCTURAL_SHARE * abs(shift):
+            bad.append(f"the cause explains {abs(effect):,.6g} after tax of a {abs(shift):,.6g} gap between the two "
+                       f"bases ({abs(effect) / abs(shift):.0%}); at least {STRUCTURAL_SHARE:.0%} must be explained")
+    if bad:
+        return fail()
+    rep.add("D7.structural", "PASS",
+            f"{sc['line']} {ws['value']:,.6g} ({first_fy}) -> {latest_line:,.6g} ({lfy}), {amount:+,.6g}; after tax "
+            f"{effect:+,.6g} of a {shift:+,.6g} gap between the bases; same direction in "
+            f"{', '.join(p_['period'] for p_ in periods)} — {sc['reason']}")
+    return latest_oe, three_year, (f"latest full year {lfy} actual margin (structural cause: {sc['line']}); "
+                                   f"three-year-margin basis {three_year:,.6g} printed beside it")
 
 
 def measured_roic(data, usable):
@@ -796,7 +914,7 @@ def validate(data, stage="final"):
     net_debt = check_treasury(data, rep)
     usable = check_history(data, rep)
     check_articulation(data, rep)
-    oe = check_owner_earnings(data, rep, usable)
+    oe, oe_alt = check_owner_earnings(data, rep, usable)
     windows = check_windows(data, rep)
     check_fx(data, rep)
     check_stakes(data, rep)
@@ -812,12 +930,13 @@ def validate(data, stage="final"):
         "conflicts": [f"{r['id']} ({r['affects']}): {r['detail']}" for r in rep.rows if r["status"] == "CONFLICT"],
         "gaps": [f"{r['id']} ({r['affects']}): {r['detail']}" for r in rep.rows if r["status"] == "GAP"],
         "derived": {
-            "owner_earnings": oe, "valuation_count": sh.get("valuation_count"), "net_debt": net_debt,
+            "owner_earnings": oe, "owner_earnings_alternative": oe_alt, "valuation_count": sh.get("valuation_count"), "net_debt": net_debt,
             "price": px.get("value"), "price_currency": px.get("currency"),
             "price_in_reporting_currency": None if rate is None or not num(px.get("value")) else px["value"] * rate,
             "reporting_currency": meta.get("currency"), "unit": meta.get("unit"),
             "ordinary_share_count": count, "usable_history": usable, "windows": windows,
             "roic": measured_roic(data, usable or []),
+            "cyclical": meta.get("cyclical") if isinstance(meta.get("cyclical"), bool) else None,
         },
         "checks": rep.rows,
     }

@@ -66,7 +66,7 @@ directly.
 
 | Block | Holds |
 |---|---|
-| `meta` | `ticker`, `listing`, `analysis_date`, `fiscal_year_end`, `currency`, `unit` (`units`/`thousands`/`millions`/`billions`), `scope` (`deep_dive`/`quick`/`refresh`/`earnings`), `ads_ratio` (ordinary shares per depositary share, else null), `is_depositary` |
+| `meta` | `ticker`, `listing`, `analysis_date`, `fiscal_year_end`, `currency`, `unit` (`units`/`thousands`/`millions`/`billions`), `scope` (`deep_dive`/`quick`/`refresh`/`earnings`), `ads_ratio` (ordinary shares per depositary share, else null), `is_depositary`, `cyclical` (true/false — autos, semiconductors, batteries, materials, shipping, airlines; required for `latest_margin`, and `scenario_dcf.py` stops if its `risk.cyclical` disagrees) |
 | `sources[]` | `id`, `tier`, `doc`, `url`, `period`, `retrieved`, `annual` (true for an annual report) |
 | `provenance{}` | keyed by path (e.g. `treasury.cash`, `shares.classes[H].count`, `statements.years[FY2025].ni`, `stakes[Spotify].shares_held`): `basis`, `source`, `page`, `quote`, optional `quote_scale` and `quoted_values`, `verified.value_read` |
 | `shares` | `classes[]`, `period_end_count`, `period_end_date`, `dilutive`, `valuation_count`, `weighted_avg_basic`, `senior_instrument{classification, distribution}`, `ni_attributable`, `eps_basic`, `eps_dp`, `bvps`, `equity_attributable`, `dps`, `dividends_declared`, `published_market_caps[]`, `other_listing_prices[]`; with a depositary ratio also `count_basis` and `eps_basis` |
@@ -74,7 +74,7 @@ directly.
 | `treasury` | exactly the block `scenario_dcf.py` reads, plus `as_of` |
 | `statements.years[]` | one row per fiscal year: `fy`, `period_end`, `basis`, `source`, `revenue`, `op_profit`, `ni`, `da`, `capex`, `ocf`, `icf`, `cff`, `fx_effect`, `cash_begin`, `cash_end`, `pretax`, `tax`, `invested_capital`, `equity_begin`, `equity_end`, `dividends`, `buybacks`, `issuance`, `acquisitions`, `other_cash_uses`, `oci_and_other`, `equity_note`, `net_cash_end`, `shares_end`, `break_note`, `context_only` |
 | `statements.ytd`, `ytd_prior` | `label`, `months`, and the same flow lines; optional `ttm` if a TTM figure is stated anywhere |
-| `owner_earnings` | `components{FY: op_profit, non_operating, tax_rate, da, maintenance_capex, wc_adjustment}`, `maintenance_capex_basis`, `tax_rate_basis`, `non_operating_note`, `adjustments[]`, `value` — operating, pre-interest (`intrinsic-value.md` Method 1 Step 1) |
+| `owner_earnings` | `components{FY: op_profit, non_operating, tax_rate, da, maintenance_capex, wc_adjustment}`, `maintenance_capex_basis`, `tax_rate_basis`, `non_operating_note`, `adjustments[]`, `method` (`average`, `margin`, or `latest_margin` with `structural_cause{line, kind, reason, amount, window_start{period, value, source}, periods[]{period, value, prior_value, source}}`), `value` — operating, pre-interest (`intrinsic-value.md` Method 1 Step 1) |
 | `fx[]` | `from`, `to`, `rate`, `basis` (`fixing`), `date`, `source` |
 | `stakes[]` | `name`, `shares_held` (absolute count), `quote`, `quote_currency`, `quote_date`, `carrying_value`, `accounting` (`fair_value`/`equity_method`), `holder_filing` |
 | `notes{}` | reconciling notes keyed by check id |
@@ -112,7 +112,7 @@ own multi-year summary table) · `aggregator` · `computed` · `estimated`.
 | **D4** | Price (P1–P5) | no timestamp note; a source dated differently; quote older than 4 days without a vintage label; a 52-week range that excludes a price on file; a >10% move with one source and no event; no source within ±2% |
 | **D5** | Net cash | a treasury line missing; >5% from the issuer's own liquidity figure without reconciling items; cash and share count on different dates without a note |
 | **D6** | Statement articulation | cash does not roll forward; equity does not roll forward; an unexplained equity plug above 10% of profit; cumulative free cash flow ≠ distributions + acquisitions + change in net cash |
-| **D7** | Owner-earnings tie | operating profit or D&A ≠ its statement line; a net-income base or a stock-compensation add-back; maintenance capex above total capex or without a stated basis; tax rate without a basis or more than 5 points from the reported rate unexplained; financial items removed from operating profit without a note; the figure handed to the valuation ≠ the computed one; owner earnings >25% above average free cash flow without a note |
+| **D7** | Owner-earnings tie | operating profit or D&A ≠ its statement line; a net-income base or a stock-compensation add-back; maintenance capex above total capex or without a stated basis; tax rate without a basis or more than 5 points from the reported rate unexplained; financial items removed from operating profit without a note; the figure handed to the valuation ≠ the computed one; owner earnings >25% above average free cash flow without a note. **D7.structural** (method `latest_margin`): `meta.cyclical` true or not stated; no structural cause; the cause not a filed, quoted figure; `amount` ≠ the filed change over the window; fewer than the last two reported periods, or one moving the other way; the cause after tax explains less than half the gap between the two bases — each a CONFLICT |
 | **D8** | History | too few years for the scope; one of the latest three years not `filed`; an `aggregator`/`estimated` year not marked `context_only`; an unexplained jump in revenue (>+50% / <−30%) or share count (>±20%) |
 | **D9** | Matched windows | a year-to-date period with no prior-year window of the same length; a stated TTM that is not FY − prior YTD + YTD |
 | **D10** | FX | a rate that is not a dated official fixing; a missing pair; a fixing more than 7 days old without a note |
@@ -188,6 +188,13 @@ Tests: `python3 -m unittest discover -s scripts/tests`.
 ---
 
 ## Change log
+
+- **2026-11-11** — **D7.structural and the `latest_margin` method.** The structural cause's figures
+  are verdict-moving numbers (provenance, quote and second read required); the validation file
+  carries `derived.owner_earnings_alternative` (the three-year-margin basis), which `scenario_dcf.py`
+  values through to a second fair value. A cyclical (`meta.cyclical` true) cannot use it, and the flag
+  must be stated; `scenario_dcf.py` stops when its rate build's `risk.cyclical` disagrees with the
+  validated flag. Rule in `intrinsic-value.md` Method 1 Step 1.
 
 - **2026-11-10 (b)** — **Three outcomes replace pass / stop.** Every failed check is a GAP or a
   CONFLICT; the result is VERIFIED, QUALIFIED or UNRESOLVED. The analysis is always produced: gaps

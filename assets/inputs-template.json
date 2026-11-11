@@ -7,6 +7,7 @@
   "currency": "USD",
   "unit": "millions",
   "scope": "deep_dive",
+  "cyclical": false,
   "ads_ratio": null
  },
  "sources": [

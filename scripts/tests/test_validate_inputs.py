@@ -370,6 +370,154 @@ class OwnerEarnings(unittest.TestCase):
         self.assertEqual(run(d)[1]["D7.vs_fcf"], "GAP")
 
 
+def structural():
+    """clean() with a structural margin rise: a cost line (stock compensation) falls 100 -> 80 -> 60 over
+    FY2023-FY2025 and operating profit rises by the same amounts. Shaped on Zoom, 2026-11-10."""
+    d = clean()
+    lift = {"FY2024": 20.0, "FY2025": 40.0}
+    for y in d["statements"]["years"]:
+        y["op_profit"] = round(y["op_profit"] + lift.get(y["fy"], 0.0), 1)
+    oe = d["owner_earnings"]
+    for fy, c in oe["components"].items():
+        c["op_profit"] = next(y["op_profit"] for y in d["statements"]["years"] if y["fy"] == fy)
+    d["meta"]["cyclical"] = False
+    oe["method"] = "latest_margin"
+    oe["value"] = round(vi.oe_year(oe["components"]["FY2025"]), 2)
+    # the synthetic cash flow has no stock-compensation add-back, so cash sits below owner earnings here
+    d["notes"]["D7.vs_fcf"] = "fixture: operating cash flow omits the stock-compensation add-back"
+    oe["structural_cause"] = {
+        "line": "stock-based compensation expense", "kind": "cost",
+        "reason": "equity awards cut after the 2023 plan reset; expense falls each year in the filings",
+        "amount": -40.0,
+        "window_start": {"period": "FY2023", "value": 100.0, "source": "AR25"},
+        "periods": [{"period": "FY2025", "value": 60.0, "prior_value": 80.0, "source": "AR25"},
+                    {"period": "FY2024", "value": 80.0, "prior_value": 100.0, "source": "AR25"}]}
+    return with_provenance(d)
+
+
+def three_year_margin(d):
+    rev = {y["fy"]: y["revenue"] for y in d["statements"]["years"]}
+    comps = d["owner_earnings"]["components"]
+    return rev["FY2025"] * sum(vi.oe_year(c) / rev[fy] for fy, c in comps.items()) / len(comps)
+
+
+class StructuralMargin(unittest.TestCase):
+    """method 'latest_margin': the latest year's margin replaces the three-year average only with a
+    quantified, persistent, filed cause; both bases print (intrinsic-value.md Method 1 Step 1, rule 6)."""
+
+    def test_passes_with_a_quantified_persistent_cause(self):
+        d = structural()
+        res, st = run(d)
+        self.assertEqual(res["status"], "VERIFIED", [r for r in res["checks"] if r["status"] in ("GAP", "CONFLICT")])
+        self.assertEqual(st["D7"], "PASS")
+        self.assertEqual(st["D7.structural"], "PASS")
+        der = res["derived"]
+        self.assertAlmostEqual(der["owner_earnings"], vi.oe_year(d["owner_earnings"]["components"]["FY2025"]), places=1)
+        alt = der["owner_earnings_alternative"]
+        self.assertEqual(alt["basis"], "three-year average margin")
+        self.assertAlmostEqual(alt["value"], three_year_margin(d), places=1)
+        self.assertLess(alt["value"], der["owner_earnings"])
+
+    def test_no_cause_fails_the_gate(self):
+        d = structural()
+        del d["owner_earnings"]["structural_cause"]
+        res, st = run(d)
+        self.assertEqual(st["D7.structural"], "CONFLICT")
+        self.assertEqual(res["status"], "UNRESOLVED")
+
+    def test_cause_needs_a_reason(self):
+        d = structural()
+        d["owner_earnings"]["structural_cause"]["reason"] = ""
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_cause_must_be_a_figure_not_a_narrative(self):
+        d = structural()
+        del d["owner_earnings"]["structural_cause"]["amount"]
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_amount_must_equal_the_filed_change_over_the_window(self):
+        d = structural()
+        d["owner_earnings"]["structural_cause"]["amount"] = -55.0      # not 60 - 100
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_window_start_must_be_the_first_component_year(self):
+        d = structural()
+        d["owner_earnings"]["structural_cause"]["window_start"]["period"] = "FY2024"
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_cause_must_show_in_two_periods(self):
+        d = structural()
+        d["owner_earnings"]["structural_cause"]["periods"].pop()
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_every_period_must_move_the_same_way(self):
+        d = structural()
+        d["owner_earnings"]["structural_cause"]["periods"][1].update(value=100.0, prior_value=80.0)  # cost rose
+        d = with_provenance(d)
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_periods_must_include_the_latest_full_year(self):
+        d = structural()
+        d["owner_earnings"]["structural_cause"]["periods"][0]["period"] = "FY2022"
+        d = with_provenance(d)
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_a_later_interim_period_must_be_one_of_the_two(self):
+        d = structural()
+        d["statements"]["ytd"] = {"label": "H1 FY2026", "months": 6, "revenue": 800.0, "op_profit": 140.0,
+                                  "ni": 80.0, "ocf": 90.0, "capex": 30.0}
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")       # FY2024 is no longer one of the last two
+        d["owner_earnings"]["structural_cause"]["periods"][1] = {"period": "H1 FY2026", "value": 25.0,
+                                                                 "prior_value": 35.0, "source": "AR25"}
+        d = with_provenance(d)
+        self.assertEqual(run(d)[1]["D7.structural"], "PASS")
+
+    def test_cause_must_explain_most_of_the_shift(self):
+        d = structural()
+        sc = d["owner_earnings"]["structural_cause"]
+        sc["amount"], sc["window_start"]["value"] = -4.0, 64.0          # a real but small fall: 64 -> 60
+        sc["periods"] = [{"period": "FY2025", "value": 60.0, "prior_value": 62.0, "source": "AR25"},
+                         {"period": "FY2024", "value": 62.0, "prior_value": 64.0, "source": "AR25"}]
+        d = with_provenance(d)
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_only_the_latest_years_actual_margin(self):
+        d = structural()
+        comps = d["owner_earnings"]["components"]
+        d["owner_earnings"]["value"] = round((vi.oe_year(comps["FY2025"]) + vi.oe_year(comps["FY2024"])) / 2, 2)
+        self.assertEqual(run(d)[1]["D7"], "CONFLICT")
+
+    def test_cause_figures_need_filed_quotes(self):
+        d = structural()
+        del d["provenance"]["owner_earnings.structural_cause.periods[FY2024].value"]
+        self.assertEqual(run(d)[1]["D1"], "GAP")
+        d = structural()
+        d["provenance"]["owner_earnings.structural_cause.window_start.value"]["quote"] = "line item 999"
+        self.assertEqual(run(d)[1]["D1"], "CONFLICT")
+
+    def test_cyclical_business_cannot_use_the_exception(self):
+        d = structural()
+        d["meta"]["cyclical"] = True              # a cyclical's margin rise is the cycle: mid-cycle rule governs
+        res, st = run(d)
+        self.assertEqual(st["D7.structural"], "CONFLICT")
+        self.assertEqual(res["status"], "UNRESOLVED")
+
+    def test_cyclical_flag_must_be_stated(self):
+        d = structural()
+        del d["meta"]["cyclical"]                 # silence is not "not cyclical"
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+        d["meta"]["cyclical"] = "no"              # a yes/no answer, not text
+        self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
+
+    def test_flag_not_required_for_other_methods(self):
+        d = clean()
+        d["meta"].pop("cyclical", None)
+        self.assertEqual(run(d)[0]["status"], "VERIFIED")
+
+    def test_other_methods_have_no_alternative(self):
+        self.assertIsNone(run(clean())[0]["derived"]["owner_earnings_alternative"])
+
+
 class History(unittest.TestCase):
     def test_latest_years_must_be_filed(self):
         d = clean()
@@ -540,6 +688,38 @@ class DcfGate(unittest.TestCase):
         self.cfg["scenarios"][0]["tg"] = 0.0
         b = json.loads(self.dcf().stdout)["scenarios"][0]["value_per_share"]
         self.assertAlmostEqual(a, b, delta=0.025 * b)       # only the first year's 2% step remains
+
+    def test_latest_margin_prints_both_bases_through_to_fair_value(self):
+        self.data = structural()
+        self.write_inputs()
+        self.assertEqual(self.validate().returncode, 0)
+        der = vi.validate(self.data)["derived"]
+        self.cfg["owner_earnings"] = der["owner_earnings"]
+        self.cfg["scenarios"] = [{"name": "Bear", "g1": 0.02, "g2": 0.02, "tg": 0.02, "p": 0.4},
+                                 {"name": "Base", "g1": 0.05, "g2": 0.03, "tg": 0.02, "p": 0.6}]
+        r = self.dcf()
+        self.assertEqual(r.returncode, 0, r.stderr)
+        out = json.loads(r.stdout)
+        alt = out["alternative_basis"]
+        self.assertEqual(alt["basis"], "three-year average margin")
+        self.assertAlmostEqual(alt["owner_earnings"], der["owner_earnings_alternative"]["value"], places=2)
+        for k in ("fair_value", "fair_value_mos_pct", "weighted_iv", "implied_return_pct"):
+            self.assertIn(k, alt)
+        self.assertEqual([s["name"] for s in alt["scenarios"]], ["Bear", "Base"])
+        self.assertLess(alt["fair_value"], out["fair_value"])
+        self.assertTrue(any("three-year average margin" in w for w in out["warnings"]))
+
+    def test_rate_build_cannot_contradict_the_validated_cyclical_flag(self):
+        self.data = structural()
+        self.write_inputs()
+        self.validate()
+        self.cfg["owner_earnings"] = vi.validate(self.data)["derived"]["owner_earnings"]
+        self.cfg["risk"] = {"op_profit_declines": 0, "moat": "narrow", "net_debt_ebitda": 0.0, "cyclical": True}
+        r = self.dcf()
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("cyclical", r.stderr)
+        self.cfg["risk"]["cyclical"] = False
+        self.assertEqual(self.dcf().returncode, 0)
 
     def test_net_cash_is_counted_once(self):
         out = json.loads(self.dcf().stdout)

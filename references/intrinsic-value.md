@@ -59,6 +59,32 @@ Rules — each is enforced by `scripts/validate_inputs.py` (D7):
    three-year average of the amounts understates a growing business and overstates a shrinking one;
    use it only where revenue moved less than 10% over the window. **Cyclicals use mid-cycle**
    (below). TTM alone is never the base.
+
+   **Exception — a structural margin shift** (`"method": "latest_margin"`, adopted 2026-11-11).
+   The latest full year's *actual* owner-earnings margin may replace the three-year average — no
+   other margin (not a forecast, not a two-year average, not an interim run-rate) — only when all of
+   these hold. Each is enforced by `validate_inputs.py` (check D7.structural); a failure makes the
+   data UNRESOLVED, so a latest-margin figure without its cause can never reach a fair value.
+
+   - **Quantified from the filings.** Name the income-statement line that moved (`kind`: cost or
+     income) and give its value for the first year of the window and for the latest full year, each
+     quoted from a filing with a second read. `amount` must equal the filed change. A narrative
+     reason is required too, but it is never the evidence.
+   - **Persistent.** The line moved the margin the same way in at least the **last two reported
+     periods**, each against the same window a year earlier: the latest full year, and the latest
+     interim period if one is in the inputs file (otherwise the year before).
+   - **It explains the shift.** The cause after tax explains at least half of the gap between the
+     latest-margin and three-year-margin owner earnings.
+   - **Both bases print through to fair value.** The three-year-margin basis runs through the same
+     scenarios (`alternative_basis` in `scenario_dcf.py`): scenario values, weighted value, fair
+     value, margin of safety and implied return, beside the headline in every deliverable.
+
+   **Not for cyclicals** — a margin rise in a cyclical is the cycle until shown otherwise, and the
+   mid-cycle rule governs. Enforced: `meta.cyclical` must be stated in the inputs file, true makes
+   `latest_margin` a CONFLICT, and `scenario_dcf.py` stops if the rate build's cyclical flag (Step 3b)
+   disagrees with it. *Case: Zoom, 2026-11-11 — stock compensation $1,057m (FY24) → $761m
+   (FY26), still falling in H1 FY27 ($359m vs $390m); after tax it explains $228m of a $272m gap;
+   fair value $66.65 on the latest margin, $56.74 on the three-year margin.*
 7. **Cross-check against cash:** owner earnings more than 25% above average free cash flow over the
    same years needs an explanation (growth capex, working-capital build).
 
@@ -806,6 +832,14 @@ Particularly common share-count errors:
 ---
 
 ## Change Log
+
+- **2026-11-11** — **Structural-margin exception to the three-year margin rule (Method 1 Step 1,
+  rule 6).** `"method": "latest_margin"` uses the latest full year's actual margin only with a
+  filed, quantified cause that shows in the last two reported periods and explains at least half the
+  gap; both bases print through to fair value; not available to cyclicals (`meta.cyclical`, enforced).
+  Enforced by `validate_inputs.py` D7.structural and
+  `scenario_dcf.py` `alternative_basis`. Derivation: the Zoom pilot (2026-11-10), where the
+  three-year average valued a 23% margin business on 13.6% after stock compensation fell ~$300m.
 
 - **2026-11-10** — **Method 1 rebuilt on operating owner earnings; growth charged for reinvestment;
   one headline fair value.** (1) Owner earnings start from operating profit after normal tax, not

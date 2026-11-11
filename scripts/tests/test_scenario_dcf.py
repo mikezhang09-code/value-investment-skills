@@ -71,5 +71,16 @@ class BridgeItemsReachEveryPerShareFigure(unittest.TestCase):
         self.moved(["legacy_method_base", "value_per_share"])
 
 
+class AlternativeBasis(unittest.TestCase):
+    def test_illustrative_run_can_print_a_second_basis(self):
+        cfg = config([])
+        cfg["alternative_owner_earnings"] = {"basis": "three-year average margin", "value": 80.0}
+        out = run(cfg)
+        self.assertLess(out["alternative_basis"]["fair_value"], out["fair_value"])
+
+    def test_no_second_basis_unless_given(self):
+        self.assertNotIn("alternative_basis", run(config([])))
+
+
 if __name__ == "__main__":
     unittest.main()
