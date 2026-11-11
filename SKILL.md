@@ -715,8 +715,8 @@ cross-checks, never averaged in** (`references/intrinsic-value.md` "Fair Value")
 2. **Growth is charged for:** each year reinvests g ÷ RONIC (read from measured ROIC); the terminal
    year reinvests tg ÷ terminal RONIC, set by moat class (r / r+2 / r+4).
 3. **The earnings base is latest revenue × the three-year average margin.** Cyclicals use a
-   mid-cycle margin instead, never the latest year. State `meta.cyclical` in the inputs file; the
-   rate build's cyclical flag must agree with it.
+   mid-cycle margin instead, never the latest year. Every inputs file states `meta.cyclical` (check
+   D7.cyclical: missing is a GAP); the rate build's cyclical flag must agree with it.
 4. **The latest year's margin replaces the three-year average only for a proven structural shift**
    (`"method": "latest_margin"`, adopted 2026-11-11). The cause must be a filed, quoted
    income-statement line that moved the margin the same way in the last two reported periods and,
@@ -1043,6 +1043,10 @@ Read these when needed — don't load all at once:
 ---
 
 ## Change Log
+
+- **2026-11-11 (b)** — **`meta.cyclical` required for every name** (Step 6 rule 3). The validator's new
+  check D7.cyclical makes a missing flag a GAP (QUALIFIED) under any method, so the rate build's
+  cyclical flag can be checked against it on every run.
 
 - **2026-11-11** — **Structural-margin exception added to Step 6** (rule 4): the latest year's
   margin may replace the three-year average only with a filed cause that persists over two reported

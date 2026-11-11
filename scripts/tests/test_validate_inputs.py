@@ -42,6 +42,7 @@ def clean():
     oe = sum(vi.oe_year(c) for c in comps.values()) / 3
     data = {
         "meta": {"ticker": "TEST", "listing": "NYSE", "analysis_date": "2026-11-10", "fiscal_year_end": "12-31",
+                 "cyclical": False,
                  "currency": "USD", "unit": "millions", "scope": "deep_dive", "ads_ratio": None},
         "sources": [{"id": "AR25", "tier": "filing", "annual": True, "doc": "FY2025 annual report",
                      "url": "https://example.invalid/ar25.pdf", "period": "FY2025", "retrieved": "2026-11-10"}],
@@ -509,10 +510,48 @@ class StructuralMargin(unittest.TestCase):
         d["meta"]["cyclical"] = "no"              # a yes/no answer, not text
         self.assertEqual(run(d)[1]["D7.structural"], "CONFLICT")
 
-    def test_flag_not_required_for_other_methods(self):
+    def test_missing_flag_is_not_reported_twice(self):
+        d = structural()
+        del d["meta"]["cyclical"]                 # D7.structural already makes it a CONFLICT
+        self.assertNotIn("D7.cyclical", {k for k, v in run(d)[1].items() if v == "GAP"})
+
+
+class CyclicalFlag(unittest.TestCase):
+    """meta.cyclical is stated for every name (data-inputs.md D7): it decides the earnings base and the
+    Step 3b rate add-on, and scenario_dcf.py checks the rate build against it."""
+
+    def test_stated_false_passes(self):
+        res, st = run(clean())
+        self.assertEqual(st["D7.cyclical"], "PASS")
+        self.assertEqual(res["status"], "VERIFIED")
+        self.assertIs(res["derived"]["cyclical"], False)
+
+    def test_missing_flag_is_a_gap_for_every_method(self):
+        for method in ("average", "margin"):
+            d = clean()
+            d["owner_earnings"]["method"] = method
+            if method == "margin":
+                comps = d["owner_earnings"]["components"]
+                by_fy = {y["fy"]: y for y in d["statements"]["years"]}
+                d["owner_earnings"]["value"] = round(vi.margin_basis(comps, by_fy, d["statements"]["years"][-1]["revenue"]), 4)
+            del d["meta"]["cyclical"]
+            res, st = run(d)
+            self.assertEqual(st["D7.cyclical"], "GAP", method)
+            self.assertEqual(res["status"], "QUALIFIED", method)
+            self.assertIsNone(res["derived"]["cyclical"])
+
+    def test_text_is_not_an_answer(self):
         d = clean()
-        d["meta"].pop("cyclical", None)
-        self.assertEqual(run(d)[0]["status"], "VERIFIED")
+        d["meta"]["cyclical"] = "no"
+        self.assertEqual(run(d)[1]["D7.cyclical"], "GAP")
+
+    def test_cyclical_true_is_flagged_not_failed(self):
+        d = clean()
+        d["meta"]["cyclical"] = True              # allowed outside latest_margin, but the base must be mid-cycle
+        res, st = run(d)
+        self.assertEqual(st["D7.cyclical"], "FLAG")
+        self.assertEqual(res["status"], "VERIFIED")
+        self.assertIs(res["derived"]["cyclical"], True)
 
     def test_other_methods_have_no_alternative(self):
         self.assertIsNone(run(clean())[0]["derived"]["owner_earnings_alternative"])

@@ -66,7 +66,7 @@ directly.
 
 | Block | Holds |
 |---|---|
-| `meta` | `ticker`, `listing`, `analysis_date`, `fiscal_year_end`, `currency`, `unit` (`units`/`thousands`/`millions`/`billions`), `scope` (`deep_dive`/`quick`/`refresh`/`earnings`), `ads_ratio` (ordinary shares per depositary share, else null), `is_depositary`, `cyclical` (true/false — autos, semiconductors, batteries, materials, shipping, airlines; required for `latest_margin`, and `scenario_dcf.py` stops if its `risk.cyclical` disagrees) |
+| `meta` | `ticker`, `listing`, `analysis_date`, `fiscal_year_end`, `currency`, `unit` (`units`/`thousands`/`millions`/`billions`), `scope` (`deep_dive`/`quick`/`refresh`/`earnings`), `ads_ratio` (ordinary shares per depositary share, else null), `is_depositary`, `cyclical` (true/false, **required for every name** — autos, semiconductors, batteries, materials, shipping, airlines are cyclical; `scenario_dcf.py` stops if its `risk.cyclical` disagrees) |
 | `sources[]` | `id`, `tier`, `doc`, `url`, `period`, `retrieved`, `annual` (true for an annual report) |
 | `provenance{}` | keyed by path (e.g. `treasury.cash`, `shares.classes[H].count`, `statements.years[FY2025].ni`, `stakes[Spotify].shares_held`): `basis`, `source`, `page`, `quote`, optional `quote_scale` and `quoted_values`, `verified.value_read` |
 | `shares` | `classes[]`, `period_end_count`, `period_end_date`, `dilutive`, `valuation_count`, `weighted_avg_basic`, `senior_instrument{classification, distribution}`, `ni_attributable`, `eps_basic`, `eps_dp`, `bvps`, `equity_attributable`, `dps`, `dividends_declared`, `published_market_caps[]`, `other_listing_prices[]`; with a depositary ratio also `count_basis` and `eps_basis` |
@@ -112,7 +112,7 @@ own multi-year summary table) · `aggregator` · `computed` · `estimated`.
 | **D4** | Price (P1–P5) | no timestamp note; a source dated differently; quote older than 4 days without a vintage label; a 52-week range that excludes a price on file; a >10% move with one source and no event; no source within ±2% |
 | **D5** | Net cash | a treasury line missing; >5% from the issuer's own liquidity figure without reconciling items; cash and share count on different dates without a note |
 | **D6** | Statement articulation | cash does not roll forward; equity does not roll forward; an unexplained equity plug above 10% of profit; cumulative free cash flow ≠ distributions + acquisitions + change in net cash |
-| **D7** | Owner-earnings tie | operating profit or D&A ≠ its statement line; a net-income base or a stock-compensation add-back; maintenance capex above total capex or without a stated basis; tax rate without a basis or more than 5 points from the reported rate unexplained; financial items removed from operating profit without a note; the figure handed to the valuation ≠ the computed one; owner earnings >25% above average free cash flow without a note. **D7.structural** (method `latest_margin`): `meta.cyclical` true or not stated; no structural cause; the cause not a filed, quoted figure; `amount` ≠ the filed change over the window; fewer than the last two reported periods, or one moving the other way; the cause after tax explains less than half the gap between the two bases — each a CONFLICT |
+| **D7** | Owner-earnings tie | operating profit or D&A ≠ its statement line; a net-income base or a stock-compensation add-back; maintenance capex above total capex or without a stated basis; tax rate without a basis or more than 5 points from the reported rate unexplained; financial items removed from operating profit without a note; the figure handed to the valuation ≠ the computed one; owner earnings >25% above average free cash flow without a note. **D7.cyclical**: `meta.cyclical` not stated as true or false — a GAP (true is a FLAG: the base must be mid-cycle). **D7.structural** (method `latest_margin`): `meta.cyclical` true or not stated; no structural cause; the cause not a filed, quoted figure; `amount` ≠ the filed change over the window; fewer than the last two reported periods, or one moving the other way; the cause after tax explains less than half the gap between the two bases — each a CONFLICT |
 | **D8** | History | too few years for the scope; one of the latest three years not `filed`; an `aggregator`/`estimated` year not marked `context_only`; an unexplained jump in revenue (>+50% / <−30%) or share count (>±20%) |
 | **D9** | Matched windows | a year-to-date period with no prior-year window of the same length; a stated TTM that is not FY − prior YTD + YTD |
 | **D10** | FX | a rate that is not a dated official fixing; a missing pair; a fixing more than 7 days old without a note |
@@ -188,6 +188,11 @@ Tests: `python3 -m unittest discover -s scripts/tests`.
 ---
 
 ## Change log
+
+- **2026-11-11 (b)** — **D7.cyclical: `meta.cyclical` required for every name.** Not stated (or not
+  true/false) is a GAP under `average` and `margin`; under `latest_margin` it stays a CONFLICT in
+  D7.structural and is not reported twice. True is a FLAG reminding that the base must be mid-cycle.
+  Every validated run can now be checked against its rate build's cyclical flag.
 
 - **2026-11-11** — **D7.structural and the `latest_margin` method.** The structural cause's figures
   are verdict-moving numbers (provenance, quote and second read required); the validation file

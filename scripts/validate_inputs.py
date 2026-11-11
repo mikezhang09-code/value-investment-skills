@@ -790,6 +790,22 @@ def check_structural_cause(data, rep, comps, by_fy):
                                    f"three-year-margin basis {three_year:,.6g} printed beside it")
 
 
+def check_cyclical(data, rep):
+    """meta.cyclical is stated for every name: it decides the earnings base (mid-cycle for a cyclical) and the
+    Step 3b rate add-on, and scenario_dcf.py checks the rate build against it (intrinsic-value.md Method 1)."""
+    cyc = data.get("meta", {}).get("cyclical")
+    method = (data.get("owner_earnings") or {}).get("method", "average")
+    if cyc is True:
+        rep.add("D7.cyclical", "FLAG", "meta.cyclical is true: owner earnings must rest on a mid-cycle base (at least "
+                                        "7 years with a down year), and the rate build carries the +1.0 cyclical add-on")
+    elif cyc is False:
+        rep.add("D7.cyclical", "PASS", "meta.cyclical stated: not cyclical")
+    elif method != "latest_margin":           # under latest_margin, D7.structural already makes this a CONFLICT
+        rep.add("D7.cyclical", "GAP", "meta.cyclical must be stated as true or false (autos, semiconductors, "
+                                       "batteries, materials, shipping, airlines are cyclical): it sets the earnings "
+                                       "base and the rate build is checked against it")
+
+
 def measured_roic(data, usable):
     """Average and incremental return on invested capital over the usable years, where each year carries
     'invested_capital'. Feeds the RONIC choice in the valuation (intrinsic-value.md Method 1 Step 2b)."""
@@ -915,6 +931,7 @@ def validate(data, stage="final"):
     usable = check_history(data, rep)
     check_articulation(data, rep)
     oe, oe_alt = check_owner_earnings(data, rep, usable)
+    check_cyclical(data, rep)
     windows = check_windows(data, rep)
     check_fx(data, rep)
     check_stakes(data, rep)

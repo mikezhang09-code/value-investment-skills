@@ -80,7 +80,7 @@ Rules — each is enforced by `scripts/validate_inputs.py` (D7):
      value, margin of safety and implied return, beside the headline in every deliverable.
 
    **Not for cyclicals** — a margin rise in a cyclical is the cycle until shown otherwise, and the
-   mid-cycle rule governs. Enforced: `meta.cyclical` must be stated in the inputs file, true makes
+   mid-cycle rule governs. Enforced: `meta.cyclical` must be stated for every name (check D7.cyclical: missing is a GAP), true makes
    `latest_margin` a CONFLICT, and `scenario_dcf.py` stops if the rate build's cyclical flag (Step 3b)
    disagrees with it. *Case: Zoom, 2026-11-11 — stock compensation $1,057m (FY24) → $761m
    (FY26), still falling in H1 FY27 ($359m vs $390m); after tax it explains $228m of a $272m gap;
@@ -89,7 +89,8 @@ Rules — each is enforced by `scripts/validate_inputs.py` (D7):
    same years needs an explanation (growth capex, working-capital build).
 
 **Mid-cycle base for cyclical and capital-heavy businesses** (autos, semiconductors, batteries,
-materials, shipping, airlines — the same list that carries the Step 3b cyclical flag):
+materials, shipping, airlines — the same list that carries the Step 3b cyclical flag). Every inputs file
+states `meta.cyclical`; true is flagged by the validator as a reminder that this base applies:
 
 ```
 Mid-cycle owner earnings = normal revenue × mid-cycle operating margin × (1 − tax) + D&A − maintenance capex
@@ -832,6 +833,10 @@ Particularly common share-count errors:
 ---
 
 ## Change Log
+
+- **2026-11-11 (b)** — **`meta.cyclical` required for every name** (validator check D7.cyclical: not
+  stated is a GAP; true is a FLAG that the mid-cycle base applies). The rate build's cyclical flag is
+  checked against it on every validated run, not only under `latest_margin`.
 
 - **2026-11-11** — **Structural-margin exception to the three-year margin rule (Method 1 Step 1,
   rule 6).** `"method": "latest_margin"` uses the latest full year's actual margin only with a
