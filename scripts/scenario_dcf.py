@@ -388,7 +388,8 @@ def main(path, illustrative=False, reading=None):
                 and not epv.get("excess_cash_reason"):
             warnings.append("epv excess_cash - total_debt differs from treasury net cash: state "
                             "epv.excess_cash_reason (e.g. operating cash held back) or align (Check 21 R4)")
-        equity = epv["after_tax_operating_earnings"] / r + epv["excess_cash"] - epv["total_debt"]
+        # Bridge items (stakes, minorities) belong in every per-share figure, as in zero_growth_oe_value.
+        equity = epv["after_tax_operating_earnings"] / r + epv["excess_cash"] - epv["total_debt"] + bridge
         out["epv_per_share"] = round(equity / sh, 2)
     else:
         out["epv_per_share"] = None
@@ -432,7 +433,7 @@ def main(path, illustrative=False, reading=None):
             cash *= 1 + (base["g1"] if year <= 5 else base["g2"])
             pv += cash / (1 + r) ** year
         tvl = cash * (1 + base["tg"]) / (r - base["tg"]) / (1 + r) ** 10
-        out["legacy_method_base"] = {"value_per_share": round((pv + tvl - nd) / sh, 2),
+        out["legacy_method_base"] = {"value_per_share": round((pv + tvl - nd + bridge) / sh, 2),
                                      "note": "pre-2026-11-10 method: net-income-based owner earnings, growth free, "
                                              "net debt deducted again. For the transition comparison only"}
 
